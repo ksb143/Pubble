@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: pubble
+#  config:
+#    import: optional:classpath:env.yml
+
+  datasource:
+    url: ENC(rWYclDMbGAznbF3MQ0DFsrHDHKaaiIYG4HYCl7M81YxK1SXW1nkwc7qEN1pGRh02)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ENC(mCoXDUfo7pgBQiB1UgTEsQ==)
+    password: ENC(ebSdgNbER/IlSSpsoLo0LjXXgGjBobLw)
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        show_sql: false
+        format_sql: true
+        default_batch_fetch_size: 100
+
+#  jwt:
+#    secret: ENC(Pp9CaGQlCpY/MbkzMiTF4Vcy/gCJ1lUdhsgWLmPlmzVdtVYN42ed4BTR3200vJCk2mHqEMCDCbeCTGL+fyIEGYVihho21TQwAnLJLmuOil6O2oBUBgSpBQ==)
+
+
+springdoc:
+  swagger-ui:
+    path: /v3/api-docs
