@@ -5,22 +5,25 @@ spring:
 #    import: optional:classpath:env.yml
 
   datasource:
-    url: ENC(rWYclDMbGAznbF3MQ0DFsrHDHKaaiIYG4HYCl7M81YxK1SXW1nkwc7qEN1pGRh02)
+    url: ENC(0hLtFdesYA5girnxXcLNrcCSYe2hdtJDUGA23oyocolm1E/PbLdkk8/FQpglOtR110JWzKpX5TEtmWinSDxPMD6Ljv6buX6Wr0tifLoQZY/g3FrAH1WIMOtK2XtwkFXO)
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(mCoXDUfo7pgBQiB1UgTEsQ==)
     password: ENC(ebSdgNbER/IlSSpsoLo0LjXXgGjBobLw)
 
+
   jpa:
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
         show_sql: false
         format_sql: true
         default_batch_fetch_size: 100
 
-#  jwt:
-#    secret: ENC(Pp9CaGQlCpY/MbkzMiTF4Vcy/gCJ1lUdhsgWLmPlmzVdtVYN42ed4BTR3200vJCk2mHqEMCDCbeCTGL+fyIEGYVihho21TQwAnLJLmuOil6O2oBUBgSpBQ==)
+  jwt:
+    secret: ENC(Pp9CaGQlCpY/MbkzMiTF4Vcy/gCJ1lUdhsgWLmPlmzVdtVYN42ed4BTR3200vJCk2mHqEMCDCbeCTGL+fyIEGYVihho21TQwAnLJLmuOil6O2oBUBgSpBQ==)
 
 
 springdoc:

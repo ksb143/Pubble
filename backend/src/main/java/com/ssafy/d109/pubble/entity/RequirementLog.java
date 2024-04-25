@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "requirement_log")
+@Table(name = "requirementLog")
 public class RequirementLog {
 
     @Id
@@ -21,28 +21,28 @@ public class RequirementLog {
     @Column(name = "logId")
     private Integer logId;
 
-    @Column(name = "changed_at")
+    @Column(name = "changedAt")
     private LocalDateTime changedAt;
 
-    @Column(name = "old_version")
+    @Column(name = "oldVersion")
     private String oldVersion;
 
-    @Column(name = "new_version")
+    @Column(name = "newVersion")
     private String newVersion;
 
-    @Column(name = "old_status")
+    @Column(name = "oldStatus")
     private String oldStatus;
 
-    @Column(name = "new_status")
+    @Column(name = "newStatus")
     private String newStatus;
 
-    @Column(name = "old_detail")
+    @Column(name = "oldDetail")
     private String oldDetail;
 
-    @Column(name = "new_detail")
+    @Column(name = "newDetail")
     private String newDetail;
 
-    @Column(name = "changed_summary")
+    @Column(name = "changedSummary")
     private String changedSummary;
 
 

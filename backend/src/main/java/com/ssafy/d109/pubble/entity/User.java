@@ -3,11 +3,15 @@ package com.ssafy.d109.pubble.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
+import java.util.Set;
+
 @Entity
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "user")
@@ -21,10 +25,10 @@ public class User {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "employeeId", unique = true)
-    private Integer employeeId;
+;    @Column(name = "employeeId", unique = true)
+    private String employeeId;
 
-    @Column(name = "delete_yn")
+    @Column(name = "deleteYN")
     private String deleteYN;
 
     @Column(name = "department")
@@ -38,6 +42,13 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "isApprovable")
+    private String isApprovable;
+
+    public Set<String> getRoles() {
+        return Set.of(this.role);
+    }
 
 
 }

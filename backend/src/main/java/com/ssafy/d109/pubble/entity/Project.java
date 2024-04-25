@@ -19,10 +19,10 @@ public class Project {
     @Column(name = "projectId")
     private Integer projectId;
 
-    @Column(name = "project_title")
+    @Column(name = "projectTitle")
     private String projectTitle;
 
-    @Column(name = "created_at")
+    @Column(name = "createdAt")
     private LocalDateTime createdAt;
 
     // 연관 관계
