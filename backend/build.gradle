@@ -33,11 +33,12 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
-//	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-//	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
-//	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
 	implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:2.1.2'
+
 }
 
 tasks.named('test') {

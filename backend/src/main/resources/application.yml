@@ -1,8 +1,9 @@
+server:
+  port: 9091
+
 spring:
   application:
     name: pubble
-#  config:
-#    import: optional:classpath:env.yml
 
   datasource:
     url: ENC(rWYclDMbGAznbF3MQ0DFsrHDHKaaiIYG4HYCl7M81YxK1SXW1nkwc7qEN1pGRh02)
@@ -18,10 +19,6 @@ spring:
         show_sql: false
         format_sql: true
         default_batch_fetch_size: 100
-
-#  jwt:
-#    secret: ENC(Pp9CaGQlCpY/MbkzMiTF4Vcy/gCJ1lUdhsgWLmPlmzVdtVYN42ed4BTR3200vJCk2mHqEMCDCbeCTGL+fyIEGYVihho21TQwAnLJLmuOil6O2oBUBgSpBQ==)
-
 
 springdoc:
   swagger-ui:
