@@ -17,11 +17,11 @@ public class CommonUtil {
     public User getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String employeeId = authentication.getName();
-        User currentUser = userRepository.findByEmployeeId(employeeId)
-                .orElseThrow(UserNotFoundException::new);
 
         // 비활성화된 유저인지 검증 로직 작성 예정
 
-        return currentUser;
+
+        return userRepository.findByEmployeeId(employeeId)
+                .orElseThrow(UserNotFoundException::new);
     }
 }

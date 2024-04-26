@@ -42,15 +42,23 @@ public class JWTUtil {
         return user.getRole();
     }
 
-    public String createJwt(String employeeId, String role, Long expiredMs) {
+    public String createJwt(String category, String employeeId, String role, Long expiredMs) {
+
+        User user = userRepository.findByEmployeeId(employeeId).orElseThrow(UserNotFoundException::new);
+        String r = user.getRole();
 
         return Jwts.builder()
+                .claim("category", category)
                 .claim("employeeId", employeeId)
-                .claim("role", role)
+                .claim("role", r)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
 }

@@ -3,10 +3,12 @@ package com.ssafy.d109.pubble.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "refreshToken")
@@ -17,7 +19,7 @@ public class RefreshToken {
     @Column(name = "refreshId")
     private Integer refreshId;
 
-    private Integer userId;
+    private String employeeId;
     private String refreshToken;
     private String expiration;
 

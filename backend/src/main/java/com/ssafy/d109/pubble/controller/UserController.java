@@ -1,12 +1,13 @@
 package com.ssafy.d109.pubble.controller;
 
 
-import com.ssafy.d109.pubble.dto.request.UserSignInRequestDto;
-import com.ssafy.d109.pubble.dto.response.UserSignInResponseDto;
-import com.ssafy.d109.pubble.security.filter.LoginFilter;
+import com.ssafy.d109.pubble.dto.requestDto.UserSignInRequestDto;
+import com.ssafy.d109.pubble.dto.responseDto.UserSignInResponseDto;
 import com.ssafy.d109.pubble.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,10 +25,12 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<UserSignInResponseDto> login(@RequestBody UserSignInRequestDto dto) {
+    public ResponseEntity<UserSignInResponseDto> login(HttpServletRequest request, @RequestBody UserSignInRequestDto dto) {
 
-        String employeeId = dto.getEmployeeId();
-        String password = dto.getPassword();
+//        String employeeId = dto.getEmployeeId();
+//        String password = dto.getPassword();
+
+//        String accessToken = (String) request.getAttribute("accessToken");
 
 
 

@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.dto.request;
+package com.ssafy.d109.pubble.dto.requestDto;
 
 import lombok.Getter;
 import lombok.Setter;
