@@ -35,3 +35,15 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+.idea/
+.vscode/
+
+## 환경변수 설정 파일 추가 ##
+*.env*
+*.pem
+venv/
+
+##  ##
+docker-compose/mysql_data/**
