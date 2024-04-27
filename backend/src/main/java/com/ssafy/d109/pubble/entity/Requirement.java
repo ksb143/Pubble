@@ -23,7 +23,7 @@ public class Requirement {
     @Column(name = "version")
     private String version;
 
-    @Column(name = "requirement_name")
+    @Column(name = "requirementName")
     private String requirementName;
 
     @Column(name = "detail")
@@ -32,16 +32,16 @@ public class Requirement {
     @Column(name = "code")
     private String code;
 
-    @Column(name = "created_at")
+    @Column(name = "createdAt")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updatedAt")
     private LocalDateTime updatedAt;
 
     @Column(name = "approval")
     private String approval;
 
-    @Column(name = "hold_message")
+    @Column(name = "holdMessage")
     private String holdMessage;
 
 
