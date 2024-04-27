@@ -1,6 +1,7 @@
 package com.ssafy.d109.pubble.config;
 
 import com.ssafy.d109.pubble.repository.RefreshTokenRepository;
+import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.security.filter.JWTFilter;
 import com.ssafy.d109.pubble.security.filter.LoginFilter;
 import com.ssafy.d109.pubble.security.jwt.JWTUtil;
@@ -29,12 +30,14 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private RefreshTokenRepository refreshTokenRepository;
+    private final UserRepository userRepository;
 
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.userRepository = userRepository;
     }
 
     @Bean
@@ -47,10 +50,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public LoginFilter loginFilter(AuthenticationManager authenticationManager) {
-//        return new LoginFilter(authenticationManager);
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -61,7 +60,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/users/signup", "/users/signin", "/users/reissue", "/").permitAll()
+                        .requestMatchers("/users/signup", "/users/signin", "/users/reissue", "/", "/hash").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
@@ -69,7 +68,7 @@ public class SecurityConfig {
                 .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
         // 로그인 경로 수정
-        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository);
+        LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
         loginFilter.setFilterProcessesUrl("/users/signin");
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
@@ -84,7 +83,7 @@ public class SecurityConfig {
 
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("TEMP")));
+                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));

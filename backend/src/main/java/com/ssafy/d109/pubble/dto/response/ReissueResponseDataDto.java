@@ -9,8 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SignInResponseDataDto {
-
-    private String accessToken;
+public class ReissueResponseDataDto {
+    private String newAccessToken;
     private Boolean data;
 }

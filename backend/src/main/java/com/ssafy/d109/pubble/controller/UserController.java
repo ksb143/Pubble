@@ -25,16 +25,9 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<UserSignInResponseDto> login(HttpServletRequest request, @RequestBody UserSignInRequestDto dto) {
-
-//        String employeeId = dto.getEmployeeId();
-//        String password = dto.getPassword();
-
-//        String accessToken = (String) request.getAttribute("accessToken");
+    public void login(@RequestBody UserSignInRequestDto dto) {
 
 
-
-        return  null;
     }
 
 

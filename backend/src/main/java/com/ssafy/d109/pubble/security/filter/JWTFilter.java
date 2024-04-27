@@ -56,7 +56,7 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         String category = jwtUtil.getCategory(accessToken);
-        if (!category.equals("access")) {
+        if (!category.equals("Authorization")) {
             PrintWriter writer = response.getWriter();
             writer.print("Invalid AccessToken");
 
@@ -76,12 +76,12 @@ public class JWTFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         log.info("===============로그인 추카염===============");
-        log.info("======커스텀한테 뽑아낸 임플아이디: {}======", customUserDetails.getUsername());
-        log.info("======어뜨토큰한테 뽑아낸 롤롤롤: {}======", authToken.getAuthorities());
-        log.info("============빌드할 때 담은 role::: {} ===============", role);
+        log.info("===============커스텀한테 뽑아낸 임플아이디: {}===============", customUserDetails.getUsername());
+        log.info("===============어뜨토큰한테 뽑아낸 롤롤롤: {}===============", authToken.getAuthorities());
+        log.info("===============빌드할 때 담은 role::: {} ===============", role);
 
-//        request.setAttribute("accessToken", accessToken);
-//        filterChain.doFilter(request, response);
+        filterChain.doFilter(request, response);
+
 
     }
 }

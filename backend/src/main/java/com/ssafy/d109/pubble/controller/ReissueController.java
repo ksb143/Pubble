@@ -1,7 +1,10 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.ssafy.d109.pubble.dto.response.ReissueResponseDataDto;
+import com.ssafy.d109.pubble.dto.responseDto.UserReissueResponseDto;
 import com.ssafy.d109.pubble.repository.RefreshTokenRepository;
 import com.ssafy.d109.pubble.security.jwt.JWTUtil;
+import com.ssafy.d109.pubble.service.ReissueService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,53 +23,29 @@ public class ReissueController {
 
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final ReissueService reissueService;
 
-    public ReissueController(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
+    public ReissueController(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, ReissueService reissueService) {
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.reissueService = reissueService;
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 
-        String refreshToken = null;
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("refresh")) {
-                refreshToken = cookie.getValue();
-            }
+        ReissueResponseDataDto dto = reissueService.reissueAccessToken(request, response);
+        if (dto == null) {
+            return new ResponseEntity<>("Invalid refreshToken!", HttpStatus.BAD_REQUEST);
         }
 
-        if (refreshToken == null) {
-            return new ResponseEntity<>("RefreshToken is Null", HttpStatus.BAD_REQUEST);
-        }
+        UserReissueResponseDto responseDto = UserReissueResponseDto
+                .builder()
+                .message("Reissue Success")
+                .resData(dto)
+                .build();
 
-        try {
-            jwtUtil.isExpired(refreshToken);
-        } catch (ExpiredJwtException e) {
-            return new ResponseEntity<>("RefreshToken is Expired", HttpStatus.BAD_REQUEST);
-        }
-
-        String category = jwtUtil.getCategory(refreshToken);
-        if (!category.equals("refresh")) {
-            return new ResponseEntity<>("RefreshToken is not valid", HttpStatus.BAD_REQUEST);
-        }
-
-        // DB에 리프레시 토큰 저장
-        Boolean isExist = refreshTokenRepository.existsByRefreshToken(refreshToken);
-        if (!isExist) {
-            return new ResponseEntity<>("RefreshToken does not exist", HttpStatus.BAD_REQUEST);
-        }
-
-        String employeeId = jwtUtil.getEmployeeId(refreshToken);
-        String role = jwtUtil.getRole(refreshToken);
-
-        String newAccessToken = jwtUtil.createJwt("access", employeeId, role, 600000L);
-        response.setHeader("Authorization", "Bearer " + newAccessToken);
-
-        log.info("======New Access Token: {} ======" ,newAccessToken);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<UserReissueResponseDto>(responseDto, HttpStatus.OK);
     }
 
 }
