@@ -27,13 +27,13 @@ package:
   image: docker:latest
   stage: package
   services:
-    - pubble-backend
+    - docker:dind
   variables:
     JASYPT_PASSWORD: niveavaseline1016!
   script:
-    - cd ./backend
+    # cd ./backend
     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - docker buildx create --use --name $DOCKER_IMAGE
+    - docker build -t hyojukimdev/d109-backend:latest backend
     - echo $DOCKER_IMAGE
     - docker buildx build --platform linux/amd64 -t $DOCKER_IMAGE:latest --push .
   tags:
