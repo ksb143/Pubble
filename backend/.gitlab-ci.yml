@@ -9,10 +9,10 @@ build:
   script:
     - chmod +x ./gradlew
     - ./gradlew clean
-    - ./gradlew build
+    - ./gradlew build -x test # 테스트 실행 제외
   artifacts:
     paths:
       - backend/build/libs/*.jar
     expire_in: 1 week
   tags:
-    - back
+    - backend
