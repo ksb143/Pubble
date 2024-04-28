@@ -1,5 +1,7 @@
 stages:
   - build
+  - package
+  - deploy
 
 
 build:
@@ -13,7 +15,44 @@ build:
   artifacts:
     paths:
       - backend/build/libs/*.jar
-    expire_in: 1 week
+    expire_in: 10 min
+
+
+package:
+  image: docker:latest
+  stage: package
+  variables:
+      IMAGE_NAME: hyojukimdev/d109-backend
+  services:
+    - name: docker:dind
+      command: ["--privileged=true", "--tls=false"]
+  before_script:
+    - echo "$DOCKER_HUB_PW" | docker login --username $DOCKER_HUB_USER --password-stdin
+  script:
+    - cd ./backend
+    - docker buildx create --use --name mybuilder
+    - docker buildx build --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm/v8,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x -t $IMAGE_NAME:$CI_PIPELINE_IID --push .
+    - docker buildx build --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm/v8,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x -t $IMAGE_NAME:latest --push .
+  after_script:
+    - docker logout
+
+
+deploy-was:
+  stage: deploy
+  variables:
+    IMAGE_NAME: hyojukimdev/d109-backend
   tags:
     - backend
-
+  before_script:
+    - echo "$DOCKER_HUB_PW" | docker login --username $DOCKER_HUB_USER --password-stdin
+  script:
+    - docker stop hyojukimdev/d109-backend || true
+    - docker rm hyojukimdev/d109-backend || true
+    - docker rmi hyojukimdev/d109-backend || true
+    - docker pull $IMAGE_NAME:latest
+    - docker run -d --restart always -e TZ=Asia/Seoul -p 10425:9091/tcp --name hyojukim/d109-backend $IMAGE_NAME:latest
+  after_script:
+    - docker logout
+  when: on_success
+  only:
+    - Back
