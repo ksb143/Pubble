@@ -31,8 +31,8 @@ package:
     JASYPT_PASSWORD: niveavaseline1016!
   script:
     - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - docker build -t $DOCKER_IMAGE backend/
-    - docker push $DOCKER_IMAGE
+    - docker build -t hyojukimdev/d109-backend backend/
+    - docker push hyojukimdev/d109-backend
 
 deploy:
   image: alpine:latest
