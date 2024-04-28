@@ -29,7 +29,7 @@ package:
   variables:
     JASYPT_PASSWORD: niveavaseline1016!
   script:
-    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - docker login -u $DOCKER_USER --password-stdin
     - docker build -t hyojukimdev/d109-backend:latest backend
     - docker push hyojukimdev/d109-backend
 
