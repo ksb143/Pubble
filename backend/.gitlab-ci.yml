@@ -15,4 +15,4 @@ build:
       - backend/build/libs/*.jar
     expire_in: 1 week
   tags:
-    - backend
+    - back
