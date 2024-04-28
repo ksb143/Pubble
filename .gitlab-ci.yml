@@ -10,6 +10,7 @@ build:
   image: azul/zulu-openjdk:17-latest
   stage: build
   script:
+    - cd backend
     - chmod +x ./gradlew
     - ./gradlew clean
     - ./gradlew build
