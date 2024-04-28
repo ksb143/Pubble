@@ -12,6 +12,7 @@ build:
   stage: build
   script:
     - cd backend
+    - chmod +x ./gradlew
     - ./gradlew clean
     - ./gradlew build
   artifacts:
