@@ -7,4 +7,4 @@
 문수민
 김효주
 장준영
-
+cicd gitlab runner 로 구축용 커밋
