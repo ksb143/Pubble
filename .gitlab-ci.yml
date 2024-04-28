@@ -4,7 +4,6 @@ stages:
 
 build:
   image: azul/zulu-openjdk:17-latest
-  only: Back
   stage: build
   script:
     - cd backend
