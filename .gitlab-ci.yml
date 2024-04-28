@@ -8,7 +8,7 @@ variables:
 
 build:
   image: azul/zulu-openjdk:17-latest
-  only: [Master, Back]
+  only: [master, Back]
   stage: build
   script:
     - chmod +x ./gradlew
@@ -43,4 +43,4 @@ deploy:
     - chmod 600 deploy_key.pem
     - ssh -o StrictHostKeyChecking=no -i deploy_key.pem $SERVER_USER@$SERVER_IP "docker pull $DOCKER_IMAGE && docker run -d -p 10425:9091 $DOCKER_IMAGE"
   only:
-    - [Master, Back]
+    - master
