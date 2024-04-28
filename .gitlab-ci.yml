@@ -1,0 +1,20 @@
+stages:
+  - build
+
+
+build:
+  image: azul/zulu-openjdk:17-latest
+  only: Back
+  stage: build
+  script:
+    - cd backend
+    - chmod +x ./gradlew
+    - ./gradlew clean
+    - ./gradlew build -x test # 테스트 실행 제외
+  artifacts:
+    paths:
+      - backend/build/libs/*.jar
+    expire_in: 1 week
+  tags:
+    - backend
+
