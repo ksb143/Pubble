@@ -1,0 +1,46 @@
+stages:
+  - build
+  - package
+  - deploy
+
+variables:
+  DOCKER_IMAGE: hyojukimdev/d109-backend:$CI_COMMIT_REF_NAME
+
+build:
+  image: azul/zulu-openjdk:17-latest
+  only: [Master, Back]
+  stage: build
+  script:
+    - chmod +x ./gradlew
+    - ./gradlew clean
+    - ./gradlew build
+  artifacts:
+    paths:
+      - backend/build/libs/*.jar
+    expire_in: 1 week
+  tags:
+    - backend
+
+package:
+  image: docker:latest
+  stage: package
+  services:
+    - docker:dind
+  variables:
+    JASYPT_PASSWORD: niveavaseline1016!
+  script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - docker build -t $DOCKER_IMAGE backend/
+    - docker push $DOCKER_IMAGE
+
+deploy:
+  image: alpine:latest
+  stage: deploy
+  environment: production
+  script:
+    - apk update && apk add openssh-client
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > deploy_key.pem
+    - chmod 600 deploy_key.pem
+    - ssh -o StrictHostKeyChecking=no -i deploy_key.pem $SERVER_USER@$SERVER_IP "docker pull $DOCKER_IMAGE && docker run -d -p 10425:9091 $DOCKER_IMAGE"
+  only:
+    - [Master, Back]
