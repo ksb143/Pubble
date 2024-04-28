@@ -8,7 +8,6 @@ variables:
 
 build:
   image: azul/zulu-openjdk:17-latest
-  only: Back
   stage: build
   script:
     - cd backend
@@ -43,5 +42,3 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > deploy_key.pem
     - chmod 600 deploy_key.pem
     - ssh -o StrictHostKeyChecking=no -i deploy_key.pem $SERVER_USER@$SERVER_IP "docker pull $DOCKER_IMAGE && docker run -d -p 10425:9091 $DOCKER_IMAGE"
-  only:
-    - Back
