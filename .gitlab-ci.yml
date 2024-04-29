@@ -21,22 +21,17 @@ build:
 package:
   image: docker:latest
   stage: package
+  variables:
+    IMAGE_NAME: hyojukimdev/d109-backend
   services:
     - name: docker:dind
-      alias: docker
-      command: ["--privileged"]
-  variables:
-    DOCKER_HOST: "tcp://docker:2375"
-    DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
-    IMAGE_NAME: hyojukimdev/d109-backend
+      command: ["--privileged=true", "--tls=false"]
   before_script:
-    - docker info
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PW
-    - docker buildx create --use --driver docker-container --name mybuilder
-    - docker buildx inspect --bootstrap
   script:
     - cd backend
+    - docker buildx create --use --driver docker-container --name mybuilder
+    - docker buildx inspect --bootstrap
     - docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_NAME:latest --push .
 
 
@@ -47,8 +42,6 @@ deploy-was:
       IMAGE_NAME: hyojukimdev/d109-backend
   tags:
     - backend
-  before_script:
-    - echo "$DOCKER_HUB_PW" | docker login --username $DOCKER_HUB_USER --password-stdin
   script:
     - docker stop hyojukimdev/d109-backend || true
     - docker rm hyojukimdev/d109-backend || true
