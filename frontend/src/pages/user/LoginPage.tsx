@@ -1,6 +1,18 @@
+import Lottie from 'react-lottie';
+import loginAnimation from '@/assets/lotties/login.json';
+
 const LoginPage = () => {
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: loginAnimation,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
+
   return (
-    <>
+    <div className='flex'>
       <div>
         <div>
           <p>로그인</p>
@@ -17,7 +29,10 @@ const LoginPage = () => {
         </div>
         <button>로그인</button>
       </div>
-    </>
+      <div>
+        <Lottie options={defaultOptions} height={400} width={400} />{' '}
+      </div>
+    </div>
   );
 };
 
