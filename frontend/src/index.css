@@ -21,10 +21,9 @@ body {
   font-weight: 200;
   color: #111827;
   background-color: #F9FAFB;
-  /* font-family: 'Pretendard Variable'; */
 
-  margin: 0;
-  min-width: 320px;
+  min-width: 640x;
+  max-width: 1920px;
   min-height: 100vh;
 }
 
