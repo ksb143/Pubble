@@ -14,3 +14,4 @@ CICD 구축용 커밋 파일
 Error saving credentials: rename /root/.docker/config.json4293881916 /root/.docker/config.json: file exists
 해결방법 -> conf toml 변경해서 저장할 mount 제거
 12. gitlab-runner container 재부팅함     
+13. jenkins webhook 연결 해결함 (root url 수정)
