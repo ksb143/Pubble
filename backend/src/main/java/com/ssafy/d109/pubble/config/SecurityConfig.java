@@ -2,6 +2,7 @@ package com.ssafy.d109.pubble.config;
 
 import com.ssafy.d109.pubble.repository.RefreshTokenRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
+import com.ssafy.d109.pubble.security.filter.CustomLogoutFilter;
 import com.ssafy.d109.pubble.security.filter.JWTFilter;
 import com.ssafy.d109.pubble.security.filter.LoginFilter;
 import com.ssafy.d109.pubble.security.jwt.JWTUtil;
@@ -18,6 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -57,6 +60,7 @@ public class SecurityConfig {
         http.csrf((auth) -> auth.disable());
         http.formLogin((auth) -> auth.disable());
         http.httpBasic((auth) -> auth.disable());
+//        http.logout((logout) -> logout.disable());
 
         http
                 .authorizeHttpRequests((auth) -> auth
@@ -72,6 +76,17 @@ public class SecurityConfig {
         loginFilter.setFilterProcessesUrl("/users/signin");
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // 로그아웃 경로 수정
+         http
+            .logout((logout) -> logout
+                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true));
+
+
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
         http
                 .sessionManagement((session) -> session
