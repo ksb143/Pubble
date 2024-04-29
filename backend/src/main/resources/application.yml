@@ -10,11 +10,11 @@ spring:
     username: ENC(mCoXDUfo7pgBQiB1UgTEsQ==)
     password: ENC(ebSdgNbER/IlSSpsoLo0LjXXgGjBobLw)
 
-  #  datasource:
-  #    url: jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
-  #    driver-class-name: com.mysql.cj.jdbc.Driver
-  #    username: realman
-  #    password: 1234
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: realman
+#    password: 1234
 
 
   jpa:
