@@ -38,6 +38,7 @@ const createApi = ({
   api.interceptors.response.use(
     (response) => response,
     async (error) => {
+      console.log(error);
       const {
         config,
         response: { status },

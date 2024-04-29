@@ -22,7 +22,7 @@ body {
   color: #111827;
   background-color: #F9FAFB;
 
-  min-width: 640x;
+  min-width: 640px;
   max-width: 1920px;
   min-height: 100vh;
 }
