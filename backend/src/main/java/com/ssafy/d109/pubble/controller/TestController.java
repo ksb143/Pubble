@@ -60,5 +60,11 @@ public class TestController {
         userRepository.saveAll(users);
     }
 
+    @GetMapping("/")
+    public void logout() {
+        System.out.println("로그아웃 하셨어예?");
+
+    }
+
 
 }

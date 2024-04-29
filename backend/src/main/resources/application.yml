@@ -14,11 +14,20 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
         show_sql: false
         format_sql: true
         default_batch_fetch_size: 100
+
+  #  jwt:
+  #    secret: ENC(Pp9CaGQlCpY/MbkzMiTF4Vcy/gCJ1lUdhsgWLmPlmzVdtVYN42ed4BTR3200vJCk2mHqEMCDCbeCTGL+fyIEGYVihho21TQwAnLJLmuOil6O2oBUBgSpBQ==)
+
+  jwt:
+    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbblkjlkjkldfdhgfhjgkjb
+
 
 springdoc:
   swagger-ui:
