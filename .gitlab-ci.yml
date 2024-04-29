@@ -23,16 +23,20 @@ package:
   stage: package
   variables:
       IMAGE_NAME: hyojukimdev/d109-backend
+      DOCKER_TLS_CERTDIR: ""
   services:
     - name: docker:dind
-      command: ["--privileged=true", "--tls=false"]
+      alias: docker
+      command: ["--privileged"]
   before_script:
+    - echo "dockerhub 로그인"
     - echo "$DOCKER_HUB_PW" | docker login --username $DOCKER_HUB_USER --password-stdin
   script:
     - cd ./backend
-    - docker buildx create --use --name mybuilder
-    - docker buildx build --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm/v8,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x -t $IMAGE_NAME:$CI_PIPELINE_IID --push .
-    - docker buildx build --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm/v8,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x -t $IMAGE_NAME:latest --push .
+    - echo "도커 이미지 만들기"
+    - docker buildx build --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm/v8,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x -t $IMAGE_NAME:latest 
+    - echo "도커 이미지 dockerhub 에 push"
+    - docker $IMAGE_NAME:latest push .
   after_script:
     - docker logout
 
@@ -40,7 +44,7 @@ package:
 deploy-was:
   stage: deploy
   variables:
-    IMAGE_NAME: hyojukimdev/d109-backend
+      IMAGE_NAME: hyojukimdev/d109-backend
   tags:
     - backend
   before_script:
