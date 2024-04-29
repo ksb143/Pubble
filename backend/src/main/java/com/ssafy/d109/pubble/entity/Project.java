@@ -37,6 +37,6 @@ public class Project {
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ownerId")
-    private User ownerId;
+    @JoinColumn(name = "owner")
+    private User owner;
 }
