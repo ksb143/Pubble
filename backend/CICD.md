@@ -6,4 +6,5 @@ CICD 구축용 커밋 파일
 5. runner 전체 초기화하고 다시 시작
 6. 테스트용 김효주 커밋
 7. backend Docker-in-Docker previleged false 로 gitlab conf toml 변경
-8. .gitlab-ci.yml에서 previleged 삭제하고 build 명령어에 현재 디렉토리 . 추가  
+8. .gitlab-ci.yml에서 previleged 삭제하고 build 명령어에 현재 디렉토리 . 추가 
+9. ERROR: Multi-platform build is not supported for the docker driver 으로 docker buildx driver 사용 방법 추가  

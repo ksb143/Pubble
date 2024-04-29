@@ -21,23 +21,23 @@ build:
 package:
   image: docker:latest
   stage: package
-  variables:
-      IMAGE_NAME: hyojukimdev/d109-backend
-      DOCKER_TLS_CERTDIR: ""
   services:
     - name: docker:dind
-      alias: docker
+      command: ["--privileged"]
+  variables:
+    DOCKER_HOST: "tcp://docker:2375"
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+    IMAGE_NAME: hyojukimdev/d109-backend
   before_script:
-    - echo "dockerhub 로그인"
-    - echo "$DOCKER_HUB_PW" | docker login --username $DOCKER_HUB_USER --password-stdin
+    - docker info
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PW
+    - docker buildx create --use --driver docker-container --name mybuilder
+    - docker buildx inspect --bootstrap
   script:
-    - cd ./backend
-    - echo "도커 이미지 만들기"
-    - docker buildx build --platform linux/386,linux/amd64,linux/arm/v5,linux/arm/v7,linux/arm/v8,linux/arm64,linux/mips64le,linux/ppc64le,linux/s390x -t $IMAGE_NAME:latest .
-    - echo "도커 이미지 dockerhub 에 push"
-    - docker $IMAGE_NAME:latest push .
-  after_script:
-    - docker logout
+    - cd backend
+    - docker buildx build --platform linux/amd64,linux/arm64 -t $IMAGE_NAME:latest --push .
+
 
 
 deploy-was:
