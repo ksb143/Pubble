@@ -8,4 +8,8 @@ CICD 구축용 커밋 파일
 7. backend Docker-in-Docker previleged false 로 gitlab conf toml 변경
 8. .gitlab-ci.yml에서 previleged 삭제하고 build 명령어에 현재 디렉토리 . 추가 
 9. ERROR: Multi-platform build is not supported for the docker driver 으로 docker buildx driver 사용 방법 추가
-10. gitlab conf toml 에 dind 관련 설정 추가   
+10. gitlab conf toml 에 dind 관련 설정 추가
+11. export DOCKER_HOST=tcp://docker:2375 는 실행됐는데 로그인 단계에서 에러 발생
+발생한 에러:
+Error saving credentials: rename /root/.docker/config.json4293881916 /root/.docker/config.json: file exists
+해결방법 -> conf toml 변경해서 저장할 mount 제거    
