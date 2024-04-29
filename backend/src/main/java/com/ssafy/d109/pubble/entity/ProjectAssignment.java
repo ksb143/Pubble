@@ -17,7 +17,6 @@ public class ProjectAssignment {
     @Column(name = "projectAssignmentId")
     private Integer projectAssignmentId;
 
-
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")

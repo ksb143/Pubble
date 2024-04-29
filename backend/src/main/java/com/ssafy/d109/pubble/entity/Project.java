@@ -2,11 +2,12 @@ package com.ssafy.d109.pubble.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,13 +23,20 @@ public class Project {
     @Column(name = "project_title")
     private String projectTitle;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(name = "start_at")
+    private LocalDateTime startAt;
+
+    @Column(name = "end_at")
+    private LocalDateTime endAt;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "code")
+    private String code;
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "leaderId")
-    private User leader;
-
-
+    @JoinColumn(name = "ownerId")
+    private User ownerId;
 }

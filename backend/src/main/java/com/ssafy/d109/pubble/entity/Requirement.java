@@ -1,13 +1,16 @@
 package com.ssafy.d109.pubble.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,43 +23,46 @@ public class Requirement {
     @Column(name = "requirementId")
     private Integer requirementId;
 
-    @Column(name = "version")
-    private String version;
+    @Column(name = "order_index") // 순서 인덱스
+    private Integer orderIndex;
 
-    @Column(name = "requirement_name")
-    private String requirementName;
+    @Column(name = "is_lock", length = 1) // 잠금 여부 u, l (unlocked, locked)
+    private String isLock;
 
-    @Column(name = "detail")
-    private String detail;
+    @Column(name = "approval", length = 1) // 승인 여부 u, h, a (unapproved, holded, approved)
+    private String approval;
 
-    @Column(name = "code")
+    @Column(name = "code") // id
     private String code;
 
-    @Column(name = "created_at")
+    @Column(name = "requirement_name") // 요구사항명
+    private String requirementName;
+
+    @Column(name = "detail") // 상세설명
+    private String detail;
+
+    @Column(name = "manager") // 담당자
+    private String manager;
+
+    @Column(name = "author") // 작성자
+    private String author;
+
+    @Column(name = "target_user") // 타겟 이용자
+    private String targetUser;
+
+    @Column(name = "latest_version") // 최근 버전
+    private String latest_version;
+
+    @Column(name = "created_at", updatable = false, nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @Column(name = "approval")
-    private String approval;
-
-    @Column(name = "hold_message")
-    private String holdMessage;
-
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId")
     private Project project;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user;
-
-
-
-
-
-
 }
