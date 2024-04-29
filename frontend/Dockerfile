@@ -16,15 +16,19 @@ RUN node -v
 RUN npm -v
 
 # root에 /app 폴더 생성
+RUN pwd
 RUN mkdir /app
 
 # work dir 고정
+RUN pwd
 WORKDIR /app
 
 # work dir에 build 폴더 생성
+RUN pwd
 RUN mkdir ./build
 
 # host pc의 현재 경로의 build 폴더를 work dir의 build 폴더로 복사
+RUN pwd
 ADD ./build ./build
 
 # nginx의 default.conf 삭제
