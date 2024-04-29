@@ -1,6 +1,20 @@
 # nginx 이미지 사용
 FROM nginx:latest
 
+# 필수 패키지 설치
+RUN apt-get update && apt-get install -y curl gnupg
+
+# Node.js 설치
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -  # 예시로 LTS 버전 설정 명령어 사용
+RUN apt-get install -y nodejs
+
+# Vite와 TypeScript 설치
+RUN npm install -g vite@5.2.10 typescript@5.4.5
+
+# Node.js와 npm이 제대로 설치되었는지 확인
+RUN node -v
+RUN npm -v
+
 # root에 /app 폴더 생성
 RUN mkdir /app
 
