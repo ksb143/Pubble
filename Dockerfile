@@ -5,7 +5,7 @@
 FROM azul/zulu-openjdk:17-latest as build
 
 # `JAR_FILE` 이라는 이름으로 build 한 jar 파일을 지정합니다.
-ARG JAR_FILE=./build/libs/*.jar
+ARG JAR_FILE=./backend/build/libs/*.jar
 
 # 지정한 jar 파일을 app.jar 라는 이름으로 Docker Container에 추가합니다.
 ADD ${JAR_FILE} app.jar

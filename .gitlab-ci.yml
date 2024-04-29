@@ -23,6 +23,7 @@ package:
   stage: package
   services:
     - name: docker:dind
+      alias: docker
       command: ["--privileged"]
   variables:
     DOCKER_HOST: "tcp://docker:2375"
