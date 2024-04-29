@@ -42,15 +42,22 @@ public class JWTUtil {
         return user.getRole();
     }
 
+    public String getProfileColor(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("profileColor", String.class);
+
+    }
+
     public String createJwt(String category, String employeeId, String role, Long expiredMs) {
 
         User user = userRepository.findByEmployeeId(employeeId).orElseThrow(UserNotFoundException::new);
         String r = user.getRole();
+        String profileColor = user.getProfileColor();
 
         return Jwts.builder()
                 .claim("category", category)
                 .claim("employeeId", employeeId)
                 .claim("role", r)
+                .claim("profileColor", profileColor)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
