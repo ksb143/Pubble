@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Lottie from 'react-lottie';
+import { AxiosError } from 'axios';
 import { login } from '@/apis/user';
 import loginAnimation from '@/assets/lotties/login.json';
 
@@ -8,6 +9,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [isEmployeeId, setIsEmployeeId] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
+  const [error, setError] = useState('');
 
   // 로티 기본 옵션
   const defaultOptions = {
@@ -20,8 +22,7 @@ const LoginPage = () => {
   };
 
   // 로그인 함수
-  const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleLogin = async () => {
     if (!employeeId) {
       setIsEmployeeId(true);
       return;
@@ -33,8 +34,24 @@ const LoginPage = () => {
     try {
       const data = await login(employeeId, password);
       localStorage.setItem('accessToken', data.resData.accessToken);
-    } catch (error) {
-      console.log(error);
+      // 성공 후 페이지 리다이렉션 필요
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        switch (axiosError.response.status) {
+          case 401:
+            setError('계정 정보가 일치하지 않습니다. 계정 정보를 확인해주세요');
+            break;
+          case 404:
+            setError('사용자를 찾을 수 없습니다. 사번을 확인해주세요.');
+            break;
+          default:
+            setError('알 수 없는 오류가 발생했습니다.');
+            break;
+        }
+      } else {
+        setError('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요');
+      }
     }
   };
 
@@ -50,7 +67,7 @@ const LoginPage = () => {
             계정에 접근하려면, 로그인이 필요합니다
           </p>
         </div>
-        <form onSubmit={handleLogin} className='mb-10'>
+        <div className='mb-10'>
           <div className='mb-5'>
             <p>사번</p>
             <input
@@ -80,12 +97,15 @@ const LoginPage = () => {
               <p className='text-sm text-red-600'>비밀번호를 입력해주세요</p>
             )}
           </div>
-          <button
-            type='submit'
-            className='rounded bg-pubble px-4 py-2 text-white'>
-            로그인
-          </button>
-        </form>
+          <div className='grid grid-cols-6'>
+            <button
+              onClick={handleLogin}
+              type='button'
+              className='col-span-1 col-start-6 grid rounded bg-pubble py-2 text-white hover:shadow-lg hover:outline-double hover:outline-4 hover:outline-gray-200'>
+              로그인
+            </button>
+          </div>
+        </div>
       </div>
       <div className='col-span-5 col-start-7'>
         <Lottie options={defaultOptions} height={500} width={500} />{' '}
