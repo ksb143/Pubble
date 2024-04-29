@@ -1,16 +1,14 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
+import User from '@/routers/User';
+
 function App() {
-  const navigate = useNavigate();
   return (
     <Router>
-      <Routes></Routes>
+      <Routes>
+        <Route path='/user/*' element={<User />} />
+      </Routes>
     </Router>
   );
 }
