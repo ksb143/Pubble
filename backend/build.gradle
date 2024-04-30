@@ -41,13 +41,13 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-bootJar {
-	archiveBaseName = 'PubbleApplication'
-	archiveVersion = '0.1.0'
-	manifest {
-		attributes(
-				'Main-Class': 'com.ssafy.d109.pubble.PubbleApplication'
-		)
-	}
-}
+//bootJar {
+//	archiveBaseName = 'PubbleApplication'
+//	archiveVersion = '0.1.0'
+//	manifest {
+//		attributes(
+//				'Main-Class': 'com.ssafy.d109.pubble.PubbleApplication'
+//		)
+//	}
+//}
 
