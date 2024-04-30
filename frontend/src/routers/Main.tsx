@@ -1,8 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 
-import DashboardPage from '@/pages/project_dashboard/projectDashboardPage';
-
-const ProjectDashboard = () => {
+import DashboardPage from '@/pages/project_dashboard/DashboardPage';
+const Main = () => {
   return (
     <Routes>
       <Route path='/' element={<DashboardPage />} />
@@ -10,4 +9,4 @@ const ProjectDashboard = () => {
   );
 };
 
-export default ProjectDashboard;
+export default Main;
