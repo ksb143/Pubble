@@ -9,6 +9,7 @@ import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +44,7 @@ public class ProjectService {
         return projectListDtos;
     }
 
+    // transactional?
     public void createProject(User user, ProjectCreateDto projectCreateDto) {
         Project project = Project.builder().projectTitle(projectCreateDto.getProjectTitle()).startAt(projectCreateDto.getStartAt()).endAt(projectCreateDto.getEndAt()).code(projectCreateDto.getCode()).status(projectCreateDto.getStatus()).owner(user).build();
         projectRepository.save(project);
@@ -84,6 +86,7 @@ public class ProjectService {
         return projectRequirementsDto;
     }
 
+    @Transactional
     public void changeProjectStatus(Integer projectId, String status) {
         Optional<Project> projectOptional = projectRepository.findByProjectId(projectId);
         if (projectOptional.isPresent()) {
