@@ -1,16 +1,16 @@
 package com.ssafy.d109.pubble.service;
 
-import com.ssafy.d109.pubble.dto.ProgressRatio;
-import com.ssafy.d109.pubble.dto.RequirementCreateDto;
+import com.ssafy.d109.pubble.dto.projectDto.ApprovalDto;
+import com.ssafy.d109.pubble.dto.projectDto.ProgressRatio;
+import com.ssafy.d109.pubble.dto.projectDto.RequirementCreateDto;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,13 +120,10 @@ public class RequirementService {
 
     // requirement 생성
     public void createRequirement(Integer projectId, RequirementCreateDto requirementCreateDto) {
-        System.out.println("RequirementService.createRequirement");
         Optional<Project> projectOptional = projectRepository.findByProjectId(projectId);
 
         if (projectOptional.isPresent()) {
             Project project = projectOptional.get();
-            System.out.println("project.toString() = " + project.toString());
-
             // orderIndex
             Integer orderIndex = requirementRepository.findMaxOrderIndexByProjectId(project.getProjectId());
             if (orderIndex == null) {
@@ -134,22 +131,66 @@ public class RequirementService {
             } else {
                 orderIndex += 1;
             }
-            System.out.println("orderIndex = " + orderIndex);
 
             requirementRepository.save(Requirement.builder().isLock("u").approval("u").code(requirementCreateDto.getCode()).requirementName(requirementCreateDto.getRequirementName()).detail(requirementCreateDto.getDetail()).manager(requirementCreateDto.getManager()).author(requirementCreateDto.getAuthor()).targetUser(requirementCreateDto.getTargetUser()).latest_version("V.1.0.").orderIndex(orderIndex).project(project).build());
         }
     }
 
-    public void updateRequirementLock() {
+    @Transactional
+    public void updateRequirementLock(Integer requirementId, String lock) {
+        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
 
+        if (optionalRequirement.isPresent()) {
+            Requirement requirement = optionalRequirement.get();
+            if ("u".equals(lock)){
+                requirement.setIsLock("u");
+            } else if ("l".equals(lock)) {
+                requirement.setIsLock("l");
+            }
+
+            requirementRepository.save(requirement);
+        }
     }
 
-    public void updateRequirementApproval() {
+    @Transactional
+    public void updateRequirementApproval(Integer requirementId, ApprovalDto approvalDto) {
+        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
 
+        if (optionalRequirement.isPresent()) {
+            Requirement requirement = optionalRequirement.get();
+            switch (approvalDto.getApproval()) {
+                case "u" -> requirement.setApproval("u");
+                case "h" -> requirement.setApproval("h");
+                case "a" -> requirement.setApproval("a");
+            }
+
+            requirement.setApprovalComment(approvalDto.getApprovalComment());
+            requirementRepository.save(requirement);
+        }
     }
 
+//    // requirement 조회
+//    public Requirement getRequirement() {
+//        System.out.println("something wip");
+//        return Requirement
+//    }
 
-    // requirement 조회
+    // requirement new version
+    public void createNewVersion(Integer requirementId, String something) {
+        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
 
-    // requirement 수정-버전
+        if (optionalRequirement.isPresent()) {
+            Requirement requirement = optionalRequirement.get();
+        }
+    }
+
+    // requirement restore version
+    public void createRestoreVersion(Integer requirementId, String something) {
+        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
+
+        if (optionalRequirement.isPresent()) {
+            Requirement requirement = optionalRequirement.get();
+            // orderindex는 물려받기
+        }
+    }
 }

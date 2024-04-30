@@ -1,26 +1,25 @@
-package com.ssafy.d109.pubble.dto;
+package com.ssafy.d109.pubble.dto.projectDto;
 
 import com.ssafy.d109.pubble.entity.User;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class ProjectDashboardDto {
+public class ProjectCreateDto {
 
-    private Integer projectId;
     private String projectTitle;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private String status;
     private String code;
-    private List<DashboardUserInfo> people;
-    private float lockRatio;
-    private float approveRatio;
-    private float changedRatio;
 }

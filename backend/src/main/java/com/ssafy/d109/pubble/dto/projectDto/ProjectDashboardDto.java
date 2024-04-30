@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.dto;
+package com.ssafy.d109.pubble.dto.projectDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,13 +10,16 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ProjectListDto {
+public class ProjectDashboardDto {
 
-    private String prdId;
+    private Integer projectId;
     private String projectTitle;
-    private List<String> people;
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     private String status;
-    private float progressRatio;
+    private String code;
+    private List<DashboardUserInfo> people;
+    private float lockRatio;
+    private float approveRatio;
+    private float changedRatio;
 }

@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.dto;
+package com.ssafy.d109.pubble.dto.projectDto;
 
 import com.ssafy.d109.pubble.entity.Project;
 import jakarta.persistence.*;
