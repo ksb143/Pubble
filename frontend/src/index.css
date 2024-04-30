@@ -17,13 +17,16 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+#root {
+  height: 100vh;
+}
+
 body {
   font-weight: 200;
   color: #111827;
   background-color: #F9FAFB;
 
-  min-width: 640x;
-  max-width: 1920px;
+  min-width: 320px;
   min-height: 100vh;
 }
 
