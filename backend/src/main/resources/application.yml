@@ -13,12 +13,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
       hibernate:
-        show_sql: false
+        show_sql: true
         format_sql: true
         default_batch_fetch_size: 100
 
