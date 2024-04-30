@@ -1,15 +1,15 @@
-import { Outlet } from "react-router-dom";
-import Navbar from "@/components/layouts/Navbar";
+import { Outlet } from 'react-router-dom';
+import Navbar from '@/components/layouts/Navbar';
 
 const Layout = () => {
-  return(
+  return (
     <>
       <Navbar></Navbar>
-      <div className="h-full pt-16">
+      <div className='h-full pt-16'>
         <Outlet />
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
