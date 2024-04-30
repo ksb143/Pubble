@@ -6,7 +6,7 @@ spring:
     name: pubble
 
   datasource:
-    url: ENC(rWYclDMbGAznbF3MQ0DFsrHDHKaaiIYG4HYCl7M81YxK1SXW1nkwc7qEN1pGRh02)
+    url: ENC(4e8GH8J5pBy/EVDqV7y5sTnjGKiTYjvrWqp+lOPA9om0VmnUrinZZgWQXVwhsLQ6GPT/TpytbUI=)
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(mCoXDUfo7pgBQiB1UgTEsQ==)
     password: ENC(ebSdgNbER/IlSSpsoLo0LjXXgGjBobLw)
