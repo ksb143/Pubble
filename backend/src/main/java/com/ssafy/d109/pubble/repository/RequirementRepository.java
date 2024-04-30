@@ -1,15 +1,17 @@
 package com.ssafy.d109.pubble.repository;
 
-import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RequirementRepository extends JpaRepository<Requirement, Integer> {
 
     List<Requirement> findAllByProject_projectId(Integer projectId);
+
+    Optional<Requirement> findByRequirementId(Integer requirementId);
 
     //    - projectId를 인자로 받는다.
     //    - projectId에 해당하는 requirement들을 찾는다.
