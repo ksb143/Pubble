@@ -1,21 +1,15 @@
+server:
+  port: 9091
+
 spring:
   application:
     name: pubble
-  #  config:
-  #    import: optional:classpath:env.yml
 
   datasource:
-    url: ENC(0hLtFdesYA5girnxXcLNrcCSYe2hdtJDUGA23oyocolm1E/PbLdkk8/FQpglOtR110JWzKpX5TEtmWinSDxPMD6Ljv6buX6Wr0tifLoQZY/g3FrAH1WIMOtK2XtwkFXO)
+    url: ENC(rWYclDMbGAznbF3MQ0DFsrHDHKaaiIYG4HYCl7M81YxK1SXW1nkwc7qEN1pGRh02)
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: ENC(mCoXDUfo7pgBQiB1UgTEsQ==)
     password: ENC(ebSdgNbER/IlSSpsoLo0LjXXgGjBobLw)
-
-#  datasource:
-#    url: jdbc:mysql://localhost:3306/testdb?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    username: realman
-#    password: 1234
-
 
   jpa:
     hibernate:

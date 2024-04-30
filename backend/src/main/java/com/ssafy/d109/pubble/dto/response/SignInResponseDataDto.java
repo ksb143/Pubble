@@ -13,4 +13,7 @@ public class SignInResponseDataDto {
 
     private String accessToken;
     private Boolean data;
+    private String profileColor;
+    private String employeeId;
+    private String name;
 }

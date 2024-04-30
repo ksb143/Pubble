@@ -101,12 +101,18 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, 600000L);
         String refreshToken = jwtUtil.createJwt("refresh", employeeId, role, 86400000L);
+        String profileColor = jwtUtil.getProfileColor(accessToken);
+        String name = jwtUtil.getName(accessToken);
+
 
         log.info("프로필 색상: {}", jwtUtil.getProfileColor(accessToken));
 
         SignInResponseDataDto dto = SignInResponseDataDto.builder()
                         .accessToken(accessToken)
                                 .data(true)
+                .profileColor(profileColor)
+                .employeeId(employeeId)
+                .name(name)
                                         .build();
 
         UserSignInResponseDto responseDto = UserSignInResponseDto.builder()
