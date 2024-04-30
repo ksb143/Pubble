@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.dto;
+package com.ssafy.d109.pubble.dto.projectDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

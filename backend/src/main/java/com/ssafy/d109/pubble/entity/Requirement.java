@@ -32,6 +32,9 @@ public class Requirement {
     @Column(name = "approval", length = 1) // 승인 여부 u, h, a (unapproved, holded, approved)
     private String approval;
 
+    @Column(name = "approval_comment") // 승인/보류 메세지
+    private String approvalComment;
+
     @Column(name = "code") // id
     private String code;
 

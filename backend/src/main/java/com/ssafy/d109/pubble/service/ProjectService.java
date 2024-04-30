@@ -1,9 +1,8 @@
 package com.ssafy.d109.pubble.service;
 
 
-import com.ssafy.d109.pubble.dto.*;
+import com.ssafy.d109.pubble.dto.projectDto.*;
 import com.ssafy.d109.pubble.entity.Project;
-import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
@@ -29,7 +28,6 @@ public class ProjectService {
     private final RequirementRepository requirementRepository;
 
     public List<ProjectListDto> getProjectList(Integer userId) {
-        System.out.println("ProjectService.getProjectList" + "userId = " + userId);
         List<Project> projects = projectAssignmentRepository.findAllProjectsByUserId(userId);
         List<ProjectListDto> projectListDtos = new ArrayList<>();
 
@@ -41,12 +39,11 @@ public class ProjectService {
 
             projectListDtos.add(ProjectListDto.builder().prdId(project.getCode()).projectTitle(project.getProjectTitle()).people(people).startAt(project.getStartAt()).endAt(project.getEndAt()).status(project.getStatus()).progressRatio(progressRatio).build());
         }
-        System.out.println("projectListDtos.toString() = " + projectListDtos.toString());
+
         return projectListDtos;
     }
 
     public void createProject(User user, ProjectCreateDto projectCreateDto) {
-
         Project project = Project.builder().projectTitle(projectCreateDto.getProjectTitle()).startAt(projectCreateDto.getStartAt()).endAt(projectCreateDto.getEndAt()).code(projectCreateDto.getCode()).status(projectCreateDto.getStatus()).owner(user).build();
         projectRepository.save(project);
     }
@@ -68,6 +65,7 @@ public class ProjectService {
 
             projectDashboardDto = ProjectDashboardDto.builder().projectId(projectId).projectTitle(project.getProjectTitle()).startAt(project.getStartAt()).endAt(project.getEndAt()).status(project.getStatus()).code(project.getCode()).people(dashboardUserInfos).lockRatio(progressRatio.getLockRatio()).approveRatio(progressRatio.getApprovalRatio()).changedRatio(progressRatio.getChangeRatio()).build();
         }
+
         return projectDashboardDto;
     }
 
@@ -82,6 +80,7 @@ public class ProjectService {
 
             projectRequirementsDto = ProjectRequirementsDto.builder().projectId(project.getProjectId()).projectTitle(project.getProjectTitle()).startAt(project.getStartAt()).endAt(project.getEndAt()).status(project.getStatus()).code(project.getCode()).people(users).requirements(requirements).build();
         }
+
         return projectRequirementsDto;
     }
 
