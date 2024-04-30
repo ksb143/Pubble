@@ -13,4 +13,5 @@ CICD 구축용 커밋 파일
 11. export DOCKER_HOST=tcp://docker:2375 는 실행됐는데 로그인 단계에서 에러 발생
     발생한 에러:
     Error saving credentials: rename /root/.docker/config.json4293881916 /root/.docker/config.json: file exists
-    해결방법 -> conf toml 변경해서 저장할 mount 제거    
+    해결방법 -> conf toml 변경해서 저장할 mount 제거
+12. Jenkins-Gitlab webhook 변경
