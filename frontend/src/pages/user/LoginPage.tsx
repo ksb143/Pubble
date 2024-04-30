@@ -37,6 +37,7 @@ const LoginPage = () => {
       // 성공 후 페이지 리다이렉션 필요
     } catch (error: unknown) {
       const axiosError = error as AxiosError;
+      console.log(axiosError);
       if (axiosError.response) {
         switch (axiosError.response.status) {
           case 401:
@@ -53,6 +54,7 @@ const LoginPage = () => {
         setError('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요');
       }
     }
+    console.log(error);
   };
 
   return (
