@@ -78,3 +78,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  font-weight: 200;
+  color: #111827;
+  background-color: #f9fafb;
+
+  min-width: 640px;
+  max-width: 1920px;
+  min-height: 100vh;
+}
