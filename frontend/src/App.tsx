@@ -11,7 +11,7 @@ function App() {
         <Route path='/user/*' element={<User />} />
         {/* 상단바 있는 페이지 */}
         <Route element={<Layout />}>
-          <Route path='/' element={<TestPage />} />
+          <Route path='/test' element={<TestPage />} />
         </Route>
       </Routes>
     </Router>
