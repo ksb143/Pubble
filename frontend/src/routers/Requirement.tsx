@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
 
-// import LoginPage from '@/pages/user/LoginPage.tsx';
 import RequirementPage from '@/pages/requirement/requirementPage.tsx';
 
 const Requirement = () => {
