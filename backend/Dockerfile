@@ -1,6 +1,6 @@
 FROM azul/zulu-openjdk:17-latest as build
 
-EXPOSE 9091
+#EXPOSE 9091
 
 # Jar 파일을 app.jar라는 이름으로 Docker 컨테이너에 추가합니다.
 COPY build/libs/*.jar app.jar
