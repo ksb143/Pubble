@@ -9,8 +9,6 @@ interface ApiConfig {
   headers?: Record<string, string>;
 }
 
-let isTokenRefreshing = false;
-
 const createApi = ({
   baseURL,
   withCredentials,
@@ -23,44 +21,54 @@ const createApi = ({
   });
 
   api.interceptors.request.use((config) => {
-    const accessToken = localStorage.getItem('accessToken');
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
-      return config;
-    } else {
-      // 토큰이 없어, 로그인 페이지로 이동
-      return Promise.reject(
-        new Error('토큰이 없어, 사용자 인증이 필요합니다.'),
-      );
+    if (withCredentials) {
+      const accessToken = localStorage.getItem('accessToken');
+      if (accessToken) {
+        config.headers.Authorization = `Bearer ${accessToken}`;
+      }
     }
+    return config;
   });
 
-  api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const {
-        config,
-        response: { status },
-      } = error;
-      if (status === httpStatusCode.UNAUTHORIZED && !isTokenRefreshing) {
-        isTokenRefreshing = true;
-        try {
-          // 토큰 재발급 성공
-          const { data } = await api.post('/users/reissue');
-          localStorage.setItem('accessToken', data.newAccessToken);
-          return api(config);
-        } catch (error) {
-          // 토큰 재발급 실패
-          return Promise.reject(error);
-        } finally {
-          isTokenRefreshing = false;
+  if (withCredentials) {
+    api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        if (error.response) {
+          if (
+            error.response.status === httpStatusCode.UNAUTHORIZED &&
+            !originalRequest._retry
+          ) {
+            originalRequest._retry = true;
+            try {
+              const { data } = await api.post('/users/reissue');
+              localStorage.setItem('accessToken', data.resData.newAccessToken);
+              return api(originalRequest);
+            } catch (refreshError) {
+              console.error('토큰 재발급 실패', refreshError);
+              return Promise.reject(
+                new Error('토큰을 갱신할 수 없습니다. 다시 로그인해주세요.'),
+              );
+            }
+          } else {
+            console.error('인증 실패:', error);
+            return Promise.reject(
+              new Error('인증이 실패했습니다. 다시 로그인해주세요.'),
+            );
+          }
+        } else {
+          // 네트워크 오류나 서버 응답 없음
+          console.error('서버 응답 없음:', error);
+          return Promise.reject(
+            new Error(
+              '서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.',
+            ),
+          );
         }
-      } else {
-        // 토큰 재발급 못했거나, 다른 오류로 인증 실패, 로그인 페이지로 이동
-        return Promise.reject(error);
-      }
-    },
-  );
+      },
+    );
+  }
   return api;
 };
 
@@ -71,12 +79,14 @@ export const noneApi = createApi({
 // 토큰 존재하지 않는 api ex. 회원가입, 로그인
 export const publicApi = createApi({
   baseURL: VITE_API_URI,
-  withCredentials: true,
+  withCredentials: false,
   headers: { 'Content-Type': 'application/json' },
 });
 // 토큰 존재하는 api
 export const privateApi = createApi({
   baseURL: VITE_API_URI,
-  withCredentials: false,
-  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
