@@ -64,8 +64,8 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/users/signup", "/users/signin", "/users/reissue", "/", "/hash").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/users/signup", "/api/users/signin", "/api/users/reissue", "/", "/api/hash", "/v3/api-docs/**", "/v3/swagger-ui/**", "/v3/swagger-resources/**", "/v3/**", "/v3/swagger-ui.html").permitAll()
+                        .requestMatchers("/api/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         http
@@ -73,14 +73,14 @@ public class SecurityConfig {
 
         // 로그인 경로 수정
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
-        loginFilter.setFilterProcessesUrl("/users/signin");
+        loginFilter.setFilterProcessesUrl("/api/users/signin");
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 로그아웃 경로 수정
          http
             .logout((logout) -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
+                .logoutRequestMatcher(new AntPathRequestMatcher("/api/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
 
@@ -92,13 +92,15 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
+
         http.cors((c) -> c.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE")));
+//                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE_TWO")));
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
