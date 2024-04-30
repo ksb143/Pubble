@@ -5,7 +5,7 @@ import LoginPage from '@/pages/user/LoginPage.tsx';
 const User = () => {
   return (
     <Routes>
-      <Route path='/login' element={<LoginPage />} />
+      <Route path='/' element={<LoginPage />} />
     </Routes>
   );
 };
