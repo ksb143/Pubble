@@ -5,8 +5,10 @@ import com.ssafy.d109.pubble.dto.projectDto.ProgressRatio;
 import com.ssafy.d109.pubble.dto.projectDto.RequirementCreateDto;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.Requirement;
+import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
+import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ public class RequirementService {
 
     private final RequirementRepository requirementRepository;
     private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
 
     public float getApprovalRatio(Integer projectId) {
 
@@ -78,7 +81,7 @@ public class RequirementService {
                 unapproved += 1;
             }
 
-            if (requirement.getLatest_version().equals("V.1.0.")) {
+            if (requirement.getVersion().equals("V.1.0.")) {
                 unchanged += 1;
             } else {
                 changed += 1;
@@ -120,10 +123,13 @@ public class RequirementService {
 
     // requirement 생성
     public void createRequirement(Integer projectId, RequirementCreateDto requirementCreateDto) {
-        Optional<Project> projectOptional = projectRepository.findByProjectId(projectId);
+        Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
+        Optional<User> optionalUser = userRepository.findByUserId(requirementCreateDto.getAuthorId());
 
-        if (projectOptional.isPresent()) {
-            Project project = projectOptional.get();
+        if (optionalProject.isPresent() && optionalUser.isPresent()) {
+            Project project = optionalProject.get();
+            User author = optionalUser.get();
+
             // orderIndex
             Integer orderIndex = requirementRepository.findMaxOrderIndexByProjectId(project.getProjectId());
             if (orderIndex == null) {
@@ -132,7 +138,7 @@ public class RequirementService {
                 orderIndex += 1;
             }
 
-            requirementRepository.save(Requirement.builder().isLock("u").approval("u").code(requirementCreateDto.getCode()).requirementName(requirementCreateDto.getRequirementName()).detail(requirementCreateDto.getDetail()).manager(requirementCreateDto.getManager()).author(requirementCreateDto.getAuthor()).targetUser(requirementCreateDto.getTargetUser()).latest_version("V.1.0.").orderIndex(orderIndex).project(project).build());
+            requirementRepository.save(Requirement.builder().isLock("u").approval("u").code(requirementCreateDto.getCode()).requirementName(requirementCreateDto.getRequirementName()).detail(requirementCreateDto.getDetail()).manager(requirementCreateDto.getManager()).author(author).targetUser(requirementCreateDto.getTargetUser()).version("V.1.0.").orderIndex(orderIndex).project(project).build());
         }
     }
 
@@ -175,22 +181,32 @@ public class RequirementService {
 //        return Requirement
 //    }
 
-    // requirement new version
-    public void createNewVersion(Integer requirementId, String something) {
+    // update version by command(h:hold / r:restore)
+    public void updateVersion(Integer requirementId, String command) {
         Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
 
         if (optionalRequirement.isPresent()) {
             Requirement requirement = optionalRequirement.get();
-        }
-    }
 
-    // requirement restore version
-    public void createRestoreVersion(Integer requirementId, String something) {
-        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
+            int holdCommand = 0;
+            int restoreCommand = 0;
 
-        if (optionalRequirement.isPresent()) {
-            Requirement requirement = optionalRequirement.get();
-            // orderindex는 물려받기
+            if ("h".equals(command)) {
+                holdCommand += 1;
+            } else if ("r".equals(command)) {
+                restoreCommand += 1;
+            }
+
+            String[] parts = requirement.getVersion().split("\\.");
+            Integer front = Integer.parseInt(parts[1]) + holdCommand;
+            Integer back = Integer.parseInt(parts[2]) + restoreCommand;
+
+            String newVersion = String.format("V.%d.%d", front, back);
+
+            // tobuild로 id, version 제외, 복제 저장
+            requirementRepository.save(requirement.toBuilder().requirementId(null).version(newVersion).build());
+
+            // orderIndex는 차후 논의
         }
     }
 }
