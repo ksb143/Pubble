@@ -1,16 +1,16 @@
-// react
+// 1. react
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// library
+// 2. library
 import { AxiosError } from 'axios';
 import Lottie from 'react-lottie';
-// api
+// 3. api
 import { login } from '@/apis/user';
-// store
+// 4. store
 import useUserStore from '@/stores/userStore';
-// component
-import AlertModal from '@/components/layouts/AlertModal.tsx';
-// assets
+// 5. component
+import ErrorAlertModal from '@/components/layouts/ErrorAlertModal.tsx';
+// 6. assets
 import loginAnimation from '@/assets/lotties/login.json';
 
 const LoginPage = () => {
@@ -20,6 +20,7 @@ const LoginPage = () => {
   const [isEmployeeId, setIsEmployeeId] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isError, setIsError] = useState(false);
   const { setName, setProfileColor } = useUserStore();
 
   // 로티 기본 옵션
@@ -69,28 +70,41 @@ const LoginPage = () => {
       navigate('/main');
     } catch (error: unknown) {
       const axiosError = error as AxiosError;
-      console.log(axiosError);
       if (axiosError.response) {
         switch (axiosError.response.status) {
           case 401:
-            setError('계정 정보가 일치하지 않습니다. 계정 정보를 확인해주세요');
+            setError(`계정 정보가 일치하지 않습니다. 
+            계정 정보를 확인해주세요`);
             break;
           case 404:
-            setError('사용자를 찾을 수 없습니다. 사번을 확인해주세요.');
+            setError(`사용자를 찾을 수 없습니다. 
+            사번을 확인해주세요.`);
             break;
           default:
-            setError('알 수 없는 오류가 발생했습니다.');
+            setError(`알 수 없는 오류가 발생했습니다.`);
             break;
         }
       } else {
-        setError('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요');
+        setError(`서버에 연결할 수 없습니다. 
+        네트워크 상태를 확인해주세요`);
       }
+      setIsError(true);
     }
+  };
+
+  // 에러 다이얼로그 닫기 함수
+  const handleCloseDialog = () => {
+    setError('');
+    setIsError(false);
   };
 
   return (
     <div className='flex grid h-screen grid-cols-12 items-center'>
-      {error && <AlertModal>{error}</AlertModal>}
+      {isError && (
+        <ErrorAlertModal isOpen={isError} closeDialog={handleCloseDialog}>
+          {error}
+        </ErrorAlertModal>
+      )}
       <div className='col-span-5 col-start-2'>
         <div className='mb-10'>
           <p className='text-2xl font-normal'>로그인</p>
