@@ -5,6 +5,13 @@ spring:
   application:
     name: pubble
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+
   datasource:
     url: ENC(4e8GH8J5pBy/EVDqV7y5sTnjGKiTYjvrWqp+lOPA9om0VmnUrinZZgWQXVwhsLQ6GPT/TpytbUI=)
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,7 +20,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
@@ -25,11 +32,8 @@ spring:
   jwt:
     secret: ENC(Uai6z1AChaeZrwQSWvhAkrwFO5fSH3lffVOYL1SCoTPyXpYqp9QHhPfXhc7HvdnDLcU+DYFhe+VCNIZtYgaYQMdQl9I4CafZZ+atB9TNChdyhmXliKiqtFny0kU9Zdat)
 
-  servlet:
-    multipart:
-      enabled: true
-      max-file-size: 100MB
-      max-request-size: 100MB
+
+
 
 springdoc:
   swagger-ui:
