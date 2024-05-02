@@ -13,7 +13,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     properties:
@@ -22,13 +22,29 @@ spring:
         format_sql: true
         default_batch_fetch_size: 100
 
-  #  jwt:
-  #    secret: ENC(Pp9CaGQlCpY/MbkzMiTF4Vcy/gCJ1lUdhsgWLmPlmzVdtVYN42ed4BTR3200vJCk2mHqEMCDCbeCTGL+fyIEGYVihho21TQwAnLJLmuOil6O2oBUBgSpBQ==)
-
   jwt:
-    secret: vmfhaltmskdlstkfkdgodyroqkfwkdbalroqkfwkdbalaaaaaaaaaaaaaaaabbbblkjlkjkldfdhgfhjgkjb
+    secret: ENC(Uai6z1AChaeZrwQSWvhAkrwFO5fSH3lffVOYL1SCoTPyXpYqp9QHhPfXhc7HvdnDLcU+DYFhe+VCNIZtYgaYQMdQl9I4CafZZ+atB9TNChdyhmXliKiqtFny0kU9Zdat)
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 springdoc:
   swagger-ui:
     path: /v3/api-docs
+
+cloud:
+  aws:
+    s3:
+      bucket: pubble
+      base-url: https://pubble.s3.ap-northeast-2.amazonaws.com/
+    credentials:
+      access-key: ENC(77Tj4QvKoqtOdQydOj7AU9lxFsYdHc2vDNGs8smEDrs=)
+      secret-key: ENC(aaJkCiiOLwOARpZkUAlw3ciq4bkLftCgahPSBYS/v571HA6UlSIVUnYzXMHK5b0qmrdrWYTHgXM=)
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
