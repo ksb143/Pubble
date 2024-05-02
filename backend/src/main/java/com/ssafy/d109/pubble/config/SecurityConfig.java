@@ -99,6 +99,7 @@ public class SecurityConfig {
                 CorsConfiguration configuration = new CorsConfiguration();
 
                 configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE")));
+                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_LOCAL")));
 //                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE_TWO")));
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
