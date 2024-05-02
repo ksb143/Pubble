@@ -51,11 +51,11 @@ public class ProjectService {
     }
 
     public ProjectDashboardDto getProjectDashboard(Integer projectId) {
-        Optional<Project> projectOptional = projectRepository.findByProjectId(projectId);
+        Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
         ProjectDashboardDto projectDashboardDto = null;
 
-        if (projectOptional.isPresent()) {
-            Project project = projectOptional.get();
+        if (optionalProject.isPresent()) {
+            Project project = optionalProject.get();
             List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
 
             List<DashboardUserInfo> dashboardUserInfos = new ArrayList<>();
@@ -72,11 +72,11 @@ public class ProjectService {
     }
 
     public ProjectRequirementsDto getProjectRequirements(Integer projectId) {
-        Optional<Project> projectOptional = projectRepository.findByProjectId(projectId);
+        Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
         ProjectRequirementsDto projectRequirementsDto = null;
 
-        if (projectOptional.isPresent()) {
-            Project project = projectOptional.get();
+        if (optionalProject.isPresent()) {
+            Project project = optionalProject.get();
             List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
             List<Requirement> requirements = requirementRepository.findLatestRequirementsForProjectByProjectId(projectId);
 
@@ -88,9 +88,9 @@ public class ProjectService {
 
     @Transactional
     public void changeProjectStatus(Integer projectId, String status) {
-        Optional<Project> projectOptional = projectRepository.findByProjectId(projectId);
-        if (projectOptional.isPresent()) {
-            Project project = projectOptional.get();
+        Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
+        if (optionalProject.isPresent()) {
+            Project project = optionalProject.get();
             project.setStatus(status);
         }
     }

@@ -18,7 +18,7 @@ public class RequirementCreateDto {
     private String requirementName;
     private String detail;
     private String manager;
-    private String author;
+    private Integer authorId; // 접속자로 그대로 만들어버릴지? userId로 받을지? employeeId로 받을지?
     private String targetUser;
 //    private String latest_version;
 //    private LocalDateTime createAt;

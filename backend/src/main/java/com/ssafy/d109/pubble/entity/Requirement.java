@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "requirement")
 public class Requirement {
 
@@ -23,22 +23,25 @@ public class Requirement {
     @Column(name = "requirementId")
     private Integer requirementId;
 
-    @Column(name = "order_index") // 순서 인덱스
+    @Column(name = "orderIndex") // 순서 인덱스
     private Integer orderIndex;
 
-    @Column(name = "is_lock", length = 1) // 잠금 여부 u, l (unlocked, locked)
+    @Column(name = "version") // 버전
+    private String version;
+
+    @Column(name = "isLock", length = 1) // 잠금 여부 u, l (unlocked, locked)
     private String isLock;
 
     @Column(name = "approval", length = 1) // 승인 여부 u, h, a (unapproved, holded, approved)
     private String approval;
 
-    @Column(name = "approval_comment") // 승인/보류 메세지
+    @Column(name = "approvalComment") // 승인/보류 메세지
     private String approvalComment;
 
     @Column(name = "code") // id
     private String code;
 
-    @Column(name = "requirement_name") // 요구사항명
+    @Column(name = "requirementName") // 요구사항명
     private String requirementName;
 
     @Column(name = "detail") // 상세설명
@@ -47,20 +50,14 @@ public class Requirement {
     @Column(name = "manager") // 담당자
     private String manager;
 
-    @Column(name = "author") // 작성자
-    private String author;
-
-    @Column(name = "target_user") // 타겟 이용자
+    @Column(name = "targetUser") // 타겟 이용자
     private String targetUser;
 
-    @Column(name = "latest_version") // 최근 버전
-    private String latest_version;
-
-    @Column(name = "created_at", updatable = false, nullable = false)
+    @Column(name = "createdAt", updatable = false, nullable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updatedAt")
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
@@ -68,4 +65,8 @@ public class Requirement {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId")
     private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author")
+    private User author;
 }
