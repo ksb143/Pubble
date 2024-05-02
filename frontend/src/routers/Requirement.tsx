@@ -1,11 +1,11 @@
 import { Routes, Route } from 'react-router-dom';
 
-import RequirementPage from '@/pages/requirement/requirementPage.tsx';
+import RQPage from '@/pages/requirement/RQPage.tsx';
 
 const Requirement = () => {
   return (
     <Routes>
-      <Route path='/' element={<RequirementPage />} />
+      <Route path='/' element={<RQPage />} />
     </Routes>
   );
 };
