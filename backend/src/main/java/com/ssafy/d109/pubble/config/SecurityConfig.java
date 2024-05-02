@@ -65,7 +65,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/api/users/signup", "/api/users/signin", "/api/users/reissue", "/api", "/api/hash").permitAll()
-                        .requestMatchers("/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/admin").hasRole("ADMIN")
                         .anyRequest().authenticated());
 
         http
@@ -73,14 +73,14 @@ public class SecurityConfig {
 
         // 로그인 경로 수정
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
-        loginFilter.setFilterProcessesUrl("/users/signin");
+        loginFilter.setFilterProcessesUrl("/api/users/signin");
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 로그아웃 경로 수정
          http
             .logout((logout) -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
+                .logoutRequestMatcher(new AntPathRequestMatcher("/api/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
 
