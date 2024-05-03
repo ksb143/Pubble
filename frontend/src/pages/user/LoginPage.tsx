@@ -1,15 +1,27 @@
+// 1. react
 import { useState } from 'react';
-import Lottie from 'react-lottie';
+import { useNavigate } from 'react-router-dom';
+// 2. library
 import { AxiosError } from 'axios';
+import Lottie from 'react-lottie';
+// 3. api
 import { login } from '@/apis/user';
+// 4. store
+import useUserStore from '@/stores/userStore';
+// 5. component
+import ErrorAlertModal from '@/components/layouts/ErrorAlertModal.tsx';
+// 6. assets
 import loginAnimation from '@/assets/lotties/login.json';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [employeeId, setEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const [isEmployeeId, setIsEmployeeId] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isError, setIsError] = useState(false);
+  const { setName, setProfileColor } = useUserStore();
 
   // 로티 기본 옵션
   const defaultOptions = {
@@ -19,6 +31,22 @@ const LoginPage = () => {
     rendererSettings: {
       preserveAspectRatio: 'xMidYMid slice',
     },
+  };
+
+  // jwt 디코드 함수
+  const parseJwt = (token: string) => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join(''),
+    );
+
+    return JSON.parse(jsonPayload);
   };
 
   // 로그인 함수
@@ -34,31 +62,49 @@ const LoginPage = () => {
     try {
       const data = await login(employeeId, password);
       localStorage.setItem('accessToken', data.resData.accessToken);
-      // 성공 후 페이지 리다이렉션 필요
+      const decodeToken = parseJwt(data.resData.accessToken);
+      // 이름 및 프로필 사진 색 스토어 설정
+      setName(decodeToken.name);
+      setProfileColor(decodeToken.profileColor);
+      // 성공 후 페이지 리다이렉션
+      navigate('/main');
     } catch (error: unknown) {
       const axiosError = error as AxiosError;
-      console.log(axiosError);
       if (axiosError.response) {
         switch (axiosError.response.status) {
           case 401:
-            setError('계정 정보가 일치하지 않습니다. 계정 정보를 확인해주세요');
+            setError(`계정 정보가 일치하지 않습니다. 
+            계정 정보를 확인해주세요`);
             break;
           case 404:
-            setError('사용자를 찾을 수 없습니다. 사번을 확인해주세요.');
+            setError(`사용자를 찾을 수 없습니다. 
+            사번을 확인해주세요.`);
             break;
           default:
-            setError('알 수 없는 오류가 발생했습니다.');
+            setError(`알 수 없는 오류가 발생했습니다.`);
             break;
         }
       } else {
-        setError('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요');
+        setError(`서버에 연결할 수 없습니다. 
+        네트워크 상태를 확인해주세요`);
       }
+      setIsError(true);
     }
-    console.log(error);
+  };
+
+  // 에러 다이얼로그 닫기 함수
+  const handleCloseDialog = () => {
+    setError('');
+    setIsError(false);
   };
 
   return (
     <div className='flex grid h-screen grid-cols-12 items-center'>
+      {isError && (
+        <ErrorAlertModal isOpen={isError} closeDialog={handleCloseDialog}>
+          {error}
+        </ErrorAlertModal>
+      )}
       <div className='col-span-5 col-start-2'>
         <div className='mb-10'>
           <p className='text-2xl font-normal'>로그인</p>
@@ -76,7 +122,11 @@ const LoginPage = () => {
               className='h-12 w-full rounded border-2 border-gray-200 p-2 focus:outline-pubble'
               type='text'
               value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
+              onChange={(e) => {
+                setEmployeeId(e.target.value);
+                setIsEmployeeId(false);
+                setIsPassword(false);
+              }}
             />
             {isEmployeeId && (
               <p className='text-sm text-red-600'>사번을 입력해주세요</p>
