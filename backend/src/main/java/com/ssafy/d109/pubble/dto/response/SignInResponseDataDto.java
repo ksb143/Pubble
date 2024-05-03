@@ -16,4 +16,6 @@ public class SignInResponseDataDto {
     private String profileColor;
     private String employeeId;
     private String name;
+    private String department;
+    private String position;
 }
