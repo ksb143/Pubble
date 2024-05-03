@@ -3,6 +3,7 @@ package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.*;
 import com.ssafy.d109.pubble.entity.Project;
+import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
@@ -73,8 +74,9 @@ public class ProjectService {
         return projectListDtos;
     }
 
-    // transactional?
+    @Transactional
     public void createProject(User user, ProjectCreateDto projectCreateDto) {
+
         Project project = Project.builder()
                 .projectTitle(projectCreateDto.getProjectTitle())
                 .startAt(projectCreateDto.getStartAt())
@@ -84,6 +86,19 @@ public class ProjectService {
                 .owner(user)
                 .build();
         projectRepository.save(project);
+
+        // participants mapping
+        for (int userid : projectCreateDto.getParticipants()) {
+            Optional<User> optionalUser = userRepository.findByUserId(userid);
+            if (optionalUser.isPresent()) {
+                User user1 = optionalUser.get();
+                ProjectAssignment projectAssignment = ProjectAssignment.builder()
+                        .user(user1)
+                        .project(project)
+                        .build();
+                projectAssignmentRepository.save(projectAssignment);
+            }
+        }
     }
 
     public ProjectDashboardDto getProjectDashboard(Integer projectId) {
