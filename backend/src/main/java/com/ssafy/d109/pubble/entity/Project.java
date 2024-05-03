@@ -20,13 +20,13 @@ public class Project {
     @Column(name = "projectId")
     private Integer projectId;
 
-    @Column(name = "project_title")
+    @Column(name = "projectTitle")
     private String projectTitle;
 
-    @Column(name = "start_at")
+    @Column(name = "startAt")
     private LocalDateTime startAt;
 
-    @Column(name = "end_at")
+    @Column(name = "endAt")
     private LocalDateTime endAt;
 
     @Column(name = "status")
