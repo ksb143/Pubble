@@ -72,6 +72,7 @@ public class RequirementConfirmController {
         responseDto.setResponseDto(confirmData);
         responseDto.setSignature(signature);
 
+        System.out.println("추카염. 니가 또 해냈다");
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
 }

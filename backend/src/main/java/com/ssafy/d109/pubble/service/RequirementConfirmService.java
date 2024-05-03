@@ -1,6 +1,6 @@
 package com.ssafy.d109.pubble.service;
 
-//import com.ssafy.d109.pubble.confirm.RSACrypto;
+import com.ssafy.d109.pubble.confirm.RSACrypto;
 import com.ssafy.d109.pubble.dto.request.ConfirmDataDto;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
