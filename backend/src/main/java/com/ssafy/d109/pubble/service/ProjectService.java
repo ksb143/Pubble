@@ -28,17 +28,46 @@ public class ProjectService {
     private final RequirementService requirementService;
     private final RequirementRepository requirementRepository;
 
+    private DashboardUserInfo getDashboardUserInfo(User user) {
+        return DashboardUserInfo.builder()
+                .name(user.getName())
+                .employeeId(user.getEmployeeId())
+                .department(user.getDepartment())
+                .position(user.getPosition())
+                .role(user.getRole())
+                .isApprovable(user.getIsApprovable())
+                .profileColor(user.getProfileColor())
+                .build();
+    }
+
+    private List<DashboardUserInfo> getDashboardUserInfos(Integer projectId) {
+        List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
+        List<DashboardUserInfo> dashboardUserInfos = new ArrayList<>();
+        for (User user : users) {
+            dashboardUserInfos.add(getDashboardUserInfo(user));
+        }
+
+        return dashboardUserInfos;
+    }
+
     public List<ProjectListDto> getProjectList(Integer userId) {
         List<Project> projects = projectAssignmentRepository.findAllProjectsByUserId(userId);
         List<ProjectListDto> projectListDtos = new ArrayList<>();
 
         for(Project project : projects) {
             List<String> people = projectAssignmentRepository.findUsernamesByProjectId(project.getProjectId());
-
-            // 진척도 - 승인 비율
             float progressRatio = requirementService.getApprovalRatio(project.getProjectId());
 
-            projectListDtos.add(ProjectListDto.builder().prdId(project.getCode()).projectTitle(project.getProjectTitle()).people(people).startAt(project.getStartAt()).endAt(project.getEndAt()).status(project.getStatus()).progressRatio(progressRatio).build());
+            ProjectListDto projectListDto = ProjectListDto.builder()
+                    .prdId(project.getCode())
+                    .projectTitle(project.getProjectTitle())
+                    .people(people)
+                    .startAt(project.getStartAt())
+                    .endAt(project.getEndAt())
+                    .status(project.getStatus())
+                    .progressRatio(progressRatio)
+                    .build();
+            projectListDtos.add(projectListDto);
         }
 
         return projectListDtos;
@@ -46,7 +75,14 @@ public class ProjectService {
 
     // transactional?
     public void createProject(User user, ProjectCreateDto projectCreateDto) {
-        Project project = Project.builder().projectTitle(projectCreateDto.getProjectTitle()).startAt(projectCreateDto.getStartAt()).endAt(projectCreateDto.getEndAt()).code(projectCreateDto.getCode()).status(projectCreateDto.getStatus()).owner(user).build();
+        Project project = Project.builder()
+                .projectTitle(projectCreateDto.getProjectTitle())
+                .startAt(projectCreateDto.getStartAt())
+                .endAt(projectCreateDto.getEndAt())
+                .code(projectCreateDto.getCode())
+                .status(projectCreateDto.getStatus())
+                .owner(user)
+                .build();
         projectRepository.save(project);
     }
 
@@ -56,16 +92,21 @@ public class ProjectService {
 
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
-            List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
-
-            List<DashboardUserInfo> dashboardUserInfos = new ArrayList<>();
-            for (User user : users) {
-                dashboardUserInfos.add(DashboardUserInfo.builder().userId(user.getUserId()).name(user.getName()).employeeId(user.getEmployeeId()).department(user.getDepartment()).position(user.getPosition()).role(user.getRole()).isApprovable(user.getIsApprovable()).profileColor(user.getProfileColor()).build());
-            }
-
             ProgressRatio progressRatio = requirementService.getProgressRatio(projectId);
+            List<DashboardUserInfo> dashboardUserInfos = getDashboardUserInfos(projectId);
 
-            projectDashboardDto = ProjectDashboardDto.builder().projectId(projectId).projectTitle(project.getProjectTitle()).startAt(project.getStartAt()).endAt(project.getEndAt()).status(project.getStatus()).code(project.getCode()).people(dashboardUserInfos).lockRatio(progressRatio.getLockRatio()).approveRatio(progressRatio.getApprovalRatio()).changedRatio(progressRatio.getChangeRatio()).build();
+            projectDashboardDto = ProjectDashboardDto.builder()
+                    .projectId(projectId)
+                    .projectTitle(project.getProjectTitle())
+                    .startAt(project.getStartAt())
+                    .endAt(project.getEndAt())
+                    .status(project.getStatus())
+                    .code(project.getCode())
+                    .people(dashboardUserInfos)
+                    .lockRatio(progressRatio.getLockRatio())
+                    .approveRatio(progressRatio.getApprovalRatio())
+                    .changedRatio(progressRatio.getChangeRatio())
+                    .build();
         }
 
         return projectDashboardDto;
@@ -77,10 +118,45 @@ public class ProjectService {
 
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
-            List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
+            List<DashboardUserInfo> dashboardUserInfos = getDashboardUserInfos(projectId);
+            List<RequirementSummaryDto> requirementSummaryDtos = new ArrayList<>();
             List<Requirement> requirements = requirementRepository.findLatestRequirementsForProjectByProjectId(projectId);
 
-            projectRequirementsDto = ProjectRequirementsDto.builder().projectId(project.getProjectId()).projectTitle(project.getProjectTitle()).startAt(project.getStartAt()).endAt(project.getEndAt()).status(project.getStatus()).code(project.getCode()).people(users).requirements(requirements).build();
+            for (Requirement requirement : requirements) {
+                DashboardUserInfo managerInfo = getDashboardUserInfo(requirement.getManager());
+                DashboardUserInfo authorInfo = getDashboardUserInfo(requirement.getAuthor());
+
+                RequirementSummaryDto requirementSummaryDto = RequirementSummaryDto.builder()
+                        .requirementId(requirement.getRequirementId())
+                        .orderIndex(requirement.getOrderIndex())
+                        .version(requirement.getVersion())
+                        .isLock(requirement.getIsLock())
+                        .approval(requirement.getApproval())
+                        .approvalComment(requirement.getApprovalComment())
+                        .code(requirement.getCode())
+                        .requirementName(requirement.getRequirementName())
+                        .detail(requirement.getDetail())
+                        .manager(managerInfo)
+                        .targetUser(requirement.getTargetUser())
+                        .createdAt(requirement.getCreatedAt())
+                        .author(authorInfo)
+                        .build();
+                requirementSummaryDtos.add(requirementSummaryDto);
+            }
+
+            projectRequirementsDto = ProjectRequirementsDto
+                    .builder()
+                    /*상단 정보*/
+                    .projectId(projectId)
+                    .projectTitle(project.getProjectTitle())
+                    .startAt(project.getStartAt())
+                    .endAt(project.getEndAt())
+                    .status(project.getStatus())
+                    .code(project.getCode())
+                    .people(dashboardUserInfos)
+                    /*상단 끝*/
+                    .requirementSummaryDtos(requirementSummaryDtos)
+                    .build();
         }
 
         return projectRequirementsDto;

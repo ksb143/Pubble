@@ -47,9 +47,6 @@ public class Requirement {
     @Column(name = "detail") // 상세설명
     private String detail;
 
-    @Column(name = "manager") // 담당자
-    private String manager;
-
     @Column(name = "targetUser") // 타겟 이용자
     private String targetUser;
 
@@ -67,6 +64,10 @@ public class Requirement {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author")
+    @JoinColumn(name = "manager") // 담당자
+    private User manager;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author") // 작성자
     private User author;
 }

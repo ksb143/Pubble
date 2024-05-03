@@ -124,11 +124,13 @@ public class RequirementService {
     // requirement 생성
     public void createRequirement(Integer projectId, RequirementCreateDto requirementCreateDto) {
         Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
-        Optional<User> optionalUser = userRepository.findByUserId(requirementCreateDto.getAuthorId());
+        Optional<User> optionalAuthor = userRepository.findByUserId(requirementCreateDto.getAuthorId());
+        Optional<User> optionalManager = userRepository.findByUserId(requirementCreateDto.getManagerId());
 
-        if (optionalProject.isPresent() && optionalUser.isPresent()) {
+        if (optionalProject.isPresent() && optionalAuthor.isPresent() && optionalManager.isPresent()) {
             Project project = optionalProject.get();
-            User author = optionalUser.get();
+            User author = optionalAuthor.get();
+            User manager = optionalManager.get();
 
             // orderIndex
             Integer orderIndex = requirementRepository.findMaxOrderIndexByProjectId(project.getProjectId());
@@ -138,7 +140,21 @@ public class RequirementService {
                 orderIndex += 1;
             }
 
-            requirementRepository.save(Requirement.builder().isLock("u").approval("u").code(requirementCreateDto.getCode()).requirementName(requirementCreateDto.getRequirementName()).detail(requirementCreateDto.getDetail()).manager(requirementCreateDto.getManager()).author(author).targetUser(requirementCreateDto.getTargetUser()).version("V.1.0.").orderIndex(orderIndex).project(project).build());
+            Requirement requirement = Requirement.builder()
+                    .isLock("u")
+                    .approval("u")
+                    .code(requirementCreateDto.getCode())
+                    .requirementName(requirementCreateDto.getRequirementName())
+                    .detail(requirementCreateDto.getDetail())
+                    .manager(manager)
+                    .author(author)
+                    .targetUser(requirementCreateDto.getTargetUser())
+                    .version("V.1.0.")
+                    .orderIndex(orderIndex)
+                    .project(project)
+                    .build();
+
+            requirementRepository.save(requirement);
         }
     }
 

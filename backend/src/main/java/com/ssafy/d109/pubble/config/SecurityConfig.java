@@ -62,35 +62,27 @@ public class SecurityConfig {
         http.httpBasic((auth) -> auth.disable());
 //        http.logout((logout) -> logout.disable());
 
-        http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/users/signup", "/api/users/signin", "/api/users/reissue", "/api", "/api/hash").permitAll()
-                        .requestMatchers("/api/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+        http.authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/users/**","/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
+                .requestMatchers("/api/admin").hasRole("ADMIN")
+                .anyRequest().authenticated());
 
-        http
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
         // 로그인 경로 수정
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
         loginFilter.setFilterProcessesUrl("/api/users/signin");
-        http
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 로그아웃 경로 수정
-         http
-            .logout((logout) -> logout
+        http.logout((logout) -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
 
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
-        http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
-
-        http
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.cors((c) -> c.configurationSource(new CorsConfigurationSource() {
             @Override

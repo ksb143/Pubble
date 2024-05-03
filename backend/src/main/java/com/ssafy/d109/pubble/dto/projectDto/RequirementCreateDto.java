@@ -17,7 +17,7 @@ public class RequirementCreateDto {
     private String code;
     private String requirementName;
     private String detail;
-    private String manager;
+    private Integer managerId; // 일단은 userid로 받는중
     private Integer authorId; // 접속자로 그대로 만들어버릴지? userId로 받을지? employeeId로 받을지?
     private String targetUser;
 //    private String latest_version;

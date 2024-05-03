@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/projects")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -64,7 +64,7 @@ public class ProjectController {
     public ResponseEntity<ResponseDto> getProjectRequirements(@PathVariable("project-id") Integer projectId) {
         ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
 
-        response = new ResponseDto(true, "해당 프로젝트의 요구사항 항목들", projectRequirementsDto);
+        response = new ResponseDto(true, "해당 프로젝트의 요구사항 항목들 - 코드 별 최신", projectRequirementsDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
