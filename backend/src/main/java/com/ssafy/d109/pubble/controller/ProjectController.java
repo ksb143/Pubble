@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-@RequestMapping("/projects")
+@RequestMapping("/api/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -64,7 +64,7 @@ public class ProjectController {
     public ResponseEntity<ResponseDto> getProjectRequirements(@PathVariable("project-id") Integer projectId) {
         ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
 
-        response = new ResponseDto(true, "해당 프로젝트의 요구사항 항목들", projectRequirementsDto);
+        response = new ResponseDto(true, "해당 프로젝트의 요구사항 항목들 - 코드 별 최신", projectRequirementsDto);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -76,19 +76,12 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/{project-id}/requirements/{requirement-id}/new")
-    public ResponseEntity<ResponseDto> createNewVersion(@PathVariable("requirement-id") Integer requirementId, @RequestBody String something) {
-        requirementService.createNewVersion(requirementId, something);
+    // update version by command(h:hold / r:restore)
+    @PostMapping("/{project-id}/requirements/{requirement-id}/version")
+    public ResponseEntity<ResponseDto> createNewVersion(@PathVariable("requirement-id") Integer requirementId, @RequestBody String command) {
+        requirementService.updateVersion(requirementId, command);
 
         response = new ResponseDto(true, "요구사항 항목의 새 버전 생성", null);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PostMapping("/{project-id}/requirements/{requirement-id}/restore")
-    public ResponseEntity<ResponseDto> createRestoreVersion(@PathVariable("requirement-id") Integer requirementId, @RequestBody String something) {
-        requirementService.createRestoreVersion(requirementId, something);
-
-        response = new ResponseDto(true, "이전 요구사항 항목 버전 복구", null);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

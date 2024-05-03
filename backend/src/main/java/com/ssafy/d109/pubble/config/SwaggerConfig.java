@@ -30,6 +30,13 @@ public class SwaggerConfig {
                 .pathsToMatch("/api/users/**")
                 .build();
     }
+    @Bean
+    public GroupedOpenApi projectApi() {
+        return GroupedOpenApi.builder()
+                .group("project-api")
+                .pathsToMatch("/api/projects/**")
+                .build();
+    }
 
 
     // 추후에 토큰을 헤더에 자동으로 추가해주는 쪽으로 변경 예정
@@ -44,5 +51,4 @@ public class SwaggerConfig {
                 .components(new Components().addSecuritySchemes("bearerAuth", securityScheme))
                 .security(Arrays.asList(securityRequirement));
     }
-
 }

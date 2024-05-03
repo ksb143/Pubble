@@ -23,8 +23,8 @@ public class ProjectRequirementsDto {
     private LocalDateTime endAt;
     private String status;
     private String code;
-    private List<User> people;
+    private List<DashboardUserInfo> people;
 
     // requirements
-    private List<Requirement> requirements;
+    private List<RequirementSummaryDto> requirementSummaryDtos;
 }

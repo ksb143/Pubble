@@ -62,24 +62,23 @@ public class SecurityConfig {
         http.httpBasic((auth) -> auth.disable());
 //        http.logout((logout) -> logout.disable());
 
-        http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/users/signup", "/api/users/signin", "/api/users/reissue", "/", "/api/hash", "/v3/api-docs/**", "/v3/swagger-ui/**", "/v3/swagger-resources/**", "/v3/**", "/v3/swagger-ui.html").permitAll()
-                        .requestMatchers("/api/admin").hasRole("ADMIN")
-                        .anyRequest().authenticated());
+        http.authorizeHttpRequests((auth) -> auth
+                .requestMatchers("/api/users/**","/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
+                .requestMatchers("/api/admin").hasRole("ADMIN")
+                .anyRequest().authenticated());
 
-        http
-                .addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+        http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
 
         // 로그인 경로 수정
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
+        loginFilter.setFilterProcessesUrl("/api/users/signin");
+        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
         loginFilter.setFilterProcessesUrl("/api/users/signin");
         http
                 .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 로그아웃 경로 수정
-         http
-            .logout((logout) -> logout
+        http.logout((logout) -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
@@ -92,7 +91,6 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-
         http.cors((c) -> c.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
@@ -100,6 +98,7 @@ public class SecurityConfig {
                 CorsConfiguration configuration = new CorsConfiguration();
 
                 configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE")));
+                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_LOCAL")));
 //                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE_TWO")));
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
