@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -22,4 +23,5 @@ public class ProjectCreateDto {
     private LocalDateTime endAt;
     private String status;
     private String code;
+    private List<Integer> participants;
 }
