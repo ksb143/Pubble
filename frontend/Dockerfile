@@ -7,10 +7,11 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 
-COPY . .
+COPY ./ ./
 
 RUN npm install
 RUN npm run build
+RUN npm run dev
 
 FROM nginx:latest
 
