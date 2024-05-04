@@ -61,6 +61,7 @@ public class RequirementConfirmService {
         return false;
     }
 
+
     @Transactional
     public void approveRequirement(Requirement requirement) {
 
@@ -71,11 +72,9 @@ public class RequirementConfirmService {
 
 
     @Transactional
-    public void holdRequirement(Requirement requirement) {
-
-        requirement.setApproval("h");
+    public void updateApprovalComment(Requirement requirement, String approvalComment) {
+        requirement.setApprovalComment(approvalComment);
         requirementRepository.save(requirement);
-
     }
 
 

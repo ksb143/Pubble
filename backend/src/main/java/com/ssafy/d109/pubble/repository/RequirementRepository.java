@@ -36,4 +36,5 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
 //    List<?> findLockApprovalByProjectId(Integer projectId);
 
     Optional<Requirement> findRequirementByRequirementId(Integer requirementId);
+
 }
