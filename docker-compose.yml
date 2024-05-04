@@ -1,0 +1,27 @@
+version: "3"
+services:
+  backend:
+    container_name: pubble-backend
+    build: ./backend
+    image: hyojukimdev/pubble-backend
+    ports:
+      - "10425:9091"
+    networks:
+      - backend_frontend
+
+  frontend:
+    container_name: pubble-frontend
+    build: ./frontend
+    image: hyojukimdev/pubble-frontend
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letscrypt:/etc/letsencrypt
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - /home/ubuntu/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - backend_frontend
+networks:
+  backend_frontend:
+    driver: bridge

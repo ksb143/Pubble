@@ -1,17 +1,19 @@
 # Node.js 20.11.1 버전을 사용
-FROM node:20.11.1 as builder
+FROM node:20.11.1 AS builder
 
 # 앱 디렉터리 생성
-WORKDIR /frontend
+WORKDIR /app
 
 COPY package.json .
+COPY package-lock.json .
 
-COPY ./ ./
+COPY . .
 
 RUN npm install
-
 RUN npm run build
 
-EXPOSE 5173
+FROM nginx:latest
 
-CMD ["npm","run","dev"]
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+CMD ["nginx", "-g", "daemon off;"]

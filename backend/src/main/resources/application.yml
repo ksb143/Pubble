@@ -1,3 +1,8 @@
+config:
+  import:
+    classpath:
+      application-secret.yml
+
 server:
   port: 9091
 

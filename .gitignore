@@ -228,3 +228,5 @@ web_modules/
 *.pem
 
 venv/
+
+backend/src/main/resources/application-secret.yml
