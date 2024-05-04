@@ -16,6 +16,10 @@ const Navbar = () => {
 
   return (
     <>
+      <div
+        className={`fixed inset-0 transition duration-500 ${showNotification ? 'z-10 bg-gray-900/30' : '-z-10 bg-transparent'}`}
+        onClick={toggleNotification}></div>
+
       <Notification
         show={showNotification}
         closeNotification={() => setShowNotification(false)}
