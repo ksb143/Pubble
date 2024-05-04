@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+  src: url('@/assets/fonts/PretendardVariable.woff2') format('woff2-variations');
+}
+
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100vh;
+}
+
+body {
+  font-weight: 200;
+  color: #111827;
+  background-color: #f9fafb;
+
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #e5e7eb;
+}
