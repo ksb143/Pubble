@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/api/requirements")
+@RequestMapping("/requirements")
 @Log4j2
 public class RequirementConfirmController {
 
