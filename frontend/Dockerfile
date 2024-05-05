@@ -6,7 +6,7 @@ COPY package-lock.json .
 COPY . .
 # 현재 디렉토리에 있는 모든 파일,디렉토리를 /app으로 복사
 RUN npm install
-RUN npm run build
+RUN unset CI && npm run build
 # /app/dist 디렉토리에 빌드된 정적 파일들을 생성함
 
 # nginx 이미지를 사용합니다. 뒤에 tag가 없으면 latest 를 사용합니다.
