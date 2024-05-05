@@ -63,7 +63,7 @@ public class SecurityConfig {
 //        http.logout((logout) -> logout.disable());
 
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/hash", "/api/users/**","/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
+                .requestMatchers("/hash", "api/users/**","/api/users/**","/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
                 .requestMatchers("/api/admin").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
@@ -93,9 +93,8 @@ public class SecurityConfig {
 
 http.cors((c) -> c.configurationSource(request -> {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of(
-        System.getenv("FRONT_BASE"),
-        System.getenv("FRONT_LOCAL")
+    configuration.setAllowedOrigins(Collections.singletonList(
+        System.getenv("FRONT_BASE")
     ));
     configuration.setAllowedMethods(Collections.singletonList("*"));
     configuration.setAllowCredentials(true);
