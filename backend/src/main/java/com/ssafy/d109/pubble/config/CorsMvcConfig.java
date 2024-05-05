@@ -11,8 +11,8 @@ public class CorsMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(
-                    System.getenv("FRONT_BASE")
-                    // System.getenv("FRONT_LOCAL")
+                    System.getenv("FRONT_BASE"),
+                    System.getenv("FRONT_LOCAL")
                 );
     }
 
