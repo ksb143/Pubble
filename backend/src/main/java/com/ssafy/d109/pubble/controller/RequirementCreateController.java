@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping(path = "/requirement")
+@RequestMapping(path = "/api/requirement")
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class RequirementCreateController {
