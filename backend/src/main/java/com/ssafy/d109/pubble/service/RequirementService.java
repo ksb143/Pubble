@@ -198,6 +198,7 @@ public class RequirementService {
 //    }
 
     // update version by command(h:hold / r:restore)
+    @Transactional
     public void updateVersion(Integer requirementId, String command) {
         Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
 
