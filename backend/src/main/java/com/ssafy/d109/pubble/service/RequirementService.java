@@ -206,6 +206,7 @@ public class RequirementService {
 
             int holdCommand = 0;
             int restoreCommand = 0;
+            String approval = "h";
 
             if ("h".equals(command)) {
                 holdCommand += 1;
@@ -220,7 +221,7 @@ public class RequirementService {
             String newVersion = String.format("V.%d.%d", front, back);
 
             // tobuild로 id, version 제외, 복제 저장
-            requirementRepository.save(requirement.toBuilder().requirementId(null).version(newVersion).build());
+            requirementRepository.save(requirement.toBuilder().requirementId(null).version(newVersion).approval(approval).build());
 
             // orderIndex는 차후 논의
         }
