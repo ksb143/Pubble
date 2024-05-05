@@ -23,6 +23,8 @@ const ImageUploadModal = ({
       const imageUrl = URL.createObjectURL(file);
       onInsert(imageUrl);
     }
+    setUrl('');
+    setFile(null);
     onClose();
   };
 
@@ -40,8 +42,9 @@ const ImageUploadModal = ({
   return (
     <div
       onDrop={handleImageDrop}
-      onDragOver={(event) => event.preventDefault()}>
-      <div className='flex justify-around'>
+      onDragOver={(event) => event.preventDefault()}
+      className='w-1/3 rounded bg-white p-6 shadow-custom'>
+      <div className='mb-3 flex justify-around'>
         <button
           className={`px-4 py-2 ${tab === 'link' ? 'border-b-4 border-pubble' : ''}`}
           onClick={() => setTab('link')}>
@@ -56,7 +59,7 @@ const ImageUploadModal = ({
       {tab === 'link' && (
         <input
           type='text'
-          className='w-full border border-gray-200 p-2'
+          className='mb-3 w-full rounded border border-gray-200 p-2 py-3'
           placeholder='이미지 주소를 입력하세요'
           value={url}
           onChange={(e) => setUrl(e.target.value)}
@@ -65,14 +68,14 @@ const ImageUploadModal = ({
       {tab === 'upload' && (
         <input
           type='file'
-          className='w-full border border-gray-200 p-2'
+          className='mb-3 w-full rounded border border-gray-200 p-2 py-3'
           onChange={(e) => setFile(e.target.files?.[0] || null)}
         />
       )}
       <div>
         <button
           onClick={handleInsert}
-          className='font- bg-pubble text-2xl font-normal text-white hover:bg-blue-800 hover:shadow-custom'>
+          className='font- w-full rounded bg-pubble py-1 text-2xl font-normal text-white hover:bg-blue-800 hover:shadow-custom'>
           삽입
         </button>
       </div>
