@@ -24,7 +24,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -88,11 +90,15 @@ public class SecurityConfig {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
+                // setAllowedOrigins
+                List<String> origins = Arrays.asList(
+                        System.getenv("FRONT_BASE"),
+                        System.getenv("FRONT_LOCAL")
+                );
+
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE")));
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_LOCAL")));
-//                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE_TWO")));
+                configuration.setAllowedOrigins(origins);
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));
