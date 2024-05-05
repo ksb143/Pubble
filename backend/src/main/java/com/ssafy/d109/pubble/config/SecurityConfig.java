@@ -91,25 +91,20 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.cors((c) -> c.configurationSource(new CorsConfigurationSource() {
-            @Override
-            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+http.cors((c) -> c.configurationSource(request -> {
+    CorsConfiguration configuration = new CorsConfiguration();
+    configuration.setAllowedOrigins(List.of(
+        System.getenv("FRONT_BASE"),
+        System.getenv("FRONT_LOCAL")
+    ));
+    configuration.setAllowedMethods(Collections.singletonList("*"));
+    configuration.setAllowCredentials(true);
+    configuration.setAllowedHeaders(Collections.singletonList("*"));
+    configuration.setMaxAge(3600L);
+    configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+    return configuration;
+}));
 
-                CorsConfiguration configuration = new CorsConfiguration();
-
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE")));
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_LOCAL")));
-//                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE_TWO")));
-                configuration.setAllowedMethods(Collections.singletonList("*"));
-                configuration.setAllowCredentials(true);
-                configuration.setAllowedHeaders(Collections.singletonList("*"));
-                configuration.setMaxAge(3600L);
-
-                configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
-                return configuration;
-            }
-        }));
 
         return http.build();
     }
