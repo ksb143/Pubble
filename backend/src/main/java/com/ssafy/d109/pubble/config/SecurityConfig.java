@@ -73,8 +73,8 @@ public class SecurityConfig {
 
         // 로그인 경로 수정
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
-        loginFilter.setFilterProcessesUrl("/users/signin");
         http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        loginFilter.setFilterProcessesUrl("/users/signin");
 
         // 로그아웃 경로 수정
         http.logout((logout) -> logout
