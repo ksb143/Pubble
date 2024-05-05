@@ -47,17 +47,36 @@ public class JWTUtil {
 
     }
 
+    public String getName(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("name", String.class);
+
+    }
+
+    public String getDepartment(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("department", String.class);
+    }
+
+    public String getPosition(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("position", String.class);
+    }
+
     public String createJwt(String category, String employeeId, String role, Long expiredMs) {
 
         User user = userRepository.findByEmployeeId(employeeId).orElseThrow(UserNotFoundException::new);
         String r = user.getRole();
         String profileColor = user.getProfileColor();
+        String name = user.getName();
+        String department = user.getDepartment();
+        String position = user.getPosition();
 
         return Jwts.builder()
                 .claim("category", category)
                 .claim("employeeId", employeeId)
                 .claim("role", r)
                 .claim("profileColor", profileColor)
+                .claim("name", name)
+                .claim("department", department)
+                .claim("position", position)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

@@ -4,4 +4,4 @@ FROM azul/zulu-openjdk:17-latest as build
 COPY build/libs/*.jar app.jar
 
 # app.jar 파일을 실행합니다.
-ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9001", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]

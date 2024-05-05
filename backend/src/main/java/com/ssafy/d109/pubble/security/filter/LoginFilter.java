@@ -101,18 +101,25 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, 600000L);
         String refreshToken = jwtUtil.createJwt("refresh", employeeId, role, 86400000L);
-
-        log.info("프로필 색상: {}", jwtUtil.getProfileColor(accessToken));
+        String profileColor = jwtUtil.getProfileColor(accessToken);
+        String name = jwtUtil.getName(accessToken);
+        String department = jwtUtil.getDepartment(accessToken);
+        String position = jwtUtil.getPosition(accessToken);
 
         SignInResponseDataDto dto = SignInResponseDataDto.builder()
-                        .accessToken(accessToken)
-                                .data(true)
-                                        .build();
+                .accessToken(accessToken)
+                .data(true)
+                .profileColor(profileColor)
+                .employeeId(employeeId)
+                .name(name)
+                .department(department)
+                .position(position)
+                .build();
 
         UserSignInResponseDto responseDto = UserSignInResponseDto.builder()
-                        .messges("SignIn Success")
-                                .resData(dto)
-                                        .build();
+                .messges("SignIn Success")
+                .resData(dto)
+                .build();
 
         response.addHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("refresh", refreshToken));

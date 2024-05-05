@@ -34,4 +34,7 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
 //    // lock, approval 뽑아옴
 //    @Query("SELECT r.lock, r.approval FROM Requirement r WHERE r.project.projectId = :projectId")
 //    List<?> findLockApprovalByProjectId(Integer projectId);
+
+    Optional<Requirement> findRequirementByRequirementId(Integer requirementId);
+
 }
