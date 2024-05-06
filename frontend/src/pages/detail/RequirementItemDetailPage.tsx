@@ -15,18 +15,31 @@ import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
 import Lottie from 'react-lottie';
+import Microlink from '@microlink/react';
 // 3. api
 // 4. store
 // 5. component
 import MenuBar from '@/components/details/MenuBar.tsx';
 import BubbleMenuBar from '@/components/details/BubbleMenuBar.tsx';
 import ImageUploadModal from '@/components/details/ImageUploadModal.tsx';
+import LinkUploadModal from '@/components/details/LinkUploadModal.tsx';
 // 6. image 등 assets
 import LodingAnimation from '@/assets/lotties/loading.json';
 import { ResizableImage } from '@/extensions/ResizableImage.ts';
 
+const mql = require('@microlink/mql');
+
+const { status, data } = await mql('https://www.netflix.com/title/80057281', {
+  screenshot: true,
+});
+
+mql.render(data);
+
 const RequirementItemDetailPage = () => {
   const [isImageUploadModalOpen, setIsImageUploadModalOpen] = useState(false);
+  const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] = useState(false);
+  const [linkTabType, setLinkTabType] = useState('');
+
   // 파라미터
   const { projectName = '', requirementId = '' } = useParams();
 
@@ -45,7 +58,11 @@ const RequirementItemDetailPage = () => {
     extensions: [
       StarterKit,
       Underline,
-      Link,
+      Link.configure({
+        HTMLAttributes: {
+          class: 'underline text-pubble cursor-pointer hover:text-blue-700',
+        },
+      }),
       ResizableImage,
       Table.configure({
         resizable: true,
@@ -72,6 +89,15 @@ const RequirementItemDetailPage = () => {
     setIsImageUploadModalOpen(false);
   };
 
+  // 링크 삽입 함수
+  const handleLinkInsert = (link: string, linkType: string) => {
+    if (linkType === 'link') {
+      editor?.chain().focus().setLink({ href: link, target: '_blank' }).run();
+    } else if (linkType === 'webImage') {
+    }
+    setIsLinkUploadModalOpen(false);
+  };
+
   // 에디터가 없을 경우
   if (!editor) {
     return <Lottie options={defaultOptions} height={500} width={500} />;
@@ -87,6 +113,10 @@ const RequirementItemDetailPage = () => {
           requirementName='좋아요 기능'
           projectName={projectName}
           openImageUploadModal={() => setIsImageUploadModalOpen(true)}
+          openLinkUploadModal={(tabType: string) => {
+            setLinkTabType(tabType);
+            setIsLinkUploadModalOpen(true);
+          }}
         />
       </div>
       <div className='col-span-10 col-start-2 h-screen p-6 shadow'>
@@ -98,6 +128,12 @@ const RequirementItemDetailPage = () => {
           isOpen={isImageUploadModalOpen}
           onClose={() => setIsImageUploadModalOpen(false)}
           onInsert={handleImageInsert}
+        />
+        <LinkUploadModal
+          tabType={linkTabType}
+          isOpen={isLinkUploadModalOpen}
+          onClose={() => setIsLinkUploadModalOpen(false)}
+          onInsert={handleLinkInsert}
         />
       </div>
     </div>

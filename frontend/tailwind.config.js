@@ -102,13 +102,12 @@ const shadcnConfig = {
   plugins: [require('tailwindcss-animate')],
 };
 
+const _ = require('lodash');
+
 module.exports = {
   content: [...oldConfig.content, ...shadcnConfig.content],
   theme: {
-    extend: {
-      ...oldConfig.theme.extend,
-      ...shadcnConfig.theme.extend,
-    },
+    extend: _.merge({}, oldConfig.theme.extend, shadcnConfig.theme.extend),
   },
   plugins: [...oldConfig.plugins, ...shadcnConfig.plugins],
 };

@@ -66,6 +66,7 @@ interface MenuBarProps {
   requirementName: string;
   projectName: string;
   openImageUploadModal: () => void;
+  openLinkUploadModal: (tabType: string) => void;
 }
 
 const MenuBar = ({
@@ -74,6 +75,7 @@ const MenuBar = ({
   requirementName,
   projectName,
   openImageUploadModal,
+  openLinkUploadModal,
 }: MenuBarProps) => {
   if (!editor) {
     return null;
@@ -150,11 +152,12 @@ const MenuBar = ({
                 <LinkIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => openLinkUploadModal('link')}>
                   <LinkUnlinkIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                   <span className='ml-2'>링크</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => openLinkUploadModal('webImage')}>
                   <WindowLineIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                   <span className='ml-2'>웹이미지</span>
                 </DropdownMenuItem>
