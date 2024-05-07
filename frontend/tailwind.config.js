@@ -16,6 +16,9 @@ const oldConfig = {
         plyellow: '#FFFAE8', // 연노랑
         plgreen: '#E8F6ED', // 연초록
         plpurple: '#F5EBFD', // 연보라
+        // 코드 색깔
+        'code-bg': '#1e1e1e',
+        'code-text': '#dcdcdc',
       },
       boxShadow: {
         custom: '0px 0px 8px rgba(0, 0, 0, 0.12)',

@@ -4,9 +4,12 @@ import { Editor } from '@tiptap/react';
 import styled from '@emotion/styled';
 import {
   DropdownMenu,
-  DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuContent,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
 // 3. api
 // 4. store
@@ -23,10 +26,19 @@ import FileLineIcon from '@/assets/icons/file-line.svg?react';
 import LinkIcon from '@/assets/icons/link.svg?react';
 import CodeBlockIcon from '@/assets/icons/code-block.svg?react';
 import TableLIneIcon from '@/assets/icons/table-line.svg?react';
-import FeedbackLineIcon from '@/assets/icons/feedback-line.svg?react';
 import LinkUnlinkIcon from '@/assets/icons/link-unlink-m.svg?react';
 import WindowLineIcon from '@/assets/icons/window-line.svg?react';
 import CodeVIewIcon from '@/assets/icons/code-view.svg?react';
+
+const codeLangType = [
+  { label: 'Javascript', value: 'javascript' },
+  { label: 'CSS', value: 'css' },
+  { label: 'HTML', value: 'html' },
+  { label: 'Python', value: 'python' },
+  { label: 'Java', value: 'java' },
+  { label: 'C', value: 'c' },
+  { label: 'C++', value: 'cpp' },
+];
 
 // 컬러팔레트 커스텀
 const ColorInput = styled.input`
@@ -167,12 +179,38 @@ const MenuBar = ({
               <DropdownMenuTrigger>
                 <CodeBlockIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
               </DropdownMenuTrigger>
+
               <DropdownMenuContent>
-                <DropdownMenuItem>
-                  <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
-                  <span className='ml-2'>코드블럭</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className='flex items-center'>
+                    <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
+                    <span className='ml-2'>언어 선택</span>
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        editor.chain().focus().toggleCodeBlock().run();
+                      }}>
+                      Plain
+                    </DropdownMenuItem>
+                    {codeLangType.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang.value}
+                        onClick={() =>
+                          editor
+                            .chain()
+                            .focus()
+                            .toggleCodeBlock({ language: lang.value })
+                            .run()
+                        }>
+                        {lang.label}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuItem
+                  onClick={() => editor.chain().focus().setCodeBlock().run()}
+                  className='flex items-center'>
                   <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                   <span className='ml-2'>HTML블럭</span>
                 </DropdownMenuItem>
@@ -180,9 +218,6 @@ const MenuBar = ({
             </DropdownMenu>
             <button>
               <TableLIneIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
-            </button>
-            <button>
-              <FeedbackLineIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
           </div>
         </div>

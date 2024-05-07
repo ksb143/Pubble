@@ -11,7 +11,10 @@ import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
+// import CodeBlock from '@tiptap/extension-code-block';
 import { Color } from '@tiptap/extension-color';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import { common, createLowlight } from 'lowlight';
 import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
@@ -26,6 +29,8 @@ import LinkUploadModal from '@/components/details/LinkUploadModal.tsx';
 // 6. image 등 assets
 import LoadingAnimation from '@/assets/lotties/loading.json';
 const { VITE_SCREENSHOT_API } = import.meta.env;
+
+const lowlight = createLowlight(common);
 
 const RequirementItemDetailPage = () => {
   const [isImageUploadModalOpen, setIsImageUploadModalOpen] =
@@ -64,6 +69,14 @@ const RequirementItemDetailPage = () => {
       TableCell,
       TableHeader,
       TableRow,
+      CodeBlockLowlight.configure({
+        lowlight,
+        languageClassPrefix: 'language-',
+        defaultLanguage: 'plaintext',
+        HTMLAttributes: {
+          class: 'bg-code-bg text-code-text py-4 p-4 rounded-md',
+        },
+      }),
       Color,
       TextStyle,
       Highlight.configure({
