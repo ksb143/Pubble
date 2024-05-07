@@ -13,6 +13,8 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
 
     Optional<Requirement> findByRequirementId(Integer requirementId);
 
+    List<Requirement> findByProject_ProjectIdAndCode(Integer projectId, String code);
+
     //    - projectId를 인자로 받는다.
     //    - projectId에 해당하는 requirement들을 찾는다.
     //    - 해당하는 requirement들 중 code 값이 같은 requirement가 여러 개 있다면, 가장 최신의 것만 고른다.

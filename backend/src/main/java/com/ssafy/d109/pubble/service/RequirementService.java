@@ -1,11 +1,11 @@
 package com.ssafy.d109.pubble.service;
 
-import com.ssafy.d109.pubble.dto.projectDto.ApprovalDto;
-import com.ssafy.d109.pubble.dto.projectDto.ProgressRatio;
-import com.ssafy.d109.pubble.dto.projectDto.RequirementCreateDto;
+import com.ssafy.d109.pubble.dto.projectDto.*;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
+import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -158,6 +159,106 @@ public class RequirementService {
         }
     }
 
+    private DashboardUserInfo getDashboardUserInfo(User user) {
+        return DashboardUserInfo.builder()
+                .userId(user.getUserId())
+                .name(user.getName())
+                .employeeId(user.getEmployeeId())
+                .department(user.getDepartment())
+                .position(user.getPosition())
+                .role(user.getRole())
+                .isApprovable(user.getIsApprovable())
+                .profileColor(user.getProfileColor())
+                .build();
+    }
+
+    public RequirementSummaryDto getRequirement(Integer requirementId) {
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
+
+        DashboardUserInfo managerInfo = getDashboardUserInfo(requirement.getManager());
+        DashboardUserInfo authorInfo = getDashboardUserInfo(requirement.getAuthor());
+
+        RequirementSummaryDto requirementSummaryDto = RequirementSummaryDto.builder()
+                .requirementId(requirement.getRequirementId())
+                .orderIndex(requirement.getOrderIndex())
+                .version(requirement.getVersion())
+                .isLock(requirement.getIsLock())
+                .approval(requirement.getApproval())
+                .approvalComment(requirement.getApprovalComment())
+                .code(requirement.getCode())
+                .requirementName(requirement.getRequirementName())
+                .detail(requirement.getDetail())
+                .manager(managerInfo)
+                .targetUser(requirement.getTargetUser())
+                .createdAt(requirement.getCreatedAt())
+                .author(authorInfo)
+                .build();
+
+        return requirementSummaryDto;
+    }
+
+    @Transactional
+    public void updateRequirement(Integer requirementId, RequirementUpdateDto udto) {
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
+
+        if (udto.getIsApproval() != null) {
+            requirement.setApproval(udto.getIsApproval());
+        }
+        if (udto.getCode() != null) {
+            requirement.setCode(udto.getCode());
+        }
+        if (udto.getRequirementName() != null) {
+            requirement.setRequirementName(udto.getRequirementName());
+        }
+        if (udto.getDetail() != null) {
+            requirement.setDetail(udto.getDetail());
+        }
+        if (udto.getManagerId() != null) {
+            User manager = userRepository.findByUserId(udto.getManagerId()).orElseThrow(UserNotFoundException::new);
+            requirement.setManager(manager);
+        }
+        if (udto.getAuthorId() != null) {
+            User author = userRepository.findByUserId(udto.getAuthorId()).orElseThrow(UserNotFoundException::new);
+            requirement.setAuthor(author);
+        }
+        if (udto.getVersion() != null) {
+            requirement.setVersion(udto.getVersion());
+        }
+
+        requirementRepository.save(requirement);
+    }
+
+    // update version by command(h:hold / r:restore)
+    @Transactional
+    public void updateVersion(Integer requirementId, String command) {
+        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
+
+        if (optionalRequirement.isPresent()) {
+            Requirement requirement = optionalRequirement.get();
+
+            int holdCommand = 0;
+            int restoreCommand = 0;
+            String approval = "h";
+
+            if ("h".equals(command)) {
+                holdCommand += 1;
+            } else if ("r".equals(command)) {
+                restoreCommand += 1;
+            }
+
+            String[] parts = requirement.getVersion().split("\\.");
+            Integer front = Integer.parseInt(parts[1]) + holdCommand;
+            Integer back = Integer.parseInt(parts[2]) + restoreCommand;
+
+            String newVersion = String.format("V.%d.%d", front, back);
+
+            // tobuild로 id, version 제외, 복제 저장
+            requirementRepository.save(requirement.toBuilder().requirementId(null).version(newVersion).approval(approval).build());
+
+            // orderIndex는 차후 논의
+        }
+    }
+
     @Transactional
     public void updateRequirementLock(Integer requirementId, String lock) {
         Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
@@ -191,40 +292,15 @@ public class RequirementService {
         }
     }
 
-//    // requirement 조회
-//    public Requirement getRequirement() {
-//        System.out.println("something wip");
-//        return Requirement
-//    }
+    public List<RequirementSummaryDto> getRequirementsByCode(Integer projectId, String code) {
+        List<Requirement> requirements = requirementRepository.findByProject_ProjectIdAndCode(projectId, code);
+        List<RequirementSummaryDto> requirementSummaryDtos = new ArrayList<>();
 
-    // update version by command(h:hold / r:restore)
-    @Transactional
-    public void updateVersion(Integer requirementId, String command) {
-        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
-
-        if (optionalRequirement.isPresent()) {
-            Requirement requirement = optionalRequirement.get();
-
-            int holdCommand = 0;
-            int restoreCommand = 0;
-            String approval = "h";
-
-            if ("h".equals(command)) {
-                holdCommand += 1;
-            } else if ("r".equals(command)) {
-                restoreCommand += 1;
-            }
-
-            String[] parts = requirement.getVersion().split("\\.");
-            Integer front = Integer.parseInt(parts[1]) + holdCommand;
-            Integer back = Integer.parseInt(parts[2]) + restoreCommand;
-
-            String newVersion = String.format("V.%d.%d", front, back);
-
-            // tobuild로 id, version 제외, 복제 저장
-            requirementRepository.save(requirement.toBuilder().requirementId(null).version(newVersion).approval(approval).build());
-
-            // orderIndex는 차후 논의
+        for(Requirement requirement : requirements) {
+            RequirementSummaryDto requirementSummaryDto = getRequirement(requirement.getRequirementId());
+            requirementSummaryDtos.add(requirementSummaryDto);
         }
+
+        return requirementSummaryDtos;
     }
 }
