@@ -1,8 +1,8 @@
 @import 'highlight.js/styles/github-dark.css';
 
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
   @layer base {
     @font-face {
@@ -95,6 +95,7 @@
 
   #root {
     height: 100vh;
+    overflow-y: auto;
   }
 
   ::-webkit-scrollbar {

@@ -12,6 +12,7 @@ const oldConfig = {
       colors: {
         pubble: '#1A60FE', // 메인 파랑
         plblue: '#E9F0FF', // 연하늘
+        dpubble: '#1A4CEA', // 진한 파랑
         plred: '#FCEAEA', // 연빨강
         plyellow: '#FFFAE8', // 연노랑
         plgreen: '#E8F6ED', // 연초록
