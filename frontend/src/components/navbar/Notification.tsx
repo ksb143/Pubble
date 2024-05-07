@@ -22,11 +22,11 @@ const ListItem = ({ text }: ListItemProps) => (
   <li className='flex items-center justify-between border-b px-2 py-6 last-of-type:border-none'>
     <div className='flex flex-grow items-center'>
       <Profile />
-      <div className='flex-grow px-2'>{text}</div>
+      <p className='flex-grow px-2'>{text}</p>
     </div>
     <div className='flex flex-col items-end'>
-      <div>2024-05-04</div>
-      <div>15:04</div>
+      <p>2024-05-04</p>
+      <p>15:04</p>
     </div>
   </li>
 );
@@ -42,7 +42,7 @@ const Notification: React.FC<NotificationProps> = ({ isOpen, closeModal }) => {
       <div className='mb-4 flex items-center justify-between'>
         <div className='flex items-center'>
           <Bell className='mr-2 h-6 w-6 fill-gray-900 stroke-gray-900 stroke-2' />
-          <div className='text-2xl font-normal'>알림</div>
+          <p className='text-2xl font-normal'>알림</p>
         </div>
         <Xmark
           className='h-8 w-8 cursor-pointer stroke-gray-900 stroke-1'

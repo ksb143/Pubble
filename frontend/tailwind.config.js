@@ -16,6 +16,7 @@ export default {
         plyellow: '#FFFAE8', // 연노랑
         plgreen: '#E8F6ED', // 연초록
         plpurple: '#F5EBFD', // 연보라
+        dpubble: '#1A4CEA', // 진한 파랑
       },
     },
   },

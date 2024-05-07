@@ -20,7 +20,7 @@ const Navbar = () => {
   return (
     <>
       <div
-        className={`fixed inset-0 transition duration-500 ${activeModal ? 'z-10 bg-gray-900/30' : '-z-10 bg-transparent'}`}
+        className={`fixed inset-0 z-10 transition duration-700 ${activeModal ? 'bg-gray-900/30 backdrop-blur-none' : 'pointer-events-none opacity-0'}`}
         onClick={() => setActiveModal(null)}></div>
 
       <Message
