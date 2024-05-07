@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import {
   ColumnDef,
@@ -36,16 +36,15 @@ import {
 } from "@/shadcn-ui/ui/button";
 
 import {
-  Input
+  Input 
 } from "@/shadcn-ui/ui/input";
 
 import {
   Checkbox
 } from "@/shadcn-ui/ui/checkbox";
 
-import { 
-  MoreHorizontal,
-  ArrowUpDown 
+import {  
+  MoreHorizontal, 
 } from "lucide-react";
 
 interface RQData {
@@ -59,6 +58,18 @@ interface RQData {
 }
 
 const RQPage = () => {
+
+  // 셀을 편집 가능한 상태로 만들기 위한 상태 추가
+  const [editingCellId, setEditingCellId] = useState<string | null>(null);
+
+// 편집 모드를 토글하는 함수
+const toggleEdit = (cellId: string | null) => {
+  if (editingCellId === cellId) {
+    setEditingCellId(null); // 편집 모드 종료
+  } else {
+    setEditingCellId(cellId); // 새 셀 편집 시작
+  }
+};
   const columns: ColumnDef<RQData>[] = useMemo(() => [
     {
       id: "select",
@@ -99,13 +110,28 @@ const RQPage = () => {
     },
     {
       accessorKey: "requirementName",
-      header: ({ column }) => (
-        <Button variant="ghost" className="font-semibold" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          요구사항이름
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      ),
+      header: "요구사항이름",
+      cell: ({ cell }) => {
+        return editingCellId === cell.id ? (
+          <input
+            type="text"
+            autoFocus
+            defaultValue={String(cell.getValue())}
+            onBlur={() => toggleEdit(null)} // 다른 곳 클릭 시 편집 종료
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                toggleEdit(null); // 엔터 키를 누를 때도 편집 종료
+              }
+            }}
+          />
+        ) : (
+          <div onClick={() => toggleEdit(cell.id)}>
+            {String(cell.getValue())}
+          </div>
+        );
+      }
     },
+    
     {
       accessorKey: "description",
       header: "상세설명",
@@ -161,10 +187,20 @@ const RQPage = () => {
     currentVersion: `v1.${idx + 1}`,
   })), []);
 
+  useEffect(() => {
+    if (editingCellId) {
+      const input = document.getElementById(editingCellId);
+      if (input) {
+        input.focus();
+      }
+    }
+  }, [editingCellId]);
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+// 편집 상태가 변경될 때마다 실행되는 useEffect
 
 
   const table = useReactTable<RQData>({
