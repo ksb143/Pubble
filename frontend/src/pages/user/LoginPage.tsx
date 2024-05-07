@@ -1,4 +1,4 @@
-// 1. react
+// 11. react
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
@@ -99,7 +99,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className='flex grid h-screen grid-cols-12 items-center'>
+    <div className='mx-12 grid h-screen grid-cols-12 items-center'>
       {isError && (
         <ErrorAlertModal isOpen={isError} closeDialog={handleCloseDialog}>
           {error}
