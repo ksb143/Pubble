@@ -8,5 +8,6 @@ import lombok.Setter;
 public class ImageUploadResponseDto {
 
     private String message;
+    private String s3Url;
     private Boolean data;
 }

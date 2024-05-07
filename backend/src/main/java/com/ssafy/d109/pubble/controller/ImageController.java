@@ -31,11 +31,13 @@ public class ImageController {
         String s3Url = imageService.uploadImage(upload, dto.getRequirementId());
         if (s3Url == null) {
             responseDto.setMessage("Image Upload Failed");
+            responseDto.setS3Url(null);
             responseDto.setData(false);
             return new ResponseEntity<>(responseDto, HttpStatus.BAD_REQUEST);
         }
 
         responseDto.setMessage("Image Upload Success");
+        responseDto.setS3Url(s3Url);
         responseDto.setData(true);
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
