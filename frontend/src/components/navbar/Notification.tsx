@@ -33,6 +33,7 @@ const ListItem = ({ text }: ListItemProps) => (
 
 const items = Array.from({ length: 10 }, (_, index) => `Test${index + 1}`);
 
+// ToDo : 불러온 데이터가 있는지 여부 => 삼항연산자 or 조건부 렌더링
 const Notification: React.FC<NotificationProps> = ({ isOpen, closeModal }) => {
   return (
     <div

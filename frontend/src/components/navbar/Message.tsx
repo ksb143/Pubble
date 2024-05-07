@@ -30,8 +30,8 @@ const ListItem = ({ title, content }: ListItemProps) => {
   };
 
   return (
-    <li className='flex items-center justify-between border-b py-6 pl-2 last-of-type:border-none'>
-      <div className='flex flex-1 items-center'>
+    <li className='flex justify-between border-b py-6 pl-2 last-of-type:border-none'>
+      <div className='flex flex-1'>
         <Profile />
         <div className='flex w-0 flex-1 flex-col px-2'>
           <div className={`font-normal ${isExpanded ? '' : 'truncate'}`}>
@@ -45,7 +45,7 @@ const ListItem = ({ title, content }: ListItemProps) => {
         <div>15:04</div>
       </div>
       <Down
-        className={`ml-3 h-4 w-4 cursor-pointer stroke-gray-400 ${isExpanded ? 'rotate-180' : ''}`}
+        className={`ml-3 mt-3 h-4 w-4 cursor-pointer stroke-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
         onClick={toggleExpansion}
       />
     </li>
@@ -55,7 +55,7 @@ const ListItem = ({ title, content }: ListItemProps) => {
 const items = Array.from(
   { length: 10 },
   (_, index) =>
-    `길이테스트중입니다길이테스트중입니다길이테스트중입니다${index + 1}`,
+    `길이테스트중입니다길이테스트중입니다길이테스트중입니다길이테스트중입니다${index + 1}`,
 );
 
 const Message: React.FC<MessageProps> = ({ isOpen, closeModal }) => {
@@ -78,7 +78,11 @@ const Message: React.FC<MessageProps> = ({ isOpen, closeModal }) => {
       </div>
       <ul className='flex flex-col'>
         {items.map((item) => (
-          <ListItem key={item} title={item} content={item} />
+          <ListItem
+            key={item}
+            title='제목은 15자 이내로 설정해야 합니다.'
+            content={item}
+          />
         ))}
       </ul>
     </div>
