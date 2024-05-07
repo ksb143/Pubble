@@ -1,5 +1,5 @@
-import { useMemo, useState, useEffect } from "react";
-
+import { useMemo, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ColumnDef,
   flexRender,
@@ -12,7 +12,6 @@ import {
   getFilteredRowModel,
   VisibilityState,
 } from "@tanstack/react-table";
-
 import {
   Table,
   TableBody,
@@ -21,7 +20,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/shadcn-ui/ui/table";
-
 import { 
   DropdownMenuLabel,
   DropdownMenu, 
@@ -30,19 +28,15 @@ import {
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
 } from "@/shadcn-ui/ui/dropdown-menu";
-
 import { 
   Button
 } from "@/shadcn-ui/ui/button";
-
 import {
   Input 
 } from "@/shadcn-ui/ui/input";
-
 import {
   Checkbox
 } from "@/shadcn-ui/ui/checkbox";
-
 import {  
   MoreHorizontal, 
 } from "lucide-react";
@@ -58,18 +52,11 @@ interface RQData {
 }
 
 const RQPage = () => {
+  const navigate = useNavigate();
+  const handleRowClick = (requirementId: string) => {
+    navigate(`/requirement/${requirementId}`);
+  };
 
-  // 셀을 편집 가능한 상태로 만들기 위한 상태 추가
-  const [editingCellId, setEditingCellId] = useState<string | null>(null);
-
-// 편집 모드를 토글하는 함수
-const toggleEdit = (cellId: string | null) => {
-  if (editingCellId === cellId) {
-    setEditingCellId(null); // 편집 모드 종료
-  } else {
-    setEditingCellId(cellId); // 새 셀 편집 시작
-  }
-};
   const columns: ColumnDef<RQData>[] = useMemo(() => [
     {
       id: "select",
@@ -111,27 +98,8 @@ const toggleEdit = (cellId: string | null) => {
     {
       accessorKey: "requirementName",
       header: "요구사항이름",
-      cell: ({ cell }) => {
-        return editingCellId === cell.id ? (
-          <input
-            type="text"
-            autoFocus
-            defaultValue={String(cell.getValue())}
-            onBlur={() => toggleEdit(null)} // 다른 곳 클릭 시 편집 종료
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                toggleEdit(null); // 엔터 키를 누를 때도 편집 종료
-              }
-            }}
-          />
-        ) : (
-          <div onClick={() => toggleEdit(cell.id)}>
-            {String(cell.getValue())}
-          </div>
-        );
-      }
+      cell: info => info.getValue(),
     },
-    
     {
       accessorKey: "description",
       header: "상세설명",
@@ -166,9 +134,8 @@ const toggleEdit = (cellId: string | null) => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel></DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => console.log(`Edit ${requirement.requirementId}`)}>수정하기</DropdownMenuItem>
               <DropdownMenuItem onClick={() => console.log(`Delete ${requirement.requirementId}`)}>삭제하기</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => console.log(`이전 버전확인 ${requirement.requirementId}`)}>이전버전 확인</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => console.log(`이전 버전확인 ${requirement.requirementId}`)}>버전확인</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -176,10 +143,10 @@ const toggleEdit = (cellId: string | null) => {
 
   ], []);
 
-  const data = useMemo(() => Array(100).fill({}).map((_, idx) => ({
+  const data = useMemo(() => Array(5).fill({}).map((_, idx) => ({
     approvalStatus: "N",
     lockStatus: "N",
-    requirementId: `OLD-00${idx + 1}`,
+    requirementId: `OLD00${idx + 1}`,
     requirementName: "로그인",
     description: "사용자는 서비스를 사용 하기 위해 로그인한다.",
     assignee: "최지원",
@@ -187,21 +154,11 @@ const toggleEdit = (cellId: string | null) => {
     currentVersion: `v1.${idx + 1}`,
   })), []);
 
-  useEffect(() => {
-    if (editingCellId) {
-      const input = document.getElementById(editingCellId);
-      if (input) {
-        input.focus();
-      }
-    }
-  }, [editingCellId]);
-
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
 // 편집 상태가 변경될 때마다 실행되는 useEffect
-
 
   const table = useReactTable<RQData>({
     data,
@@ -223,23 +180,31 @@ const toggleEdit = (cellId: string | null) => {
     },
   });
 
+  const handleAddRequirementItem = () => {
+    console.log("요구사항 항목의 추가");
+  };
+
   return (
     <div className="p-8 text-center">
-      <p className="text-4xl font-bold mb-4">올리브올드 쇼핑몰 제작 프로젝트</p>
-      <p className="text-2xl mb-8">2024.04.25. ~ 2024.05.25.</p>
+      {/* 프로젝트 제목 및 기간 시작 */}
+      <p className="text-2xl font-bold mb-4">올리브올드 쇼핑몰 제작 프로젝트</p>
+      <p className="text-lg mb-8">2024.04.25. ~ 2024.05.25.</p>
+      {/* 프로젝트 제목 및 기간 끝 */}
+      <br />
+      {/* 테이블 시작 */}
       <div className="rounded-md border">
       <div className="flex items-center py-5 px-5">
       <Input
         placeholder="요구사항이름으로 필터링 가능합니다."
         value={(table.getColumn("requirementName")?.getFilterValue() as string) ?? ""}
         onChange={(event) => table.getColumn("requirementName")?.setFilterValue(event.target.value)}
-        className="max-w-sm"
+        className="max-w-sm text-lg"
       />
-      
+      {/* 테이블 시작 */}
       <div className="ml-auto">
       <DropdownMenu >
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">컬럼</Button>
+          <Button variant="outline" className="text-lg">컬럼선택</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           {table.getAllColumns().filter((column) => column.getCanHide()&& column.id !== 'actions').map((column) => (
@@ -259,9 +224,9 @@ const toggleEdit = (cellId: string | null) => {
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map(headerGroup => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} >
                 {headerGroup.headers.map(header => (
-                  <TableHead key={header.id} className="text-center font-semibold">
+                  <TableHead key={header.id} className="text-center font-semibold text-lg">
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -270,10 +235,10 @@ const toggleEdit = (cellId: string | null) => {
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="text-base">
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map(row => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} role="button" className="hover:bg-gray-100 cursor-pointer" onClick={() => handleRowClick(row.original.requirementId)}>
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -291,16 +256,26 @@ const toggleEdit = (cellId: string | null) => {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-center space-x-2 py-4">
-      <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-        Previous
-      </Button>
-      <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-        Next
+      <br />
+      <div className="flex justify-start">
+      <Button className="text-base" onClick={handleAddRequirementItem}>
+        항목 추가
       </Button>
     </div>
+      <div className="flex items-center justify-center space-x-2 py-4">
+        <Button className="text-base" variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+          이전 페이지
+        </Button>
+      <div/>
+      <div/>
+      <div/>
+        <Button className="text-base" variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          다음 페이지
+        </Button>
+      </div>
+    
     <div className="flex-1 text-sm text-muted-foreground">
-  {table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row(s) selected.
+  {table.getFilteredRowModel().rows.length} 개 중 {table.getFilteredSelectedRowModel().rows.length} 개 선택됨.
 </div>
 
     </div>
