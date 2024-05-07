@@ -9,11 +9,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/user/*' element={<User />} />
-        <Route path='/requirement/*' element={<Requirement />} />
-        <Route path='/main/*' element={<Main />} />
         {/* 상단바 없는 페이지 */}
         <Route path='/' element={<User />} />
+        <Route path='/requirement/*' element={<Requirement />} />
+        <Route path='/main/*' element={<Main />} />
         {/* 상단바 있는 페이지 */}
         <Route element={<Layout />}>
           <Route path='/test' element={<TestPage />} />
