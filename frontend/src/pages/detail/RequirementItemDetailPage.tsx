@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
+import { ResizableImage } from '@/extensions/ResizableImage.ts';
 import Link from '@tiptap/extension-link';
 import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
@@ -15,7 +16,6 @@ import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
 import Lottie from 'react-lottie';
-import Microlink from '@microlink/react';
 // 3. api
 // 4. store
 // 5. component
@@ -24,21 +24,15 @@ import BubbleMenuBar from '@/components/details/BubbleMenuBar.tsx';
 import ImageUploadModal from '@/components/details/ImageUploadModal.tsx';
 import LinkUploadModal from '@/components/details/LinkUploadModal.tsx';
 // 6. image 등 assets
-import LodingAnimation from '@/assets/lotties/loading.json';
-import { ResizableImage } from '@/extensions/ResizableImage.ts';
-
-const mql = require('@microlink/mql');
-
-const { status, data } = await mql('https://www.netflix.com/title/80057281', {
-  screenshot: true,
-});
-
-mql.render(data);
+import LoadingAnimation from '@/assets/lotties/loading.json';
+const { VITE_SCREENSHOT_API } = import.meta.env;
 
 const RequirementItemDetailPage = () => {
-  const [isImageUploadModalOpen, setIsImageUploadModalOpen] = useState(false);
-  const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] = useState(false);
-  const [linkTabType, setLinkTabType] = useState('');
+  const [isImageUploadModalOpen, setIsImageUploadModalOpen] =
+    useState<boolean>(false);
+  const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] =
+    useState<boolean>(false);
+  const [linkTabType, setLinkTabType] = useState<string>('');
 
   // 파라미터
   const { projectName = '', requirementId = '' } = useParams();
@@ -47,7 +41,7 @@ const RequirementItemDetailPage = () => {
   const defaultOptions = {
     loop: true,
     autoplay: true,
-    animationData: LodingAnimation,
+    animationData: LoadingAnimation,
     rendererSettings: {
       preserveAspectRatio: 'xMidYMid slice',
     },
@@ -83,6 +77,18 @@ const RequirementItemDetailPage = () => {
     content: '',
   });
 
+  const fetchScreenshotData = async (url: string) => {
+    const response = await fetch(
+      `https://api.screenshotone.com/animate?url=${encodeURIComponent(url)}&access_key=${VITE_SCREENSHOT_API}&format=gif`,
+    );
+    if (!response.ok) {
+      throw new Error(`Failed to fetch screenshot for URL: ${url}`);
+    }
+    const blob = await response.blob();
+    console.log(blob);
+    return URL.createObjectURL(blob);
+  };
+
   // 이미지 삽입 함수
   const handleImageInsert = (image: string) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
@@ -90,10 +96,25 @@ const RequirementItemDetailPage = () => {
   };
 
   // 링크 삽입 함수
-  const handleLinkInsert = (link: string, linkType: string) => {
+  const handleLinkInsert = async (link: string, linkType: string) => {
     if (linkType === 'link') {
       editor?.chain().focus().setLink({ href: link, target: '_blank' }).run();
     } else if (linkType === 'webImage') {
+      try {
+        const screenshotUrl = await fetchScreenshotData(link);
+        editor
+          ?.chain()
+          .focus()
+          .setResizableImage({ src: screenshotUrl, width: 300 })
+          .run();
+      } catch (error) {
+        console.error('Failed to fetch screenshot for URL: ', error);
+        editor
+          ?.chain()
+          .focus()
+          .insertContent(`페이지 스크린샷 로드에 실패했습니다: ${link}`)
+          .run();
+      }
     }
     setIsLinkUploadModalOpen(false);
   };
