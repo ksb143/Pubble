@@ -24,4 +24,7 @@ dist-ssr
 *.sw?
 
 *.env*
-.npmrc
+
+*.env.development
+*.env.production
+*.npmrc*
