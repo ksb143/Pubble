@@ -44,7 +44,7 @@ public class ImageService {
     private String localLocation = System.getProperty("java.io.tmpdir");
 
     @Transactional
-    public void uploadImage(MultipartFile file, Integer requirementId) throws IOException {
+    public String uploadImage(MultipartFile file, Integer requirementId) throws IOException {
         String fileName = file.getOriginalFilename();
         String ext = fileName.substring(fileName.lastIndexOf("."));
         String uuidFileName = UUID.randomUUID().toString() + ext;
@@ -71,6 +71,8 @@ public class ImageService {
         log.info("Uploaded to S3 URL: {}", s3Url);
 
         uploadRepository.save(upload);
+
+        return s3Url;
     }
 
 
