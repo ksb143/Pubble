@@ -38,6 +38,32 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi requirementsConfirmApi() {
+        return GroupedOpenApi.builder()
+                .group("confirm-api")
+                .pathsToMatch("/requirements/confirm/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi requirementsApi() {
+        return GroupedOpenApi.builder()
+                .group("requirements-api")
+                .pathsToMatch("/requirements/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi uploadsApi() {
+        return GroupedOpenApi.builder()
+                .group("uploads-api")
+                .pathsToMatch("/uploads/**")
+                .build();
+    }
+
+
+
 
     // 추후에 토큰을 헤더에 자동으로 추가해주는 쪽으로 변경 예정
     @Bean
