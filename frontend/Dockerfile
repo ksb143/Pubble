@@ -1,9 +1,15 @@
 # Node.js 20.11.1 버전을 사용
-FROM node:lts-alpine as build-stage
+FROM node:lts-alpine as builder
 # 앱 디렉터리 생성
 
+RUN cd
+RUN ls
 WORKDIR /frontend
+RUN cd
+RUN ls
 COPY package*.json ./
+RUN cd
+RUN ls
 
 RUN npm install
 COPY . .
