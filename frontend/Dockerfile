@@ -16,7 +16,9 @@ COPY package-lock.json ./
 RUN npm install
 
 # 애플리케이션 빌드
-RUN npm run build
+
+RUN npm run build || echo "Build failed, but continuing for diagnostics..."
+RUN npm run build --verbose
 
 # 두 번째 단계: NGINX를 사용하여 정적 파일 서빙
 FROM nginx:latest
