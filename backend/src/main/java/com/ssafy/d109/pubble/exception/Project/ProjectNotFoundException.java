@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.exception.project;
+package com.ssafy.d109.pubble.exception.Project;
 
 public class ProjectNotFoundException extends RuntimeException{
     public ProjectNotFoundException(){
