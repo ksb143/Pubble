@@ -7,17 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
 
 import java.io.IOException;
 
 @RestController
-//@RequestMapping("/api")
-public class ImageController {
+@RequestMapping("/uploads")
+public class UploadController {
 
     private final ImageService imageService;
 
-    public ImageController(ImageService imageService) {
+    public UploadController(ImageService imageService) {
         this.imageService = imageService;
     }
 
