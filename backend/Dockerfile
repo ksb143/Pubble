@@ -1,3 +1,7 @@
+FROM docker
+COPY --from=docker/buildx-bin:latest /buildx /usr/libexec/docker/cli-plugins/docker-buildx
+
+
 FROM azul/zulu-openjdk:17-latest as build
 
 ARG JAR_FILE=build/libs/pubble-0.0.1-SNAPSHOT.jar
@@ -6,5 +10,6 @@ ARG JAR_FILE=build/libs/pubble-0.0.1-SNAPSHOT.jar
 
 COPY ${JAR_FILE} app.jar
 
+EXPOSE 443
 # app.jar 파일을 실행합니다.
 ENTRYPOINT ["java", "-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9091", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
