@@ -9,4 +9,4 @@ COPY build/libs/*.jar app.jar
 EXPOSE 443
 
 # app.jar 파일을 실행합니다.
-ENTRYPOINT ["java", "-Xdebug", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:9091", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "-jar", "app.jar"]
