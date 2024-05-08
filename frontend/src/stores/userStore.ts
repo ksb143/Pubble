@@ -9,9 +9,15 @@ const getLuminance = (colorHex: string) => {
 
 type UserStore = {
   name: string;
+  employeeId: string;
+  department: string;
+  position: string;
   profileColor: string;
   textColor: string;
   setName: (name: string) => void;
+  setEmployeeId: (employeeId: string) => void;
+  setDepartment: (department: string) => void;
+  setPosition: (position: string) => void;
   setProfileColor: (color: string) => void;
   setTextColor: (color: string) => void;
 };
@@ -20,7 +26,13 @@ const useUserStore = create<UserStore>((set) => ({
   name: '',
   profileColor: '',
   textColor: '',
+  department: '',
+  employeeId: '',
+  position: '',
   setName: (name: string) => set({ name }),
+  setEmployeeId: (employeeId: string) => set({ employeeId }),
+  setDepartment: (department: string) => set({ department }),
+  setPosition: (position: string) => set({ position }),
   setProfileColor: (color: string) => {
     const luminance = getLuminance(color);
     const textColor = luminance > 186 ? '#000000' : '#ffffff';
