@@ -48,7 +48,7 @@ public class NoticeController {
             noticeService.createNotice(user, noticeCreateDto);
             response = new ResponseDto(true, "새 공지사항 생성", null);
 
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } else {
             response = new ResponseDto(false, "권한 없음", null);
@@ -65,7 +65,7 @@ public class NoticeController {
             noticeService.deleteNotice(noticeId);
             response = new ResponseDto(true, "해당 공지사항 삭제", null);
 
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
 
         } else {
             response = new ResponseDto(false, "권한 없음", null);
