@@ -30,11 +30,20 @@ public class SwaggerConfig {
                 .pathsToMatch("/users/**")
                 .build();
     }
+
     @Bean
     public GroupedOpenApi projectApi() {
         return GroupedOpenApi.builder()
                 .group("project-api")
                 .pathsToMatch("/projects/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi noticeApi() {
+        return GroupedOpenApi.builder()
+                .group("notice-api")
+                .pathsToMatch("/notices/**")
                 .build();
     }
 
@@ -61,8 +70,6 @@ public class SwaggerConfig {
                 .pathsToMatch("/uploads/**")
                 .build();
     }
-
-
 
 
     // 추후에 토큰을 헤더에 자동으로 추가해주는 쪽으로 변경 예정
