@@ -15,13 +15,19 @@ import loginAnimation from '@/assets/lotties/login.json';
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const [employeeId, setEmployeeId] = useState('');
+  const [loginEmployeeId, setLoginEmployeeId] = useState('');
   const [password, setPassword] = useState('');
   const [isEmployeeId, setIsEmployeeId] = useState(false);
   const [isPassword, setIsPassword] = useState(false);
   const [error, setError] = useState('');
   const [isError, setIsError] = useState(false);
-  const { setName, setProfileColor } = useUserStore();
+  const {
+    setName,
+    setProfileColor,
+    setEmployeeId,
+    setDepartment,
+    setPosition,
+  } = useUserStore();
 
   // 로티 기본 옵션
   const defaultOptions = {
@@ -51,7 +57,7 @@ const LoginPage = () => {
 
   // 로그인 함수
   const handleLogin = async () => {
-    if (!employeeId) {
+    if (!loginEmployeeId) {
       setIsEmployeeId(true);
       return;
     }
@@ -60,11 +66,14 @@ const LoginPage = () => {
       return;
     }
     try {
-      const data = await login(employeeId, password);
+      const data = await login(loginEmployeeId, password);
       localStorage.setItem('accessToken', data.resData.accessToken);
       const decodeToken = parseJwt(data.resData.accessToken);
-      // 이름 및 프로필 사진 색 스토어 설정
+      // 이름, id, 부서, 직급, 고유 색 스토어 설정
       setName(decodeToken.name);
+      setEmployeeId(decodeToken.employeeId);
+      setDepartment(decodeToken.department);
+      setPosition(decodeToken.position);
       setProfileColor(decodeToken.profileColor);
       // 성공 후 페이지 리다이렉션
       navigate('/main');
@@ -121,9 +130,9 @@ const LoginPage = () => {
             <input
               className='h-12 w-full rounded border-2 border-gray-200 p-2 focus:outline-pubble'
               type='text'
-              value={employeeId}
+              value={loginEmployeeId}
               onChange={(e) => {
-                setEmployeeId(e.target.value);
+                setLoginEmployeeId(e.target.value);
                 setIsEmployeeId(false);
                 setIsPassword(false);
               }}
