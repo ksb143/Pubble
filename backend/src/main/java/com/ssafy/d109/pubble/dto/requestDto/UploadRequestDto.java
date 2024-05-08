@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImageUploadRequestDto {
+public class UploadRequestDto {
 
     private Integer requirementId;
 }
