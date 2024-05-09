@@ -60,6 +60,7 @@ public class ProjectService {
             float progressRatio = requirementService.getApprovalRatio(project.getProjectId());
 
             ProjectListDto projectListDto = ProjectListDto.builder()
+                    .projectId(project.getProjectId())
                     .prdId(project.getCode())
                     .projectTitle(project.getProjectTitle())
                     .people(people)
