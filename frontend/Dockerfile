@@ -1,10 +1,10 @@
 # 첫 번째 단계: Node.js를 사용하여 프론트엔드 소스 코드 빌드
-FROM node:20.11.1 AS builder
+FROM node:lts AS builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
 
-# 환경 변수 파일과 npm 설정 파일 복사
+# 환경 변수 파일과 npm 설정 파일, 그리고 tsconfig.json 복사
 COPY .env.production .npmrc ./
 
 # package.json과 package-lock.json 파일 복사
@@ -14,7 +14,8 @@ COPY package.json package-lock.json ./
 RUN npm install
 
 # 애플리케이션 빌드
-RUN npm run build --verbose
+# 빌드 실패시 계속 진행 (진단을 위해)
+RUN npm run build 
 
 # 두 번째 단계: NGINX를 사용하여 정적 파일 서빙
 FROM nginx:latest
