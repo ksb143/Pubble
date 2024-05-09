@@ -65,7 +65,7 @@ public class SecurityConfig {
 //        http.logout((logout) -> logout.disable());
 
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/hash", "/api/users/**","/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
+                .requestMatchers("/hash", "/api/users/signin", "/api/users/refresh", "/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
                 .requestMatchers("/api/admin").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
@@ -81,7 +81,6 @@ public class SecurityConfig {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
-
         http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -93,7 +92,8 @@ public class SecurityConfig {
                 // setAllowedOrigins
                 List<String> origins = Arrays.asList(
                         System.getenv("FRONT_BASE"),
-                        System.getenv("FRONT_LOCAL")
+                        System.getenv("FRONT_LOCAL"),
+                        System.getenv("BASE_URL")
                 );
 
                 CorsConfiguration configuration = new CorsConfiguration();

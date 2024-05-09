@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ImageUploadResponseDto {
+public class UploadResponseDto {
 
     private String message;
     private String s3Url;

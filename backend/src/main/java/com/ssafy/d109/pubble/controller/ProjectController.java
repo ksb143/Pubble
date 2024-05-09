@@ -61,6 +61,14 @@ public class ProjectController {
     }
 
     @GetMapping("/{project-id}/requirements")
+    public ResponseEntity<ResponseDto> getRequirementsByCode(@PathVariable("project-id") Integer projectId, @RequestParam("code") String code) {
+        List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, code);
+
+        response = new ResponseDto(true, "코드에 해당하는 요구사항 항목 기록 반환", requirementSummaryDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/{project-id}/requirements/recent")
     public ResponseEntity<ResponseDto> getProjectRequirements(@PathVariable("project-id") Integer projectId) {
         ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
 
@@ -74,6 +82,22 @@ public class ProjectController {
 
         response = new ResponseDto(true, "요구사항 항목 생성", null);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{project-id}/requirements/{requirement-id}")
+    public ResponseEntity<ResponseDto> getRequirement(@PathVariable("requirement-id") Integer requirementId) {
+        RequirementSummaryDto requirementSummaryDto = requirementService.getRequirement(requirementId);
+
+        response = new ResponseDto(true, "요구사항 항목 조회", requirementSummaryDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @PatchMapping("/{project-id}/requirements/{requirement-id}")
+    public ResponseEntity<ResponseDto> updateRequirement(@PathVariable("requirement-id") Integer requirementId, RequirementUpdateDto requirementUpdateDto) {
+        requirementService.updateRequirement(requirementId, requirementUpdateDto);
+
+        response = new ResponseDto(true, "요구사항 항목 수정", null);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
     // update version by command(h:hold / r:restore)

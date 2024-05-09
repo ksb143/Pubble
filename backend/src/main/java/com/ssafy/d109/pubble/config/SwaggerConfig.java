@@ -30,11 +30,52 @@ public class SwaggerConfig {
                 .pathsToMatch("/users/**")
                 .build();
     }
+
     @Bean
     public GroupedOpenApi projectApi() {
         return GroupedOpenApi.builder()
                 .group("project-api")
                 .pathsToMatch("/projects/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi noticeApi() {
+        return GroupedOpenApi.builder()
+                .group("notice-api")
+                .pathsToMatch("/notices/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi requirementsConfirmApi() {
+        return GroupedOpenApi.builder()
+                .group("confirm-api")
+                .pathsToMatch("/requirements/confirm/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi requirementsApi() {
+        return GroupedOpenApi.builder()
+                .group("requirements-api")
+                .pathsToMatch("/requirements/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi uploadsApi() {
+        return GroupedOpenApi.builder()
+                .group("uploads-api")
+                .pathsToMatch("/uploads/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi testApi() {
+        return GroupedOpenApi.builder()
+                .group("test-api")
+                .pathsToMatch("/test/**")
                 .build();
     }
 
