@@ -31,6 +31,7 @@ public class ProjectService {
 
     private DashboardUserInfo getDashboardUserInfo(User user) {
         return DashboardUserInfo.builder()
+                .userId(user.getUserId())
                 .name(user.getName())
                 .employeeId(user.getEmployeeId())
                 .department(user.getDepartment())
