@@ -92,7 +92,8 @@ public class SecurityConfig {
                 // setAllowedOrigins
                 List<String> origins = Arrays.asList(
                         System.getenv("FRONT_BASE"),
-                        System.getenv("FRONT_LOCAL")
+                        System.getenv("FRONT_LOCAL"),
+                        System.getenv("BASE_URL")
                 );
 
                 CorsConfiguration configuration = new CorsConfiguration();
