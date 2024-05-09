@@ -65,7 +65,7 @@ public class SecurityConfig {
 //        http.logout((logout) -> logout.disable());
 
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/hash", "/api/users/**",  "/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
+                .requestMatchers("/hash", "/api/users/signin", "/api/users/refresh", "/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
                 .requestMatchers("/api/admin").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
