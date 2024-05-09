@@ -28,12 +28,14 @@ public class UserController {
 
     }
 
-    @GetMapping("/")
-    public String signOut() {
+    @PostMapping("/logout")
+    public String logOut() {
         System.out.println("로그아웃된 상태");
 
         return "당신은 로그아웃된 상태입니다.";
     }
+
+
 
 
 }
