@@ -71,6 +71,14 @@ public class SwaggerConfig {
                 .build();
     }
 
+    @Bean
+    public GroupedOpenApi testApi() {
+        return GroupedOpenApi.builder()
+                .group("test-api")
+                .pathsToMatch("/test/**")
+                .build();
+    }
+
 
     // 추후에 토큰을 헤더에 자동으로 추가해주는 쪽으로 변경 예정
     @Bean
