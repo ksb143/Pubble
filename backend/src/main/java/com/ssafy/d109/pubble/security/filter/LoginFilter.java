@@ -121,6 +121,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .resData(dto)
                 .build();
 
+
         response.addHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -163,6 +164,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);
         cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+
+
 
         return cookie;
     }
