@@ -1,4 +1,4 @@
-import { useState, DragEvent } from 'react';
+import { useState, useRef, useEffect, DragEvent } from 'react';
 
 interface ImageUploadModalProps {
   isOpen: boolean;
@@ -14,6 +14,8 @@ const ImageUploadModal = ({
   const [tab, setTab] = useState('link');
   const [url, setUrl] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const initialClick = useRef(true);
 
   // 이미지 링크 혹은 파일 삽입하는 함수
   const handleInsert = () => {
@@ -37,10 +39,33 @@ const ImageUploadModal = ({
     setTab('upload');
   };
 
+  // 모달 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        !initialClick.current &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+      initialClick.current = false;
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
     <div
+      ref={modalRef}
       onDrop={handleImageDrop}
       onDragOver={(event) => event.preventDefault()}
       className='w-1/3 rounded bg-white p-6 shadow-custom'>
