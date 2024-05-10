@@ -1,5 +1,5 @@
 // 1. react
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 import { AxiosError } from 'axios';
@@ -107,8 +107,16 @@ const LoginPage = () => {
     setIsError(false);
   };
 
+  // 엔터키 입력 시 로그인 함수
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  };
   return (
-    <div className='mx-12 grid h-screen grid-cols-12 items-center'>
+    <div
+      className='mx-12 grid h-screen grid-cols-12 items-center'
+      onKeyDown={handleKeyDown}>
       {isError && (
         <ErrorAlertModal isOpen={isError} closeDialog={handleCloseDialog}>
           {error}
