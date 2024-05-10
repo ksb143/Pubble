@@ -1,11 +1,8 @@
 package com.ssafy.d109.pubble.dto.projectDto;
 
-import com.ssafy.d109.pubble.entity.Requirement;
-import com.ssafy.d109.pubble.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +20,7 @@ public class ProjectRequirementsDto {
     private LocalDateTime endAt;
     private String status;
     private String code;
-    private List<DashboardUserInfo> people;
+    private List<UserInfoDto> people;
 
     // requirements
     private List<RequirementSummaryDto> requirementSummaryDtos;

@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.dto.NoticeDto;
+package com.ssafy.d109.pubble.dto.noticeDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,13 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
-public class NoticeSummaryDto {
+public class NoticeResponseDto {
 
     private Integer noticeId;
 
     private String title; // 제목
+
+    private String content; // 내용
 
     private String category; // 공지의 분류
 

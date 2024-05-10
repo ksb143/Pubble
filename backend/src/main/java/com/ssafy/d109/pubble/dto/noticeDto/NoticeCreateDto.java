@@ -1,6 +1,5 @@
-package com.ssafy.d109.pubble.dto.NoticeDto;
+package com.ssafy.d109.pubble.dto.noticeDto;
 
-import com.ssafy.d109.pubble.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

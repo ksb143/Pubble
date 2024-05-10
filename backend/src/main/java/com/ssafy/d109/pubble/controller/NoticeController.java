@@ -1,8 +1,8 @@
 package com.ssafy.d109.pubble.controller;
 
-import com.ssafy.d109.pubble.dto.NoticeDto.NoticeCreateDto;
-import com.ssafy.d109.pubble.dto.NoticeDto.NoticeResponseDto;
-import com.ssafy.d109.pubble.dto.NoticeDto.NoticeSummaryDto;
+import com.ssafy.d109.pubble.dto.noticeDto.NoticeCreateDto;
+import com.ssafy.d109.pubble.dto.noticeDto.NoticeResponseDto;
+import com.ssafy.d109.pubble.dto.noticeDto.NoticeSummaryDto;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NoticeService;

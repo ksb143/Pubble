@@ -125,8 +125,8 @@ public class RequirementService {
     // requirement 생성
     public void createRequirement(Integer projectId, RequirementCreateDto requirementCreateDto) {
         Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
-        Optional<User> optionalAuthor = userRepository.findByUserId(requirementCreateDto.getAuthorId());
-        Optional<User> optionalManager = userRepository.findByUserId(requirementCreateDto.getManagerId());
+        Optional<User> optionalAuthor = userRepository.findByEmployeeId(requirementCreateDto.getAuthorEId());
+        Optional<User> optionalManager = userRepository.findByEmployeeId(requirementCreateDto.getManagerEId());
 
         if (optionalProject.isPresent() && optionalAuthor.isPresent() && optionalManager.isPresent()) {
             Project project = optionalProject.get();
@@ -159,24 +159,11 @@ public class RequirementService {
         }
     }
 
-    private DashboardUserInfo getDashboardUserInfo(User user) {
-        return DashboardUserInfo.builder()
-                .userId(user.getUserId())
-                .name(user.getName())
-                .employeeId(user.getEmployeeId())
-                .department(user.getDepartment())
-                .position(user.getPosition())
-                .role(user.getRole())
-                .isApprovable(user.getIsApprovable())
-                .profileColor(user.getProfileColor())
-                .build();
-    }
-
     public RequirementSummaryDto getRequirement(Integer requirementId) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
-        DashboardUserInfo managerInfo = getDashboardUserInfo(requirement.getManager());
-        DashboardUserInfo authorInfo = getDashboardUserInfo(requirement.getAuthor());
+        UserInfoDto managerInfo = UserInfoDto.createUserInfo(requirement.getManager());
+        UserInfoDto authorInfo = UserInfoDto.createUserInfo(requirement.getAuthor());
 
         RequirementSummaryDto requirementSummaryDto = RequirementSummaryDto.builder()
                 .requirementId(requirement.getRequirementId())
