@@ -267,21 +267,23 @@ export function ProjectList() {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <Link to={`/project/${row.original.projectId}`}>
+                
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
+                      <Link to={`/project/${row.original.projectId}`}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
+                      </Link>
                     </TableCell>
                   ))}
                 </TableRow>
-                </Link>
+                
               ))
             ) : (
               <TableRow>

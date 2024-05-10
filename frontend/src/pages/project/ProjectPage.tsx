@@ -274,21 +274,22 @@ const ProjectPage = () => {
           <TableBody className='text-base'>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <Link to={`requirement/${row.original.requirementId}`}>
+                
                 <TableRow
                   key={row.id}
                   role='button'
                   className='cursor-pointer hover:bg-gray-100'>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
+                      <Link to={`requirement/${row.original.requirementId}`}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
                       )}
+                      </Link>
                     </TableCell>
                   ))}
                 </TableRow>
-                </Link>
               ))
             ) : (
               <TableRow>
