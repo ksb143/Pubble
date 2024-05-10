@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 // 3. api
 // 4. store
+import useRichStore from '@/stores/richStore';
 // 5. component
 // 6. image 등 assets
 import BoldIcon from '@/assets/icons/bold.svg?react';
@@ -89,6 +90,7 @@ const MenuBar = ({
   openImageUploadModal,
   openLinkUploadModal,
 }: MenuBarProps) => {
+  const { openCodePreviewModal  } = useRichStore();
   if (!editor) {
     return null;
   }
@@ -209,7 +211,7 @@ const MenuBar = ({
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuItem
-                  onClick={() => editor.chain().focus().setCodeBlock().run()}
+                  onClick={() => {openCodePreviewModal("", "", "")}}
                   className='flex items-center'>
                   <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                   <span className='ml-2'>HTML블럭</span>

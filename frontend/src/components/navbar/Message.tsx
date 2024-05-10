@@ -6,11 +6,11 @@ import Xmark from '@/assets/icons/x-mark.svg?react';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import MailPlus from '@/assets/icons/mail-plus.svg?react';
 import Down from '@/assets/icons/chevron-down.svg?react';
-import Profile from '@/components/layouts/Profile';
+import Profile from '@/components/layout/Profile';
 
 interface MessageProps {
   isOpen: boolean;
-  closeModal: () => void;
+  closeMenu: () => void;
 }
 
 interface ListItemProps {
@@ -33,7 +33,7 @@ const ListItem = ({ title, content }: ListItemProps) => {
   return (
     <li className='flex justify-between border-b py-6 pl-2 last-of-type:border-none'>
       <div className='flex flex-1'>
-        <Profile />
+        <Profile width='3rem' height='3rem' />
         <div className='flex w-0 flex-1 flex-col px-2'>
           <p className={`font-normal ${isExpanded ? '' : 'truncate'}`}>
             {title}
@@ -46,7 +46,7 @@ const ListItem = ({ title, content }: ListItemProps) => {
         <p>15:04</p>
       </div>
       <Down
-        className={`ml-3 mt-3 h-4 w-4 cursor-pointer stroke-gray-400 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+        className={`ml-3 mt-3 h-4 w-4 cursor-pointer stroke-gray-400 transition duration-300 ${isExpanded ? 'rotate-180' : ''}`}
         onClick={toggleExpansion}
       />
     </li>
@@ -59,7 +59,7 @@ const items = Array.from(
     `길이테스트중입니다길이테스트중입니다길이테스트중입니다길이테스트중입니다${index + 1}`,
 );
 
-const Message: React.FC<MessageProps> = ({ isOpen, closeModal }) => {
+const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
   const [isMessageSendModalOpen, setIsMessageSendModalOpen] = useState(false);
 
   return (
@@ -79,15 +79,17 @@ const Message: React.FC<MessageProps> = ({ isOpen, closeModal }) => {
             <p className='text-2xl font-normal'>쪽지</p>
           </div>
           <div className='flex items-center'>
-            <MailPlus
-              className='mx-6 h-6 w-6 cursor-pointer stroke-gray-900'
-              onClick={() => {
-                setIsMessageSendModalOpen(true);
-              }}
-            />
+            <div className='mx-5 flex h-9 w-9 cursor-pointer items-center justify-center rounded hover:bg-gray-900/10'>
+              <MailPlus
+                className='h-6 w-6 stroke-gray-900'
+                onClick={() => {
+                  setIsMessageSendModalOpen(true);
+                }}
+              />
+            </div>
             <Xmark
               className='h-8 w-8 cursor-pointer stroke-gray-900 stroke-1'
-              onClick={closeModal}
+              onClick={closeMenu}
             />
           </div>
         </div>

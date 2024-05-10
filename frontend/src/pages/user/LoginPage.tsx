@@ -9,7 +9,7 @@ import { login } from '@/apis/user';
 // 4. store
 import useUserStore from '@/stores/userStore';
 // 5. component
-import ErrorAlertModal from '@/components/layouts/ErrorAlertModal.tsx';
+import ErrorAlertModal from '@/components/layout/ErrorAlertModal.tsx';
 // 6. assets
 import loginAnimation from '@/assets/lotties/login.json';
 

@@ -15,9 +15,9 @@ const MessageSendModal: React.FC<MessageSendModalProps> = ({
       className={`fixed inset-0 z-50 flex items-center justify-center transition duration-500 ${
         isOpen
           ? ' bg-gray-900/30 backdrop-blur-none'
-          : 'pointer-events-none opacity-0'
+          : 'pointer-events-none -z-10 opacity-0'
       }`}>
-      <div className='h-fit w-1/3 rounded bg-gray-50 p-6 shadow-lg'>
+      <div className='h-fit w-1/3 rounded bg-white p-6 shadow-lg'>
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center'>
             <Envelope className='mr-3 h-6 w-6 stroke-gray-900 stroke-1' />
@@ -50,7 +50,7 @@ const MessageSendModal: React.FC<MessageSendModalProps> = ({
           </div>
         </div>
         <div className='flex justify-end'>
-          <button className='hover:bg-dpubble w-1/4 rounded bg-pubble py-3 text-white hover:outline-double hover:outline-4 hover:outline-gray-200'>
+          <button className='w-1/4 rounded bg-pubble py-3 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'>
             보내기
           </button>
         </div>
