@@ -2,6 +2,7 @@ package com.ssafy.d109.pubble.security.filter;
 
 import com.ssafy.d109.pubble.repository.RefreshTokenRepository;
 import com.ssafy.d109.pubble.security.jwt.JWTUtil;
+import com.ssafy.d109.pubble.service.NotificationService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,10 +21,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private NotificationService notificationService;
 
-    public CustomLogoutFilter(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository) {
+    public CustomLogoutFilter(JWTUtil jwtUtil, RefreshTokenRepository refreshTokenRepository, NotificationService notificationService) {
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -88,6 +91,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
+        notificationService.deleteNotification();
 
         System.out.println("로그아웃 완료 ㅋㅋ");
 

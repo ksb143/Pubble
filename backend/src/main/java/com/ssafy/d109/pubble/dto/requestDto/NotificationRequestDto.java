@@ -3,15 +3,17 @@ package com.ssafy.d109.pubble.dto.requestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FcmSendDto {
+public class NotificationRequestDto {
 
-    private String token;
     private String title;
-    private String body;
+    private String message;
+    private String token;
+
+
 }

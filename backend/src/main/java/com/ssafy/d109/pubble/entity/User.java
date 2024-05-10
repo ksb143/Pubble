@@ -47,8 +47,6 @@ public class User {
     @Column(name = "profileColor")
     private String profileColor;
 
-    @Column(name = "firebaseToken")
-    private String firebaseToken;
 
     public Set<String> getRoles() {
         return Set.of(this.role);
