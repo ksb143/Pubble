@@ -200,12 +200,12 @@ public class RequirementService {
         if (udto.getDetail() != null) {
             requirement.setDetail(udto.getDetail());
         }
-        if (udto.getManagerId() != null) {
-            User manager = userRepository.findByUserId(udto.getManagerId()).orElseThrow(UserNotFoundException::new);
+        if (udto.getManagerEId() != null) {
+            User manager = userRepository.findByEmployeeId(udto.getManagerEId()).orElseThrow(UserNotFoundException::new);
             requirement.setManager(manager);
         }
-        if (udto.getAuthorId() != null) {
-            User author = userRepository.findByUserId(udto.getAuthorId()).orElseThrow(UserNotFoundException::new);
+        if (udto.getAuthorEId() != null) {
+            User author = userRepository.findByEmployeeId(udto.getAuthorEId()).orElseThrow(UserNotFoundException::new);
             requirement.setAuthor(author);
         }
         if (udto.getVersion() != null) {

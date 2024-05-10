@@ -13,7 +13,7 @@ public class RequirementUpdateDto {
     private String code;
     private String requirementName;
     private String detail;
-    private Integer managerId;
-    private Integer authorId;
+    private String managerEId;
+    private String authorEId;
     private String version; // ??
 }

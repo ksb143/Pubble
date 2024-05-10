@@ -77,8 +77,8 @@ public class ProjectService {
         projectRepository.save(project);
 
         // participants mapping
-        for (int userid : projectCreateDto.getParticipants()) {
-            Optional<User> optionalUser = userRepository.findByUserId(userid);
+        for (String userEID : projectCreateDto.getParticipantsEID()) {
+            Optional<User> optionalUser = userRepository.findByEmployeeId(userEID);
             if (optionalUser.isPresent()) {
                 User user1 = optionalUser.get();
                 ProjectAssignment projectAssignment = ProjectAssignment.builder()
