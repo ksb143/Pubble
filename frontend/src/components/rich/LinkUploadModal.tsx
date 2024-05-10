@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface LinkUploadModalProps {
   tabType: string;
@@ -15,6 +15,8 @@ const LinkUploadModal = ({
 }: LinkUploadModalProps) => {
   const [linkType, setLinkType] = useState(tabType);
   const [url, setUrl] = useState('');
+  const modalRef = useRef<HTMLDivElement>(null);
+  const initialClick = useRef(true);
 
   // 링크 삽입하는 함수
   const handleInsert = (linkType: string) => {
@@ -23,10 +25,37 @@ const LinkUploadModal = ({
     onClose();
   };
 
+  // tabType이 변경 감지 및 상태 업데이트
+  useEffect(() => {
+    setLinkType(tabType);
+  }, [tabType]);
+
+  // 모달 외부 클릭 시 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        !initialClick.current &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose();
+      }
+      initialClick.current = false;
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
-    <div className='w-1/3 rounded bg-white p-6 shadow-custom'>
+    <div ref={modalRef} className='w-1/3 rounded bg-white p-6 shadow-custom'>
       <div className='mb-3 flex justify-around'>
         <button
           className={`px-4 py-2 ${linkType === 'link' ? 'border-b-4 border-pubble' : ''}`}
