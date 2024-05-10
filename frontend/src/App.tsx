@@ -1,18 +1,24 @@
+// 1. react 관련
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// 2. library
+// 3. api
+// 4. store
+import useUserStore from '@/stores/userStore.ts';
+// 5. component
 import User from '@/routers/User';
 import Project from '@/routers/Project';
 import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
-import useUserStore from '@/stores/userStore.ts';
+// 6. image 등 assets
 
 function App() {
   const {
-    setName,
-    setProfileColor,
-    setEmployeeId,
-    setDepartment,
-    setPosition,
+    setName, // 이름 세팅
+    setProfileColor, // 프로필 색상 세팅
+    setEmployeeId, // 사원번호 세팅
+    setDepartment, // 부서 세팅
+    setPosition, // 직급 세팅
   } = useUserStore();
 
   useEffect(() => {
