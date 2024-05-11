@@ -1,4 +1,5 @@
 // 1. react 관련
+import { useState, useRef } from 'react';
 // 2. library
 import { Editor } from '@tiptap/react';
 import styled from '@emotion/styled';
@@ -11,10 +12,16 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 // 3. api
 // 4. store
 import useRichStore from '@/stores/richStore';
 // 5. component
+import Grid from '@/components/rich/Grid';
 // 6. image 등 assets
 import BoldIcon from '@/assets/icons/bold.svg?react';
 import ItalicIcon from '@/assets/icons/italic.svg?react';
@@ -91,6 +98,17 @@ const MenuBar = ({
   openLinkUploadModal,
 }: MenuBarProps) => {
   const { openCodePreviewModal } = useRichStore();
+  const [row, setRow] = useState<number>(3);
+  const [col, setCol] = useState<number>(3);
+  const rowInput = useRef(null);
+  const colInput = useRef(null);
+
+  // 셀 클릭 반영 함수
+  const handleCellClick = (rowIndex: number, colIndex: number) => {
+    setRow(rowIndex);
+    setCol(colIndex);
+  };
+
   if (!editor) {
     return null;
   }
@@ -220,16 +238,65 @@ const MenuBar = ({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <button
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                  .run()
-              }>
-              <TableLIneIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
-            </button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button>
+                  <TableLIneIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent>
+                <p className='mb-3'>
+                  <span>표 삽입 </span>
+                  <span className='text-pubble'>{col}</span>
+                  <span className='text-pubble'> X </span>
+                  <span className='text-pubble'>{row}</span>
+                </p>
+                <div className='mb-3'>
+                  <Grid rows={row} cols={col} onCellClick={handleCellClick} />
+                </div>
+                <div className='mb-3 flex items-center justify-center'>
+                  <span className='w-1/4'>열 개수</span>
+                  <input
+                    ref={colInput}
+                    value={col}
+                    type='number'
+                    className='w-3/4 rounded border-2 border-gray-200 px-2 focus:outline-none'
+                    onChange={(event) => {
+                      setCol(parseInt(event.target.value, 10));
+                    }}
+                  />
+                </div>
+                <div className='mb-3 flex items-center justify-center'>
+                  <span className='w-1/4'>행 개수</span>
+                  <input
+                    ref={rowInput}
+                    value={row}
+                    type='number'
+                    className='w-3/4 rounded border-2 border-gray-200 px-2 focus:outline-none'
+                    onChange={(event) => {
+                      setRow(parseInt(event.target.value, 10));
+                    }}
+                  />
+                </div>
+                <div className='flex justify-end'>
+                  <button
+                    onClick={() =>
+                      editor
+                        .chain()
+                        .focus()
+                        .insertTable({
+                          rows: row,
+                          cols: col,
+                          withHeaderRow: true,
+                        })
+                        .run()
+                    }
+                    className='text-pubble'>
+                    적용
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </div>

@@ -182,28 +182,6 @@ const RichPage = () => {
     };
   }, [openCodePreviewModal]);
 
-  // 표 이벤트 감지
-  useEffect(() => {
-    const handleMouseOver = (event: MouseEvent) => {
-      // 버튼을 동적으로 표시하는 로직
-      if (!editor) return;
-      const tables = editor.view.dom.querySelectorAll('table');
-      tables.forEach((table) => {
-        let lastRow = table.lastElementChild?.lastElementChild;
-        let lastCell = lastRow?.lastElementChild;
-      });
-      console.log(event);
-      console.log('lastRow', lastRow);
-      console.log('lastCell', lastCell);
-    };
-
-    document.addEventListener('mouseover', handleMouseOver);
-
-    return () => {
-      document.removeEventListener('mouseover', handleMouseOver);
-    };
-  }, [editor]);
-
   // 에디터가 없을 경우
   if (!editor) {
     return <Lottie options={defaultOptions} height={500} width={500} />;
