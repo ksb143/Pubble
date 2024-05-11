@@ -3,12 +3,12 @@
 // 3. api
 // 4. store
 // 5. components
-import {
+import 
   ProjectList
-} from "@/components/main/ProjectList";
-import {
+from "@/components/main/ProjectList";
+import 
   Calendar
-} from "@/components/main/Calendar";
+ from "@/components/main/Calendar";
 // 6. image 등 assets
 const MainDashboardPage = () => {
   return (
