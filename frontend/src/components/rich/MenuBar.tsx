@@ -90,7 +90,7 @@ const MenuBar = ({
   openImageUploadModal,
   openLinkUploadModal,
 }: MenuBarProps) => {
-  const { openCodePreviewModal  } = useRichStore();
+  const { openCodePreviewModal } = useRichStore();
   if (!editor) {
     return null;
   }
@@ -211,14 +211,23 @@ const MenuBar = ({
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuItem
-                  onClick={() => {openCodePreviewModal("", "", "")}}
+                  onClick={() => {
+                    openCodePreviewModal('', '', '');
+                  }}
                   className='flex items-center'>
                   <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                   <span className='ml-2'>HTML블럭</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <button>
+            <button
+              onClick={() =>
+                editor
+                  .chain()
+                  .focus()
+                  .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+                  .run()
+              }>
               <TableLIneIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
           </div>

@@ -28,6 +28,7 @@ import ImageUploadModal from '@/components/rich/ImageUploadModal.tsx';
 import LinkUploadModal from '@/components/rich/LinkUploadModal.tsx';
 import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
 // 6. image 등 assets
+import './RichPage.css';
 import LoadingAnimation from '@/assets/lotties/loading.json';
 const { VITE_SCREENSHOT_API } = import.meta.env;
 
@@ -42,25 +43,6 @@ const RichPage = () => {
   const [linkTabType, setLinkTabType] = useState<string>('');
   const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } =
     useRichStore();
-
-  useEffect(() => {
-    const handleCodeImageClick = (event: CustomEvent) => {
-      console.log(event);
-      const { html, css, javascript } = event.detail;
-      openCodePreviewModal(html, css, javascript);
-    };
-
-    document.addEventListener(
-      'codeImageClicked',
-      handleCodeImageClick as EventListener,
-    );
-    return () => {
-      document.removeEventListener(
-        'codeImageClicked',
-        handleCodeImageClick as EventListener,
-      );
-    };
-  }, [openCodePreviewModal]);
 
   // 파라미터
   const projectName = '브레드 이발소  단장 프로젝트';
@@ -180,6 +162,47 @@ const RichPage = () => {
       .run();
     closeCodePreviewModal();
   };
+
+  // 코드이미지 클릭 이벤트 감지
+  useEffect(() => {
+    const handleCodeImageClick = (event: CustomEvent) => {
+      console.log(event);
+      const { html, css, javascript } = event.detail;
+      openCodePreviewModal(html, css, javascript);
+    };
+    document.addEventListener(
+      'codeImageClicked',
+      handleCodeImageClick as EventListener,
+    );
+    return () => {
+      document.removeEventListener(
+        'codeImageClicked',
+        handleCodeImageClick as EventListener,
+      );
+    };
+  }, [openCodePreviewModal]);
+
+  // 표 이벤트 감지
+  useEffect(() => {
+    const handleMouseOver = (event: MouseEvent) => {
+      // 버튼을 동적으로 표시하는 로직
+      if (!editor) return;
+      const tables = editor.view.dom.querySelectorAll('table');
+      tables.forEach((table) => {
+        let lastRow = table.lastElementChild?.lastElementChild;
+        let lastCell = lastRow?.lastElementChild;
+      });
+      console.log(event);
+      console.log('lastRow', lastRow);
+      console.log('lastCell', lastCell);
+    };
+
+    document.addEventListener('mouseover', handleMouseOver);
+
+    return () => {
+      document.removeEventListener('mouseover', handleMouseOver);
+    };
+  }, [editor]);
 
   // 에디터가 없을 경우
   if (!editor) {
