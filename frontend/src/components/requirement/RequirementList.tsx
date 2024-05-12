@@ -1,5 +1,7 @@
+// 1. react 관련
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+// 2. library: react-table
 import {
   ColumnDef,
   flexRender,
@@ -12,6 +14,11 @@ import {
   getFilteredRowModel,
   VisibilityState,
 } from '@tanstack/react-table';
+// 2. library: lucide-react
+import { MoreHorizontal } from 'lucide-react';
+// 3. api
+// 4. store
+// 5. components
 import {
   Table,
   TableBody,
@@ -19,7 +26,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table.tsx';
+} from '@/components/ui/table';
 import {
   DropdownMenuLabel,
   DropdownMenu,
@@ -27,29 +34,67 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu.tsx';
-import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input.tsx';
-import { Checkbox } from '@/components/ui/checkbox.tsx';
-import { MoreHorizontal } from 'lucide-react';
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 
-interface RQData {
-  approvalStatus: string;
-  requirementId: string;
-  requirementName: string;
-  description: string;
-  assignee: string;
-  author: string;
-  currentVersion: string;
+// TableData: 테이블 데이터 타입
+
+const requirements: Requirement[] = [
+    {
+        id: "OLD001",
+        approvalStatus:"Y",
+        lockStatus:"Y",
+        requirementId:"aaaaa",
+        requirementName:"aaaaa",
+        description:"aaaaa",
+        assignee:"aaaaa",
+        author:"aaaaa",
+        currentVersion:"aaaaa",
+    },
+    {
+        id: "OLD002",
+        approvalStatus:"Y",
+        lockStatus:"Y",
+        requirementId:"aaaaa",
+        requirementName:"aaaaa",
+        description:"aaaaa",
+        assignee:"aaaaa",
+        author:"aaaaa",
+        currentVersion:"aaaaa",
+    },
+]
+
+export type Requirement = {
+    id: string
+    approvalStatus: "Y" | "N"
+    lockStatus: "Y" | "N"
+    requirementId: string
+    requirementName: string
+    description: string
+    assignee: string
+    author: string
+    currentVersion: string
+  }
+interface RequirementListProps {
+    projectId: string
 }
 
-const RQPage = () => {
-  const navigate = useNavigate();
-  const handleRowClick = (requirementId: string) => {
-    navigate(`/requirement/${requirementId}`);
-  };
+// ProjectPage: 특정 프로젝트의 요구사항을 개괄적으로 볼 수 있는 페이지
+const RequirementList = ({projectId}: RequirementListProps) => {
 
-  const columns: ColumnDef<RQData>[] = useMemo(
+  const navigate = useNavigate();
+
+  const handleRowClick = (requirement: Requirement)=>{
+
+    navigate(`/project/${projectId}/requirement/${requirement.requirementId}`,{
+      state: {requirement}
+    });
+  }
+
+  const columns: ColumnDef<Requirement>[] = useMemo( 
+    // useMemo는 계산 결과를 메모리에 저장(캐싱)하여, 컬럼 정의를 한번만 하게하고, 불필요한 리렌더링을 방지합니다.
     () => [
       {
         id: 'select',
@@ -131,13 +176,13 @@ const RQPage = () => {
                 <DropdownMenuLabel></DropdownMenuLabel>
                 <DropdownMenuItem
                   onClick={() =>
-                    console.log(`Delete ${requirement.requirementId}`)
+                    console.log(`Delete ${requirement.requirementId}`) // 함수 추가 후 콘솔 로그 삭제예정
                   }>
                   삭제하기
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() =>
-                    console.log(`이전 버전확인 ${requirement.requirementId}`)
+                    console.log(`이전 버전확인 ${requirement.requirementId}`) // 함수 추가 후 콘솔 로그 삭제예정
                   }>
                   버전확인
                 </DropdownMenuItem>
@@ -149,32 +194,16 @@ const RQPage = () => {
     ],
     [],
   );
+  // 테이블 데이터
 
-  const data = useMemo(
-    () =>
-      Array(5)
-        .fill({})
-        .map((_, idx) => ({
-          approvalStatus: 'N',
-          lockStatus: 'N',
-          requirementId: `OLD00${idx + 1}`,
-          requirementName: '로그인',
-          description: '사용자는 서비스를 사용 하기 위해 로그인한다.',
-          assignee: '최지원',
-          author: '최지원',
-          currentVersion: `v1.${idx + 1}`,
-        })),
-    [],
-  );
-
+  // 테이블 상태 관리
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  // 편집 상태가 변경될 때마다 실행되는 useEffect
 
-  const table = useReactTable<RQData>({
-    data,
+  const table = useReactTable({
+    data: requirements,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -199,8 +228,8 @@ const RQPage = () => {
   return (
     <div className='p-8 text-center'>
       {/* 프로젝트 제목 및 기간 시작 */}
-      <p className='mb-4 text-2xl font-bold'>올리브올드 쇼핑몰 제작 프로젝트</p>
-      <p className='mb-8 text-lg'>2024.04.25. ~ 2024.05.25.</p>
+      <p className='mb-4 text-2xl font-bold'>{projectId}</p>
+      <p className='mb-8 text-lg'>프로젝트 기간</p>
       {/* 프로젝트 제목 및 기간 끝 */}
       <br />
       {/* 테이블 시작 */}
@@ -270,17 +299,22 @@ const RQPage = () => {
           <TableBody className='text-base'>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
+                
                 <TableRow
                   key={row.id}
                   role='button'
-                  className='cursor-pointer hover:bg-gray-100'
-                  onClick={() => handleRowClick(row.original.requirementId)}>
+                  className='cursor-pointer hover:bg-gray-100'>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell 
+                      key={cell.id}
+                      onClick={()=> handleRowClick(row.original)}
+                      >
+                      
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
                       )}
+                      
                     </TableCell>
                   ))}
                 </TableRow>
@@ -333,4 +367,4 @@ const RQPage = () => {
   );
 };
 
-export default RQPage;
+export default RequirementList;
