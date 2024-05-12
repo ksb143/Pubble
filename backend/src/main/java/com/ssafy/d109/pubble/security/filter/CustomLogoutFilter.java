@@ -91,7 +91,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
         cookie.setPath("/");
-        notificationService.deleteNotification();
+//        notificationService.deleteNotification();
 
         System.out.println("로그아웃 완료 ㅋㅋ");
 

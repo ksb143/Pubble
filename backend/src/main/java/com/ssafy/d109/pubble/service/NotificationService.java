@@ -28,6 +28,25 @@ public class NotificationService {
         this.commonUtil = commonUtil;
     }
 
+    // 사용자의 기기에서 생성된 FCM 토큰을 서버에 등록하고 저장 (currentUser가 수행)
+    public String registerToken(String token, User currentUser) {
+
+        Notification notification = notificationRepository.findNotificationByUser(currentUser).orElseThrow(NotificationNotFoundException::new);
+        notification.confirmUser(currentUser);
+        notificationRepository.save(notification);
+
+        return "Token Saved Successfully";
+    }
+
+
+
+
+
+
+
+
+
+    /*
     @Transactional
     public void saveNotification(String token) {
         User user = commonUtil.getUser();
@@ -70,4 +89,6 @@ public class NotificationService {
 
         notificationRepository.delete(notification);
     }
+
+     */
 }

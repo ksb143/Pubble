@@ -15,7 +15,7 @@ import java.io.IOException;
 @Log4j2
 public class FCMInitializer {
 
-    private static final String FIREBASE_CONFIG_PATH = "pubble-push-firebase-adminsdk-eb4ae-98b9f0e5f0.json";
+    private static final String FIREBASE_CONFIG_PATH = "pubble-push-firebase.json";
 
     @PostConstruct
     public void initialize() {
