@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Editor from '@monaco-editor/react';
 import rasterizeHTML from 'rasterizehtml';
 // 3. api
+import { getImageUrl } from '@/apis/rich.ts';
 // 4. store
 import useRichStore from '@/stores/richStore';
 // 5. component
@@ -21,11 +22,13 @@ interface CodeEditorWithPreviewProps {
     css: string,
     javascript: string,
   ) => void;
+  requirementId: number;
 }
 
 const CodeEditorWithPreview = ({
   isOpen,
   applyCodeCapture,
+  requirementId,
 }: CodeEditorWithPreviewProps) => {
   const { setHtml, setCss, setJavascript, javascript, html, css } =
     useRichStore();
@@ -110,11 +113,18 @@ const CodeEditorWithPreview = ({
     try {
       const canvasResult = await rasterizeHTML.drawHTML(sourceDoc, canvas, {
         executeJs: true,
-        executeJsTimeout: 5000,
+        executeJsTimeout: 1000,
       });
       const svgDataUrl = (canvasResult.image as HTMLImageElement).src;
       const imageDataUrl = (await convertSvgToImage(svgDataUrl)) as string;
-      applyCodeCapture(imageDataUrl, html, css, javascript);
+
+      const response = await fetch(imageDataUrl);
+      const blob = await response.blob();
+      const imageFile = new File([blob], 'code-image.png', { type: blob.type });
+
+      const uploadedImageUrl = await getImageUrl(imageFile, requirementId);
+
+      applyCodeCapture(uploadedImageUrl, html, css, javascript);
     } catch (error) {
       console.error('Error rendering HTML to image:', error);
     }

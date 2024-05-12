@@ -1,5 +1,6 @@
 // 1. react 관련
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 // 2. library
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -19,6 +20,7 @@ import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
 import Lottie from 'react-lottie';
 // 3. api
+import { getImageUrl } from '@/apis/rich.ts';
 // 4. store
 import useRichStore from '@/stores/richStore';
 // 5. component
@@ -30,6 +32,7 @@ import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
 // 6. image 등 assets
 import './RichPage.css';
 import LoadingAnimation from '@/assets/lotties/loading.json';
+import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
 const { VITE_SCREENSHOT_API } = import.meta.env;
 
 const lowlight = createLowlight(common);
@@ -41,12 +44,20 @@ const RichPage = () => {
   const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] =
     useState<boolean>(false);
   const [linkTabType, setLinkTabType] = useState<string>('');
+  const [isFileUploadModalOpen, setIsFileUploadModalOpen] =
+    useState<boolean>(false);
   const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } =
     useRichStore();
 
   // 파라미터
+  // const { projectId } = useParams<{ projectId: string }>();
+  // const projectIdNumber = Number(projectId);
+  const { requirementId } = useParams<{ requirementId: string }>();
+  const requirementIdNumber = Number(requirementId);
+
+  // props
   const projectName = '브레드 이발소  단장 프로젝트';
-  const requirementId = 'BREAD001';
+  const requirementUniqueId = 'BREAD001';
 
   // 로티 기본 옵션
   const defaultOptions = {
@@ -92,7 +103,40 @@ const RichPage = () => {
         },
         multicolor: true,
       }),
-      FileHandler,
+      FileHandler.configure({
+        onPaste: (editor, files) => {
+          files.forEach((file) => {
+            if (file.type.startsWith('image/')) {
+              const reader = new FileReader();
+              reader.onload = (event) => {
+                const url = event.target!.result as string;
+                editor
+                  .chain()
+                  .focus()
+                  .setResizableImage({ src: url, width: 300 })
+                  .run();
+              };
+              reader.readAsDataURL(file);
+            } else if (file.type === 'text/plain') {
+              const render = new FileReader();
+              render.onload = (event) => {
+                const text = event.target!.result as string;
+                editor.chain().focus().insertContent(text).run();
+              };
+              render.readAsText(file);
+            }
+          });
+        },
+        allowedMimeTypes: [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'application/pdf',
+          'text/plain',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/msword',
+        ],
+      }),
     ],
     content: '',
   });
@@ -105,15 +149,28 @@ const RichPage = () => {
     if (!response.ok) {
       throw new Error(`Failed to fetch screenshot for URL: ${url}`);
     }
-    const blob = await response.blob();
-    console.log(blob);
-    return URL.createObjectURL(blob);
+    try {
+      const blob = await response.blob();
+      const fileName = `screenshot-${new Date().getTime()}.gif`;
+      const file = new File([blob], fileName, { type: blob.type });
+      const imageUrl = await getImageUrl(file, requirementIdNumber);
+      return imageUrl;
+    } catch (error) {
+      console.error('Failed to upload image: ', error);
+    }
   };
 
   // 이미지 삽입 함수
   const handleImageInsert = (image: string) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
     setIsImageUploadModalOpen(false);
+  };
+
+  // 파일 삽입 함수
+  const handleFileInsert = (fileUrl: string, fileName: string) => {
+    const linkHtml = `<a href="${fileUrl}" target="_blank" download="${fileName}">${fileName}</a>`;
+    editor?.chain().focus().insertContent(linkHtml).run();
+    setIsFileUploadModalOpen(false);
   };
 
   // 링크 삽입 함수
@@ -166,7 +223,6 @@ const RichPage = () => {
   // 코드이미지 클릭 이벤트 감지
   useEffect(() => {
     const handleCodeImageClick = (event: CustomEvent) => {
-      console.log(event);
       const { html, css, javascript } = event.detail;
       openCodePreviewModal(html, css, javascript);
     };
@@ -193,7 +249,7 @@ const RichPage = () => {
       <div className='col-span-10 col-start-2'>
         <MenuBar
           editor={editor}
-          requirementId={requirementId}
+          requirementUniqueId={requirementUniqueId}
           requirementName='좋아요 기능'
           projectName={projectName}
           openImageUploadModal={() => setIsImageUploadModalOpen(true)}
@@ -201,6 +257,7 @@ const RichPage = () => {
             setLinkTabType(tabType);
             setIsLinkUploadModalOpen(true);
           }}
+          openFileUploadModal={() => setIsFileUploadModalOpen(true)}
         />
       </div>
       <div className='col-span-10 col-start-2 h-screen p-6 shadow'>
@@ -212,6 +269,7 @@ const RichPage = () => {
           isOpen={isImageUploadModalOpen}
           onClose={() => setIsImageUploadModalOpen(false)}
           onInsert={handleImageInsert}
+          requirementId={requirementIdNumber}
         />
         <LinkUploadModal
           tabType={linkTabType}
@@ -219,11 +277,18 @@ const RichPage = () => {
           onClose={() => setIsLinkUploadModalOpen(false)}
           onInsert={handleLinkInsert}
         />
+        <FileUploadModal
+          isOpen={isFileUploadModalOpen}
+          onClose={() => setIsFileUploadModalOpen(false)}
+          onInsert={handleFileInsert}
+          requireUniqueId={requirementIdNumber}
+        />
       </div>
       {isCodeModalOpen && (
         <CodeEditorWithPreview
           isOpen={isCodeModalOpen}
           applyCodeCapture={captureCodeImage}
+          requirementId={requirementIdNumber}
         />
       )}
     </div>

@@ -40,7 +40,6 @@ export const ExtendedImageExtension = Node.create({
       img.setAttribute('src', node.attrs.src);
 
       img.addEventListener('click', () => {
-        console.log('Image clicked', node.attrs);
         const event = new CustomEvent('codeImageClicked', {
           detail: {
             html: node.attrs.html,

@@ -1,15 +1,24 @@
+// 1. react 관련
 import { useState, useRef, useEffect, DragEvent } from 'react';
+// 2. library
+// 3. api
+import { getImageUrl } from '@/apis/rich.ts';
+// 4. store
+// 5. component
+// 6. image 등 assets
 
 interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onInsert: (image: string) => void;
+  requirementId: number;
 }
 
 const ImageUploadModal = ({
   isOpen,
   onClose,
   onInsert,
+  requirementId,
 }: ImageUploadModalProps) => {
   const [tab, setTab] = useState('link');
   const [url, setUrl] = useState('');
@@ -18,12 +27,16 @@ const ImageUploadModal = ({
   const initialClick = useRef(true);
 
   // 이미지 링크 혹은 파일 삽입하는 함수
-  const handleInsert = () => {
+  const handleInsert = async () => {
     if (tab === 'link') {
       onInsert(url);
     } else if (tab === 'upload' && file) {
-      const imageUrl = URL.createObjectURL(file);
-      onInsert(imageUrl);
+      try {
+        const imageUrl = await getImageUrl(file, requirementId);
+        onInsert(imageUrl);
+      } catch (error) {
+        console.error('Failed to upload image: ', error);
+      }
     }
     setUrl('');
     setFile(null);
@@ -93,6 +106,7 @@ const ImageUploadModal = ({
       {tab === 'upload' && (
         <input
           type='file'
+          name='upload'
           className='mb-3 w-full rounded border border-gray-200 p-2 py-3'
           onChange={(e) => setFile(e.target.files?.[0] || null)}
         />
