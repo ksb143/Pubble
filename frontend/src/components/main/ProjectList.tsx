@@ -1,6 +1,6 @@
 // 1. react 관련
 import React from "react"
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // 2. library 관련
 // 3. component 관련
 import {
