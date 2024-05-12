@@ -1,6 +1,6 @@
 // 1. react 관련
 import { useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // 2. library: react-table
 import {
   ColumnDef,
