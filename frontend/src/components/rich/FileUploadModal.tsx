@@ -37,6 +37,7 @@ const FileUploadModal = ({
       onClose();
     } catch (error) {
       console.error('file upload failed', error);
+      alert('파일 업로드에 실패했습니다');
     }
     onClose();
   };

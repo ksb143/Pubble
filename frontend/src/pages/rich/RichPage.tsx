@@ -18,6 +18,9 @@ import { common, createLowlight } from 'lowlight';
 import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
+import Collaboration from '@tiptap/extension-collaboration';
+import * as Y from 'yjs';
+import { TiptapCollabProvider } from '@hocuspocus/provider';
 import Lottie from 'react-lottie';
 // 3. api
 import { getImageUrl, getFileUrl } from '@/apis/rich.ts';
@@ -33,7 +36,8 @@ import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
 import './RichPage.css';
 import LoadingAnimation from '@/assets/lotties/loading.json';
 import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
-const { VITE_SCREENSHOT_API } = import.meta.env;
+const { VITE_SCREENSHOT_API, VITE_TIPTAP_APP_ID, VITE_TIPTAP_JWT_TOKEN } =
+  import.meta.env;
 
 const lowlight = createLowlight(common);
 
@@ -50,8 +54,8 @@ const RichPage = () => {
     useRichStore();
 
   // 파라미터
-  // const { projectId } = useParams<{ projectId: string }>();
-  // const projectIdNumber = Number(projectId);
+  const { projectId } = useParams<{ projectId: string }>();
+  const projectIdNumber = Number(projectId);
   const { requirementId } = useParams<{ requirementId: string }>();
   const requirementIdNumber = Number(requirementId);
 
@@ -173,8 +177,60 @@ const RichPage = () => {
           'image/gif',
         ],
       }),
+      Collaboration.configure({
+        document: doc,
+      }),
     ],
-    content: '',
+    content: `
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>
+      <p></p>      
+    `,
+  });
+
+  // 동시편집
+  const doc = new Y.Doc();
+  const accessToken = localStorage.getItem('accessToken');
+  const provider = new TiptapCollabProvider({
+    name: `${projectIdNumber}.${projectName}-${requirementIdNumber}.${requirementUniqueId}`,
+    appId: VITE_TIPTAP_APP_ID,
+    token: accessToken,
+    document: doc,
+
+    onSynced() {
+      if (!doc.getMap('config').get('initialContentLoaded') && editor) {
+        doc.getMap('config').set('initialContentLoaded', true);
+
+        editor.commands.setContent(``);
+      }
+    },
   });
 
   // url 스크린샷 집어넣는 함수
