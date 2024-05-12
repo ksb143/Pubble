@@ -46,6 +46,7 @@ const projects: Project[] = [
     memberCount: 5,
     status: "in progress",
   },
+  // 이 부분이 GET-project api로 호출되어서 projects 라는 배열을 채워줘야 함.
 ]
 
 export type Project = {
