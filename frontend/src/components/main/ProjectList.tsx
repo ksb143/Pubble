@@ -1,6 +1,6 @@
 // 1. react 관련
 import React from "react"
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // 2. library 관련
 // 3. component 관련
 import {
@@ -36,67 +36,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-// 4. store
-// 5. components
-// 6. image 등 assets
-const data: Project[] = [
-  {
-    id: "m5gr84i9",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "OldOlive",
-    memberCount: 5,
-    status: "in progress",
-  },
-  {
-    id: "3u1reuv4",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "Daiso",
-    memberCount: 3,
-    status: "complete",
-  },
-  {
-    id: "m5gr84i9",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "OldOlive",
-    memberCount: 5,
-    status: "in progress",
-  },
-  {
-    id: "3u1reuv4",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "Daiso",
-    memberCount: 3,
-    status: "complete",
-  },
-  {
-    id: "m5gr84i9",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "OldOlive",
-    memberCount: 5,
-    status: "in progress",
-  },
-  {
-    id: "3u1reuv4",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "Daiso",
-    memberCount: 3,
-    status: "complete",
-  },
-  {
-    id: "3u1reuv4",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "Daiso",
-    memberCount: 3,
-    status: "complete",
-  },
 
+import exp from "constants";
+
+const projects: Project[] = [
+  {
+    id: "aaaaaaaa",
+    startDate: "2022-01-01",
+    endDate: "2022-01-01",
+    projectId: "OldOlive",
+    memberCount: 5,
+    status: "in progress",
+  },
 ]
 
 export type Project = {
@@ -165,7 +116,6 @@ export const columns: ColumnDef<Project>[] = [
     header: () => <div className="text-right">시작일</div>,
     cell: ({ row }) => {
       const startDate = row.getValue("startDate") as string;
-
       // 날짜 형식으로 포맷
       const formatted = new Intl.DateTimeFormat("ko-KR").format(new Date(startDate));
 
@@ -202,7 +152,15 @@ export const columns: ColumnDef<Project>[] = [
   },
 ]
 
-export function ProjectList() {
+const ProjectList = () => {
+  
+  const navigate = useNavigate();
+
+  const handleRowClick = (projectId: string)=>{
+
+    navigate(`/project/${projectId}`);
+  }
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -212,7 +170,7 @@ export function ProjectList() {
   const [rowSelection, setRowSelection] = React.useState({})
 
   const table = useReactTable({
-    data,
+    data: projects,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -271,15 +229,16 @@ export function ProjectList() {
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={()=> handleRowClick(row.original.projectId)}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      <Link to={`/project/${row.original.projectId}`}>
+                    <TableCell 
+                      key={cell.id}
+                      >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
                       )}
-                      </Link>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -326,3 +285,5 @@ export function ProjectList() {
 
   )
 }
+
+export default ProjectList;
