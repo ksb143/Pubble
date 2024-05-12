@@ -37,8 +37,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import exp from "constants";
-
 const projects: Project[] = [
   {
     id: "aaaaaaaa",
