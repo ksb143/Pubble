@@ -24,7 +24,7 @@ declare module '@tiptap/core' {
   }
 }
 
-export const ResizableImageExtension = Node.create<ResizableImageOptions>({
+export const ResizableImage = Node.create<ResizableImageOptions>({
   name: 'resizableImage',
 
   inline: true,

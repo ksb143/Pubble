@@ -1,17 +1,17 @@
 // 1. react 관련
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 // 2. library
 import { useEditor, EditorContent, BubbleMenu } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
-import { ResizableImageExtension } from '@/extensions/ResizableImageExtension.ts';
-import { ExtendedImageExtension } from '@/extensions/ExtendedImageExtension.ts';
+import { ResizableImage } from '@/extensions/ResizableImage.ts';
 import Link from '@tiptap/extension-link';
 import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import TableRow from '@tiptap/extension-table-row';
+// import CodeBlock from '@tiptap/extension-code-block';
 import { Color } from '@tiptap/extension-color';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
@@ -20,44 +20,27 @@ import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
 import Lottie from 'react-lottie';
 // 3. api
-import { getImageUrl } from '@/apis/rich.ts';
 // 4. store
-import useRichStore from '@/stores/richStore';
 // 5. component
-import MenuBar from '@/components/rich/MenuBar.tsx';
-import BubbleMenuBar from '@/components/rich/BubbleMenuBar.tsx';
-import ImageUploadModal from '@/components/rich/ImageUploadModal.tsx';
-import LinkUploadModal from '@/components/rich/LinkUploadModal.tsx';
-import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
+import MenuBar from '@/components/details/MenuBar.tsx';
+import BubbleMenuBar from '@/components/details/BubbleMenuBar.tsx';
+import ImageUploadModal from '@/components/details/ImageUploadModal.tsx';
+import LinkUploadModal from '@/components/details/LinkUploadModal.tsx';
 // 6. image 등 assets
-import './RichPage.css';
 import LoadingAnimation from '@/assets/lotties/loading.json';
-import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
 const { VITE_SCREENSHOT_API } = import.meta.env;
 
 const lowlight = createLowlight(common);
 
-const RichPage = () => {
-  // useState
+const RequirementItemDetailPage = () => {
   const [isImageUploadModalOpen, setIsImageUploadModalOpen] =
     useState<boolean>(false);
   const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] =
     useState<boolean>(false);
   const [linkTabType, setLinkTabType] = useState<string>('');
-  const [isFileUploadModalOpen, setIsFileUploadModalOpen] =
-    useState<boolean>(false);
-  const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } =
-    useRichStore();
 
   // 파라미터
-  // const { projectId } = useParams<{ projectId: string }>();
-  // const projectIdNumber = Number(projectId);
-  const { requirementId } = useParams<{ requirementId: string }>();
-  const requirementIdNumber = Number(requirementId);
-
-  // props
-  const projectName = '브레드 이발소  단장 프로젝트';
-  const requirementUniqueId = 'BREAD001';
+  const { projectName = '', requirementId = '' } = useParams();
 
   // 로티 기본 옵션
   const defaultOptions = {
@@ -79,8 +62,7 @@ const RichPage = () => {
           class: 'underline text-pubble cursor-pointer hover:text-blue-700',
         },
       }),
-      ResizableImageExtension,
-      ExtendedImageExtension,
+      ResizableImage,
       Table.configure({
         resizable: true,
       }),
@@ -103,45 +85,11 @@ const RichPage = () => {
         },
         multicolor: true,
       }),
-      FileHandler.configure({
-        onPaste: (editor, files) => {
-          files.forEach((file) => {
-            if (file.type.startsWith('image/')) {
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                const url = event.target!.result as string;
-                editor
-                  .chain()
-                  .focus()
-                  .setResizableImage({ src: url, width: 300 })
-                  .run();
-              };
-              reader.readAsDataURL(file);
-            } else if (file.type === 'text/plain') {
-              const render = new FileReader();
-              render.onload = (event) => {
-                const text = event.target!.result as string;
-                editor.chain().focus().insertContent(text).run();
-              };
-              render.readAsText(file);
-            }
-          });
-        },
-        allowedMimeTypes: [
-          'image/jpeg',
-          'image/png',
-          'image/gif',
-          'application/pdf',
-          'text/plain',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'application/msword',
-        ],
-      }),
+      FileHandler,
     ],
     content: '',
   });
 
-  // url 스크린샷 집어넣는 함수
   const fetchScreenshotData = async (url: string) => {
     const response = await fetch(
       `https://api.screenshotone.com/animate?url=${encodeURIComponent(url)}&access_key=${VITE_SCREENSHOT_API}&format=gif`,
@@ -149,28 +97,15 @@ const RichPage = () => {
     if (!response.ok) {
       throw new Error(`Failed to fetch screenshot for URL: ${url}`);
     }
-    try {
-      const blob = await response.blob();
-      const fileName = `screenshot-${new Date().getTime()}.gif`;
-      const file = new File([blob], fileName, { type: blob.type });
-      const imageUrl = await getImageUrl(file, requirementIdNumber);
-      return imageUrl;
-    } catch (error) {
-      console.error('Failed to upload image: ', error);
-    }
+    const blob = await response.blob();
+    console.log(blob);
+    return URL.createObjectURL(blob);
   };
 
   // 이미지 삽입 함수
   const handleImageInsert = (image: string) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
     setIsImageUploadModalOpen(false);
-  };
-
-  // 파일 삽입 함수
-  const handleFileInsert = (fileUrl: string, fileName: string) => {
-    const linkHtml = `<a href="${fileUrl}" target="_blank" download="${fileName}">${fileName}</a>`;
-    editor?.chain().focus().insertContent(linkHtml).run();
-    setIsFileUploadModalOpen(false);
   };
 
   // 링크 삽입 함수
@@ -197,47 +132,6 @@ const RichPage = () => {
     setIsLinkUploadModalOpen(false);
   };
 
-  // 코드 이미지 캡쳐 함수
-  const captureCodeImage = (
-    imageDataUrl: string,
-    html: string,
-    css: string,
-    javascript: string,
-  ) => {
-    editor
-      ?.chain()
-      .focus()
-      .insertContent({
-        type: 'extendedImage',
-        attrs: {
-          src: imageDataUrl,
-          html: html,
-          css: css,
-          javascript: javascript,
-        },
-      })
-      .run();
-    closeCodePreviewModal();
-  };
-
-  // 코드이미지 클릭 이벤트 감지
-  useEffect(() => {
-    const handleCodeImageClick = (event: CustomEvent) => {
-      const { html, css, javascript } = event.detail;
-      openCodePreviewModal(html, css, javascript);
-    };
-    document.addEventListener(
-      'codeImageClicked',
-      handleCodeImageClick as EventListener,
-    );
-    return () => {
-      document.removeEventListener(
-        'codeImageClicked',
-        handleCodeImageClick as EventListener,
-      );
-    };
-  }, [openCodePreviewModal]);
-
   // 에디터가 없을 경우
   if (!editor) {
     return <Lottie options={defaultOptions} height={500} width={500} />;
@@ -249,7 +143,7 @@ const RichPage = () => {
       <div className='col-span-10 col-start-2'>
         <MenuBar
           editor={editor}
-          requirementUniqueId={requirementUniqueId}
+          requirementId={requirementId}
           requirementName='좋아요 기능'
           projectName={projectName}
           openImageUploadModal={() => setIsImageUploadModalOpen(true)}
@@ -257,7 +151,6 @@ const RichPage = () => {
             setLinkTabType(tabType);
             setIsLinkUploadModalOpen(true);
           }}
-          openFileUploadModal={() => setIsFileUploadModalOpen(true)}
         />
       </div>
       <div className='col-span-10 col-start-2 h-screen p-6 shadow'>
@@ -269,7 +162,6 @@ const RichPage = () => {
           isOpen={isImageUploadModalOpen}
           onClose={() => setIsImageUploadModalOpen(false)}
           onInsert={handleImageInsert}
-          requirementId={requirementIdNumber}
         />
         <LinkUploadModal
           tabType={linkTabType}
@@ -277,22 +169,9 @@ const RichPage = () => {
           onClose={() => setIsLinkUploadModalOpen(false)}
           onInsert={handleLinkInsert}
         />
-        <FileUploadModal
-          isOpen={isFileUploadModalOpen}
-          onClose={() => setIsFileUploadModalOpen(false)}
-          onInsert={handleFileInsert}
-          requireUniqueId={requirementIdNumber}
-        />
       </div>
-      {isCodeModalOpen && (
-        <CodeEditorWithPreview
-          isOpen={isCodeModalOpen}
-          applyCodeCapture={captureCodeImage}
-          requirementId={requirementIdNumber}
-        />
-      )}
     </div>
   );
 };
 
-export default RichPage;
+export default RequirementItemDetailPage;
