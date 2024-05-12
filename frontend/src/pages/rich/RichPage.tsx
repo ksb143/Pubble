@@ -20,7 +20,7 @@ import Highlight from '@tiptap/extension-highlight';
 import FileHandler from '@tiptap-pro/extension-file-handler';
 import Lottie from 'react-lottie';
 // 3. api
-import { getImageUrl } from '@/apis/rich.ts';
+import { getImageUrl, getFileUrl } from '@/apis/rich.ts';
 // 4. store
 import useRichStore from '@/stores/richStore';
 // 5. component
@@ -104,37 +104,73 @@ const RichPage = () => {
         multicolor: true,
       }),
       FileHandler.configure({
-        onPaste: (editor, files) => {
-          files.forEach((file) => {
+        onPaste: async (editor, files) => {
+          for (const file of files) {
             if (file.type.startsWith('image/')) {
-              const reader = new FileReader();
-              reader.onload = (event) => {
-                const url = event.target!.result as string;
+              try {
+                const imageUrl = await getImageUrl(file, requirementIdNumber);
                 editor
                   .chain()
                   .focus()
-                  .setResizableImage({ src: url, width: 300 })
+                  .setResizableImage({ src: imageUrl, width: 300 })
                   .run();
-              };
-              reader.readAsDataURL(file);
-            } else if (file.type === 'text/plain') {
-              const render = new FileReader();
-              render.onload = (event) => {
-                const text = event.target!.result as string;
-                editor.chain().focus().insertContent(text).run();
-              };
-              render.readAsText(file);
+              } catch (error) {
+                console.error('Image uplad failed: ', error);
+              }
+            } else {
+              try {
+                const fileUrl = await getFileUrl(file, requirementIdNumber);
+                editor
+                  .chain()
+                  .focus()
+                  .insertContent(
+                    `<a href="${fileUrl}" target="_blank" download="${file.name}">${file.name}</a>`,
+                  )
+                  .run();
+              } catch (error) {
+                console.error('File upload failed: ', error);
+              }
             }
-          });
+          }
+        },
+        onDrop: async (editor, files, position) => {
+          for (const file of files) {
+            if (file.type.startsWith('image/')) {
+              try {
+                const imageUrl = await getImageUrl(file, requirementIdNumber);
+                editor
+                  .chain()
+                  .focus()
+                  .setTextSelection(position)
+                  .setResizableImage({ src: imageUrl, width: 300 })
+                  .run();
+              } catch (error) {
+                console.error('Image upload failed: ', error);
+              }
+            } else {
+              try {
+                const fileUrl = await getFileUrl(file, requirementIdNumber);
+                editor
+                  .chain()
+                  .focus()
+                  .setTextSelection(position)
+                  .insertContent(
+                    `<a href="${fileUrl}" target="_blank" download="${file.name}">${file.name}</a>`,
+                  )
+                  .run();
+              } catch (error) {
+                console.error('File upload failed: ', error);
+              }
+            }
+          }
         },
         allowedMimeTypes: [
+          'text/plain',
+          'application/msword',
+          'application/pdf',
           'image/jpeg',
           'image/png',
           'image/gif',
-          'application/pdf',
-          'text/plain',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-          'application/msword',
         ],
       }),
     ],
