@@ -1,8 +1,11 @@
 package com.ssafy.d109.pubble.security.jwt;
 
+import com.ssafy.d109.pubble.dto.projectDto.ProjectListDto;
+import com.ssafy.d109.pubble.dto.responseDto.ProjectListResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
+import com.ssafy.d109.pubble.service.ProjectService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,18 +13,23 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JWTUtil {
 
     private SecretKey secretKey;
     private final UserRepository userRepository;
+    private final ProjectService projectService;
 
-    public JWTUtil(@Value("${spring.jwt.secret}") String secret, UserRepository userRepository) {
+
+    public JWTUtil(@Value("${spring.jwt.secret}") String secret, UserRepository userRepository, ProjectService projectService) {
 
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.userRepository = userRepository;
+        this.projectService = projectService;
     }
 
     public String getEmployeeId(String token) {
@@ -69,6 +77,16 @@ public class JWTUtil {
         String department = user.getDepartment();
         String position = user.getPosition();
 
+        List<ProjectListResponseDto> reponseDto = new ArrayList<>();
+
+
+        List<ProjectListDto> projectListDtos = projectService.getProjectList(user.getUserId());
+        for (ProjectListDto dto : projectListDtos) {
+            ProjectListResponseDto pjtIdAndTitle = new ProjectListResponseDto();
+            pjtIdAndTitle.setProjectIdAndTitle(dto.getProjectId() + dto.getProjectTitle());
+            reponseDto.add(pjtIdAndTitle);
+        }
+
         return Jwts.builder()
                 .claim("category", category)
                 .claim("employeeId", employeeId)
@@ -77,6 +95,7 @@ public class JWTUtil {
                 .claim("name", name)
                 .claim("department", department)
                 .claim("position", position)
+                .claim("allowedDocumentNames", reponseDto)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
