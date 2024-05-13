@@ -2,6 +2,7 @@ package com.ssafy.d109.pubble.service;
 
 
 import com.ssafy.d109.pubble.dto.projectDto.*;
+import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
@@ -12,14 +13,17 @@ import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ProjectService {
 
     //     비고 | 현재, 프로젝트 = 요구사항 명세서
@@ -28,6 +32,7 @@ public class ProjectService {
     private final ProjectAssignmentRepository projectAssignmentRepository;
     private final RequirementService requirementService;
     private final RequirementRepository requirementRepository;
+    private final NotificationService notificationService;
 
     private DashboardUserInfo getDashboardUserInfo(User user) {
         return DashboardUserInfo.builder()
@@ -97,6 +102,19 @@ public class ProjectService {
                         .project(project)
                         .build();
                 projectAssignmentRepository.save(projectAssignment);
+
+                // 알림 메시지 생성 및 발송
+                NotificationRequestDto reqDto = NotificationRequestDto.builder()
+                        .title("새로운 프로젝트 참여 알림")
+                        .message(user.getName() + " " + user.getPosition() + "님, '" + project.getProjectTitle() + "' 프로젝트에 참여하게 되었습니다.")
+                        .build();
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        notificationService.sendNotification(reqDto);
+                    } catch (Exception e) {
+                        log.error("Failed to send notification", e);
+                    }
+                });
             }
         }
     }

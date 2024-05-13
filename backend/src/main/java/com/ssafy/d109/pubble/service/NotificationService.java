@@ -14,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.Message;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -27,6 +28,7 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
         this.commonUtil = commonUtil;
     }
+
 
     // 사용자의 기기에서 생성된 FCM 토큰을 서버에 등록하고 저장 (currentUser가 수행)
     public String registerToken(String token, User currentUser) {
@@ -56,6 +58,8 @@ public class NotificationService {
                     .setToken(token)
                     .build();
 
+
+            /*
             String response = FirebaseMessaging.getInstance().sendAsync(message).get();
             log.info(">>>>>Send Message: " + response);
         } catch (ExecutionException | InterruptedException e) {
@@ -63,7 +67,32 @@ public class NotificationService {
         } catch (NotificationNotFoundException e) {
             log.error("Notification token not found for user", e);
         }
+
+             */
+
+
+            // 비동기로 메시지 보내기
+            CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+                try {
+                    return FirebaseMessaging.getInstance().sendAsync(message).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException("Failed to send message", e);
+                }
+            });
+
+            // 비동기 작업 완료 후 로그 기록
+            future.thenAccept(response -> {
+                log.info("Send Message: " + response);
+            }).exceptionally(ex -> {
+                log.error("Failed to send message due to error", ex);
+                return null;
+            });
+
+        } catch (NotificationNotFoundException e) {
+            log.error("Notification token not found for user", e);
+        }
     }
+
 
     private String getNotificationToken() {
         User user = commonUtil.getUser();
