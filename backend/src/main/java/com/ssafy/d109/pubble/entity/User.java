@@ -47,6 +47,7 @@ public class User {
     @Column(name = "profileColor")
     private String profileColor;
 
+
     public Set<String> getRoles() {
         return Set.of(this.role);
     }

@@ -6,6 +6,7 @@ import com.ssafy.d109.pubble.security.filter.CustomLogoutFilter;
 import com.ssafy.d109.pubble.security.filter.JWTFilter;
 import com.ssafy.d109.pubble.security.filter.LoginFilter;
 import com.ssafy.d109.pubble.security.jwt.JWTUtil;
+import com.ssafy.d109.pubble.service.NotificationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
@@ -36,13 +37,15 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, NotificationService notificationService) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Bean
@@ -81,7 +84,7 @@ public class SecurityConfig {
                 .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
-        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository, notificationService), LogoutFilter.class);
 
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
