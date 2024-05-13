@@ -99,7 +99,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             role = auth.getAuthority();
         }
 
-        String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, 600000L);
+        long oneMonthMillis = 30L * 24 * 60 * 60 * 1000;
+        String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, oneMonthMillis);
         String refreshToken = jwtUtil.createJwt("refresh", employeeId, role, 86400000L);
         String profileColor = jwtUtil.getProfileColor(accessToken);
         String name = jwtUtil.getName(accessToken);
