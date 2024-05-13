@@ -47,6 +47,8 @@ public class User {
     @Column(name = "profileColor")
     private String profileColor;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = true)
+    private Notification notification;
 
     public Set<String> getRoles() {
         return Set.of(this.role);
