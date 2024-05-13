@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent,  DialogTrigger, } from '@radix-ui/react-dialog'
@@ -17,26 +16,42 @@ export function ProjectAddModal({ isOpen, onClose }: ProjectAddModalProps) {
         
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">프로젝트 이름</Label>
+            <Label htmlFor="projectTitle" className="text-right">프로젝트 이름</Label>
             <Input
-              id="name"
-              defaultValue="Pedro Duarte"
+              id="projectTitle"
+              defaultValue="홈페이지 제작"
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">프로젝트 Code</Label>
+            <Label htmlFor="projectCode" className="text-right">프로젝트 Code</Label>
             <Input
-              id="username"
-              defaultValue="@peduarte"
+              id="projectCode"
+              defaultValue="homepage"
               className="col-span-3"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="username" className="text-right">프로젝트 Code</Label>
+            <Label htmlFor="projectParticipant" className="text-right">프로젝트 참여자</Label>
             <Input
-              id="username"
-              defaultValue="@peduarte"
+              id="projectParticipant"
+              defaultValue="SSAFY1001"
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="startAt" className="text-right">시작일</Label>
+            <Input
+              id="startAt"
+              defaultValue="2024-03-01"
+              className="col-span-3"
+            />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="endAt" className="text-right">종료일</Label>
+            <Input
+              id="endAt"
+              defaultValue="2024-03-02"
               className="col-span-3"
             />
           </div>
