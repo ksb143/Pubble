@@ -53,7 +53,7 @@ public class NotificationService {
                                     .setBody(reqDto.getMessage())
                                     .build())
                             .build())
-                    .setToken(getNotificationToken())
+                    .setToken(token)
                     .build();
 
             String response = FirebaseMessaging.getInstance().sendAsync(message).get();
