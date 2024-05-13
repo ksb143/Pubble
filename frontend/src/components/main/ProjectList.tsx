@@ -1,17 +1,17 @@
 // 1. react 관련
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 // 2. library 관련
-import { getProject, addProject } from "@/apis/project";
+import { getProject } from "@/apis/project";
 // 3. component 관련
-import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
+import { Cell, Header, HeaderGroup, Row, ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, TableInstance } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ProjectAddModal } from "@/components/main/ProjectAddModal"
+import  ProjectAddModal  from "@/components/main/ProjectAddModal"
 
 export type Project = {
   projectId: string
@@ -26,20 +26,20 @@ export type Project = {
 export const columns: ColumnDef<Project>[] = [
   {
     id: "select",
-    header: ({ table }) => (
+    header: ({ table }: { table: TableInstance<Project> }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
     ),
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),
@@ -49,42 +49,42 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "projectTitle",
     header: "프로젝트 이름",
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> } ) => (
       <div className="capitalize">{row.getValue("projectTitle")}</div>
     ),
   },
   {
     accessorKey: "people",
     header: "구성원 수",
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> }) => (
       <div className="capitalize">{(row.getValue("people") as string[]).length}</div>
       ),
   },
   {
     accessorKey: "progressRatio",
     header: "진행률",
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> }) => (
       <div className="capitalize">{row.getValue("progressRatio")}</div>
     ),
   },
   {
     accessorKey: "status",
     header: "상태",
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> }) => (
       <div className="capitalize">{row.getValue("status")}</div>
     ),
   },
   {
     accessorKey: "startAt",
     header: "시작일",
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> }) => (
       <div className="capitalize">{(row.getValue("startAt") as string).split('T')[0]}</div>
     ),
   },
   {
     accessorKey: "endAt",
     header: "종료일",
-    cell: ({ row }) => (
+    cell: ({ row }:{ row: Row<Project> }) => (
       <div className="capitalize">{(row.getValue("endAt") as string).split('T')[0]}</div>
     ),
   },
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Project>[] = [
   {
     id: "actions",
     enableHiding: false,
-    cell: ({ row }) => {
+    cell: ({ row }:{ row: Row<Project> }) => {
       const project = row.original
 
       return (
@@ -168,13 +168,13 @@ const ProjectList = () => {
     };
     fetchProjects();
   }, [])
-  // 사용자의 프로젝트 목록에 새로운 프로젝트 추가하기.
+  // 사용자의 프로젝트 목록에 새로운 프로젝트 추가하기. // 프로젝트 생성 모달 true. 
   const handleAddProject = () => {
-    setIsModalOpen(true); // 프로젝트 생성 모달 열기.
+    setIsModalOpen(true);
   };
-
+  // 프로젝트 생성 모달 닫기.
   const handleCloseModal = () => {
-    setIsModalOpen(false); // 프로젝트 생성 모달 닫기.
+    setIsModalOpen(false);
   };
 
   // 특정 프로젝트 행 클릭시, 특정 프로젝트에 진입할 수 있도록 하는 함수.
@@ -184,8 +184,7 @@ const ProjectList = () => {
 
   return (
     
-    <div className="w-full overflow-hidden px-2 max-h-[500px]">
-      <br />
+    <div className="w-full px-2 ">
       
       <ProjectAddModal isOpen={isModalOpen} onClose={handleCloseModal} />
       <Button onClick={handleAddProject}>프로젝트 추가</Button>
@@ -203,9 +202,9 @@ const ProjectList = () => {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: HeaderGroup<Project>) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header: Header<Project>, index: number) => {
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
@@ -222,14 +221,14 @@ const ProjectList = () => {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row: Row<Project> ) => (
                 
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={()=> handleRowClick(row.original.projectId)}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell: Cell<Project>, index: number) => (
                     <TableCell 
                       key={cell.id}
                       >
@@ -246,7 +245,7 @@ const ProjectList = () => {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-14 text-center"
                 >
                   No results.
                 </TableCell>
