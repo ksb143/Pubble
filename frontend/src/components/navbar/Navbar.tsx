@@ -4,10 +4,10 @@ import Message from '@/components/navbar/Message';
 import Notification from '@/components/navbar/Notification';
 import Profile from '@/components/layout/Profile';
 import ProfileDropdown from '@/components/navbar/ProfileDropdown';
+import Breadcrumb from '@/components/navbar/Breadcrumb';
 import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
-import Right from '@/assets/icons/chevron-right.svg?react';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -46,19 +46,11 @@ const Navbar = () => {
             }}
           />
 
-          <div className='mx-10 flex items-center'>
-            <p className='text-xl font-normal'>올리브 올드 프로젝트</p>
-            <Right className='mx-2 h-4 w-4 stroke-gray-500/50 stroke-2' />
-            <p className='text-xl font-normal'>좋아요 기능</p>
-            <Right className='mx-2 h-4 w-4 stroke-gray-500/50 stroke-2' />
-            <p className='text-xl font-normal'>에디터</p>
-          </div>
+          <Breadcrumb />
         </div>
 
         <div className='flex items-center'>
-          <div>
-            <Profile width='3rem' height='3rem' />
-          </div>
+          <div className='mr-8'>프로젝트 참여 인원 및 현재 접속자 표시</div>
           <div
             className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-900/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
             onClick={() => toggleMenu('message')}>
@@ -68,7 +60,7 @@ const Navbar = () => {
           </div>
 
           <div
-            className={`mr-10 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-900/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
+            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-900/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
             onClick={() => toggleMenu('notification')}>
             <Bell
               className={`h-8 w-8 fill-gray-900 stroke-gray-900 ${activeMenu === 'notification' ? 'stroke-[6]' : 'stroke-2'}`}
