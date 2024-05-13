@@ -1,14 +1,12 @@
 package com.ssafy.d109.pubble.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
 @Getter
+@Setter
 @Table(name = "notification")
 public class Notification {
 

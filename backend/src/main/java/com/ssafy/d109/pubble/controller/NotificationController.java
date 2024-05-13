@@ -1,5 +1,6 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.ssafy.d109.pubble.dto.requestDto.FCMTokenRequestDto;
 import com.ssafy.d109.pubble.entity.Notification;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NotificationService;
@@ -22,9 +23,10 @@ public class NotificationController {
     }
 
     @PostMapping("/token")
-    public void registerToken(@RequestBody String token) {
+    public void registerToken(@RequestBody FCMTokenRequestDto tokenDto) {
 
         User currentUser = commonUtil.getUser();
+        String token = tokenDto.getToken();
         notificationService.registerToken(token, currentUser);
 
     }

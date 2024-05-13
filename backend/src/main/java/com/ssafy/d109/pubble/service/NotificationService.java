@@ -31,18 +31,46 @@ public class NotificationService {
     // 사용자의 기기에서 생성된 FCM 토큰을 서버에 등록하고 저장 (currentUser가 수행)
     public String registerToken(String token, User currentUser) {
 
-        Notification notification = notificationRepository.findNotificationByUser(currentUser).orElseThrow(NotificationNotFoundException::new);
-        notification.confirmUser(currentUser);
-        notificationRepository.save(notification);
+        Notification notification = notificationRepository.findNotificationByUser(currentUser)
+                .orElse(Notification.builder().token(token).build());
+        notification.setToken(token);  // 기존 또는 새 토큰 업데이트
+        notification.confirmUser(currentUser);  // 사용자 확인
+
+        notificationRepository.save(notification);  // Notification 객체 저장
 
         return "Token Saved Successfully";
     }
 
 
+    public void sendNotification(NotificationRequestDto reqDto) {
 
+        try {
+            String token = getNotificationToken();
+            Message message = Message.builder()
+                    .setWebpushConfig(WebpushConfig.builder()
+                            .setNotification(WebpushNotification.builder()
+                                    .setTitle(reqDto.getTitle())
+                                    .setBody(reqDto.getMessage())
+                                    .build())
+                            .build())
+                    .setToken(getNotificationToken())
+                    .build();
 
+            String response = FirebaseMessaging.getInstance().sendAsync(message).get();
+            log.info(">>>>>Send Message: " + response);
+        } catch (ExecutionException | InterruptedException e) {
+            log.error("Failed to send message due to interruption or execution error", e);
+        } catch (NotificationNotFoundException e) {
+            log.error("Notification token not found for user", e);
+        }
+    }
 
-
+    private String getNotificationToken() {
+        User user = commonUtil.getUser();
+        return notificationRepository.findNotificationByUser(user)
+                .map(Notification::getToken)
+                .orElseThrow(NotificationNotFoundException::new);
+    }
 
 
 
@@ -57,29 +85,6 @@ public class NotificationService {
 
         notification.confirmUser(user);
         notificationRepository.save(notification);
-
-    }
-    
-    public String getNotificationToken() {
-        User user = commonUtil.getUser();
-        Notification notification = notificationRepository.findNotificationByUser(user).orElseThrow(NotificationNotFoundException::new);
-        
-        return notification.getToken();
-    }
-
-    public void sendNotification(NotificationRequestDto reqDto) throws ExecutionException, InterruptedException {
-        Message message = Message.builder()
-                .setWebpushConfig(WebpushConfig.builder()
-                        .setNotification(WebpushNotification.builder()
-                                .setTitle(reqDto.getTitle())
-                                .setBody(reqDto.getMessage())
-                                .build())
-                        .build())
-                .setToken(getNotificationToken())
-                .build();
-
-        String response = FirebaseMessaging.getInstance().sendAsync(message).get();
-        log.info(">>>>>Send Message: " + response);
 
     }
 
