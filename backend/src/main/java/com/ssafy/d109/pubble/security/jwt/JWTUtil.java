@@ -1,7 +1,6 @@
 package com.ssafy.d109.pubble.security.jwt;
 
 import com.ssafy.d109.pubble.dto.projectDto.ProjectListDto;
-import com.ssafy.d109.pubble.dto.responseDto.ProjectListResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
@@ -77,14 +76,12 @@ public class JWTUtil {
         String department = user.getDepartment();
         String position = user.getPosition();
 
-        List<ProjectListResponseDto> reponseDto = new ArrayList<>();
+        List<String> reponseDto = new ArrayList<>();
 
 
         List<ProjectListDto> projectListDtos = projectService.getProjectList(user.getUserId());
         for (ProjectListDto dto : projectListDtos) {
-            ProjectListResponseDto pjtIdAndTitle = new ProjectListResponseDto();
-            pjtIdAndTitle.setProjectIdAndTitle(dto.getProjectId() + dto.getProjectTitle() + "/*");
-            reponseDto.add(pjtIdAndTitle);
+            reponseDto.add(dto.getProjectId() + dto.getProjectTitle() + "/*");
         }
 
         return Jwts.builder()
