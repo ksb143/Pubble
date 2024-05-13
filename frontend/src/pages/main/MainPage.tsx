@@ -1,4 +1,5 @@
 // 1. react 관련
+import React from 'react';
 // 2. library
 // 3. api
 // 4. store
@@ -19,13 +20,13 @@ const MainDashboardPage = () => {
     </div>
     {/* br보다 gap, margin, padding으로 마진 조정 */}
     <div className="flex items-center justify-center ">
-      <div className="grid grid-cols-2 gap-10 max-w-[1500px] max-h-[600px] overflow-hidden">
+      <div className="grid grid-cols-2 gap-10 max-w-[1500px] max-h-[900px] overflow-auto">
 
-        <div className="bg-gradient-to-r from-blue-500 to-blue-300 flex items-center justify-center text-black overflow-hidden w-full h-full">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-300 flex items-center justify-center text-black overflow-auto w-full h-full">
           <Calendar />
         </div>
 
-        <div className="flex items-center justify-center text-black overflow-hidden w-full h-full">
+        <div className="flex items-center justify-center text-black overflow-auto w-full h-full">
           <ProjectList />
         </div>
 
