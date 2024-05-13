@@ -82,20 +82,22 @@ const HighlightInput = styled.input`
 
 interface MenuBarProps {
   editor: Editor;
-  requirementId: string;
+  requirementUniqueId: string;
   requirementName: string;
   projectName: string;
   openImageUploadModal: () => void;
   openLinkUploadModal: (tabType: string) => void;
+  openFileUploadModal: () => void;
 }
 
 const MenuBar = ({
   editor,
-  requirementId,
+  requirementUniqueId,
   requirementName,
   projectName,
   openImageUploadModal,
   openLinkUploadModal,
+  openFileUploadModal,
 }: MenuBarProps) => {
   const { openCodePreviewModal } = useRichStore();
   const [row, setRow] = useState<number>(3);
@@ -116,7 +118,7 @@ const MenuBar = ({
   return (
     <div className='flex w-full justify-around rounded py-2 shadow-custom'>
       <div className='flex items-end gap-3'>
-        <h1 className='text-2xl font-normal'>ID {requirementId}</h1>
+        <h1 className='text-2xl font-normal'>ID {requirementUniqueId}</h1>
         <h1 className='text-2xl font-normal'>{requirementName}</h1>
         <h2>{projectName}</h2>
       </div>
@@ -176,7 +178,7 @@ const MenuBar = ({
             <button onClick={openImageUploadModal}>
               <ImageLineIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
-            <button>
+            <button onClick={() => openFileUploadModal()}>
               <FileLineIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
             <DropdownMenu modal={false}>
