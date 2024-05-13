@@ -82,7 +82,7 @@ const HighlightInput = styled.input`
 
 interface MenuBarProps {
   editor: Editor;
-  requirementUniqueId: string;
+  requirementCode: string;
   requirementName: string;
   projectName: string;
   openImageUploadModal: () => void;
@@ -92,7 +92,7 @@ interface MenuBarProps {
 
 const MenuBar = ({
   editor,
-  requirementUniqueId,
+  requirementCode,
   requirementName,
   projectName,
   openImageUploadModal,
@@ -116,9 +116,9 @@ const MenuBar = ({
   }
 
   return (
-    <div className='flex w-full justify-around rounded py-2 shadow-custom'>
+    <div className='flex w-full justify-around py-2 '>
       <div className='flex items-end gap-3'>
-        <h1 className='text-2xl font-normal'>ID {requirementUniqueId}</h1>
+        <h1 className='text-2xl font-normal'>ID {requirementCode}</h1>
         <h1 className='text-2xl font-normal'>{requirementName}</h1>
         <h2>{projectName}</h2>
       </div>

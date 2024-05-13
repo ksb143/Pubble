@@ -1,5 +1,5 @@
 // 1. react 관련
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // 2. library
 import {
   BubbleMenu,
@@ -17,20 +17,22 @@ import * as Y from 'yjs';
 import { getImageUrl, getFileUrl } from '@/apis/rich.ts';
 // 4. store
 import useRichStore from '@/stores/richStore';
+// import useUserStore from '@/stores/userStore.ts';
 // 5. component
+import BubbleMenuBar from '@/components/rich/BubbleMenuBar.tsx';
 import ImageUploadModal from '@/components/rich/ImageUploadModal.tsx';
 import LinkUploadModal from '@/components/rich/LinkUploadModal.tsx';
 import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
 import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
 // 6. image 등 assets
-import { TNote } from '@/types/types.ts';
 import DraggableIcon from '@/assets/icons/draggable.svg?react';
-import BubbleMenuBar from '@/components/rich/BubbleMenuBar.tsx';
-// import useUserStore from '@/stores/userStore.ts';
+import { TNote } from '@/types/types.ts';
 const { VITE_SCREENSHOT_API, VITE_TIPTAP_APP_ID } = import.meta.env;
 
 interface NoteProps {
   note: TNote;
+  notes: TNote[];
+  setNotes: React.Dispatch<React.SetStateAction<TNote[]>>;
   projectId: number;
   requirementId: number;
   onEditorUpdate: (
@@ -38,22 +40,38 @@ interface NoteProps {
     transaction: Transaction,
     noteId: string,
   ) => void;
+  setActiveEditor: (editor: TiptapEditor) => void;
+  isImageUploadModalOpen: boolean;
+  isLinkUploadModalOpen: boolean;
+  isFileUploadModalOpen: boolean;
+  linkTabType: string;
 }
 
-const Note = ({
+const Node = ({
   note,
+  notes,
+  setNotes,
   projectId,
   requirementId,
   onEditorUpdate,
+  setActiveEditor,
+  isImageUploadModalOpen,
+  isLinkUploadModalOpen,
+  isFileUploadModalOpen,
+  linkTabType,
 }: NoteProps) => {
   // useState
-  const [isImageUploadModalOpen, setIsImageUploadModalOpen] =
-    useState<boolean>(false);
-  const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] =
-    useState<boolean>(false);
-  const [linkTabType, setLinkTabType] = useState<string>('');
-  const [isFileUploadModalOpen, setIsFileUploadModalOpen] =
-    useState<boolean>(false);
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [openImageUploadModal, setOpenImageUploadModal] = useState<boolean>(
+    isImageUploadModalOpen,
+  );
+  const [openLinkUploadModal, setOpenLinkUploadModal] = useState<boolean>(
+    isLinkUploadModalOpen,
+  );
+  const [openFileUploadModal, setOpenFileUploadModal] = useState<boolean>(
+    isFileUploadModalOpen,
+  );
+
   // useStore
   // const { name, profileColor } = useUserStore();
   const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } =
@@ -64,7 +82,6 @@ const Note = ({
   // 공동 편집
   const doc = new Y.Doc();
   const accessToken = localStorage.getItem('accessToken');
-
   useEffect(() => {
     const provider = new TiptapCollabProvider({
       name: `${projectId}${projectName}/${requirementId}${requirementName}/${note.id}`,
@@ -72,16 +89,16 @@ const Note = ({
       token: accessToken,
       document: doc,
     });
-
     return () => {
       provider.destroy();
     };
   }, [note.id]);
 
+  // 에디터 설정
   const editor = useEditor({
     editorProps: {
       attributes: {
-        class: 'm-2 p-2',
+        class: 'p-2 mx-8 focus:outline-none',
       },
     },
     extensions: [
@@ -160,10 +177,20 @@ const Note = ({
         document: doc,
       }),
     ],
-    content: `<p></p>`,
-    onUpdate: ({ editor, transaction }) =>
-      onEditorUpdate(editor as TiptapEditor, transaction, note.id),
+    content: note.defaultContent,
+    onCreate: ({ editor }) => {
+      setActiveEditor(editor as TiptapEditor);
+    },
+    onUpdate: ({ editor, transaction }) => {
+      onEditorUpdate(editor as TiptapEditor, transaction, note.id);
+    },
   });
+
+  useEffect(() => {
+    return () => {
+      editor?.destroy();
+    };
+  }, [editor]);
 
   // url 스크린샷 집어넣는 함수
   const fetchScreenshotData = async (url: string) => {
@@ -187,14 +214,14 @@ const Note = ({
   // 이미지 삽입 함수
   const handleImageInsert = (image: string) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
-    setIsImageUploadModalOpen(false);
+    setOpenImageUploadModal(false);
   };
 
   // 파일 삽입 함수
   const handleFileInsert = (fileUrl: string, fileName: string) => {
     const linkHtml = `<a href="${fileUrl}" target="_blank" download="${fileName}">${fileName}</a>`;
     editor?.chain().focus().insertContent(linkHtml).run();
-    setIsFileUploadModalOpen(false);
+    setOpenFileUploadModal(false);
   };
 
   // 링크 삽입 함수
@@ -218,7 +245,7 @@ const Note = ({
           .run();
       }
     }
-    setIsLinkUploadModalOpen(false);
+    setOpenLinkUploadModal(false);
   };
 
   // 코드 이미지 캡쳐 함수
@@ -262,30 +289,90 @@ const Note = ({
     };
   }, [openCodePreviewModal]);
 
+  // 노드 드래그 시작 함수
+  const handleDragStart = (event: React.DragEvent, noteId: string) => {
+    setIsDragging(true);
+    event.dataTransfer.setData('application/vnd.yourapp.note', noteId);
+  };
+
+  // 노드 드래그 타겟 위로 이동될 때 호출 함수
+  const handleDrop = (event: React.DragEvent, targetNoteId: string) => {
+    event.preventDefault();
+    const draggedNoteId = event.dataTransfer.getData(
+      'application/vnd.yourapp.note',
+    );
+    if (draggedNoteId !== targetNoteId) {
+      switchNotes(draggedNoteId, targetNoteId);
+    }
+  };
+
+  // 노드 드래그 타겟 위로 이동될 때 호출 핸들러
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+  };
+
+  // 노드 드래그 종료 함수
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  // 노드 위치 교환 로직
+  const switchNotes = (draggedNoteId: string, targetNoteId: string) => {
+    const newNotes = [...notes];
+    const draggedIndex = newNotes.findIndex(
+      (note) => note.id === draggedNoteId,
+    );
+    const targetIndex = newNotes.findIndex((note) => note.id === targetNoteId);
+
+    if (draggedIndex < 0 || targetIndex < 0) return; // 드래그 또는 타겟 인덱스가 유효하지 않은 경우 early return
+
+    [newNotes[draggedIndex], newNotes[targetIndex]] = [
+      newNotes[targetIndex],
+      newNotes[draggedIndex],
+    ];
+    setNotes(newNotes);
+  };
+
   return (
     <>
-      <div className='col-span-10 col-start-2'>
-        <EditorContent editor={editor}>
-          <DraggableIcon />
-        </EditorContent>
-        <BubbleMenu>
+      <div
+        id={`editor-${note.id}`}
+        className='group relative col-span-10 col-start-2 px-4 py-2'
+        onDrop={(event) => handleDrop(event, note.id)}
+        onDragOver={handleDragOver}
+        onDragStart={(event) => handleDragStart(event, note.id)}
+        onDragEnd={handleDragEnd}>
+        <div
+          className='absolute left-3.5 top-3.5 cursor-move opacity-0 group-hover:opacity-100'
+          draggable='true'>
+          <DraggableIcon
+            className='h-7 w-7 fill-gray-200'
+            aria-label='Drag handle'
+          />
+        </div>
+        <EditorContent
+          className={`${isDragging ? 'border-b-4 border-gray-200' : ''}`}
+          editor={editor}></EditorContent>
+        <BubbleMenu
+          editor={editor || undefined}
+          tippyOptions={{ placement: 'bottom' }}>
           <BubbleMenuBar />
         </BubbleMenu>
         <ImageUploadModal
-          isOpen={isImageUploadModalOpen}
-          onClose={() => setIsImageUploadModalOpen(false)}
+          isOpen={openImageUploadModal}
+          onClose={() => setOpenImageUploadModal(false)}
           onInsert={handleImageInsert}
           requirementId={requirementId}
         />
         <LinkUploadModal
           tabType={linkTabType}
-          isOpen={isLinkUploadModalOpen}
-          onClose={() => setIsLinkUploadModalOpen(false)}
+          isOpen={openLinkUploadModal}
+          onClose={() => setOpenLinkUploadModal(false)}
           onInsert={handleLinkInsert}
         />
         <FileUploadModal
-          isOpen={isFileUploadModalOpen}
-          onClose={() => setIsFileUploadModalOpen(false)}
+          isOpen={openFileUploadModal}
+          onClose={() => setOpenFileUploadModal(false)}
           onInsert={handleFileInsert}
           requireUniqueId={requirementId}
         />
@@ -301,4 +388,4 @@ const Note = ({
   );
 };
 
-export default Note;
+export default Node;

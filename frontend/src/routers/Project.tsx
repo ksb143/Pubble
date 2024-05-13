@@ -12,7 +12,7 @@ const Project = () => {
         element={<RequirementPage />}
       />
       <Route
-        path='/:projectId/requirement/:requirementId/detail'
+        path='/:projectCode/requirement/:requirementCode/detail'
         element={<RichPage />}
       />
     </Routes>
