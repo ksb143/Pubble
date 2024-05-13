@@ -83,7 +83,7 @@ public class JWTUtil {
         List<ProjectListDto> projectListDtos = projectService.getProjectList(user.getUserId());
         for (ProjectListDto dto : projectListDtos) {
             ProjectListResponseDto pjtIdAndTitle = new ProjectListResponseDto();
-            pjtIdAndTitle.setProjectIdAndTitle(dto.getProjectId() + dto.getProjectTitle());
+            pjtIdAndTitle.setProjectIdAndTitle(dto.getProjectId() + dto.getProjectTitle() + "/*");
             reponseDto.add(pjtIdAndTitle);
         }
 
