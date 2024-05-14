@@ -93,7 +93,7 @@ public class ProjectController {
     }
 
     @PatchMapping("/{project-id}/requirements/{requirement-id}")
-    public ResponseEntity<ResponseDto> updateRequirement(@PathVariable("requirement-id") Integer requirementId, RequirementUpdateDto requirementUpdateDto) {
+    public ResponseEntity<ResponseDto> updateRequirement(@PathVariable("requirement-id") Integer requirementId, @RequestBody RequirementUpdateDto requirementUpdateDto) {
         requirementService.updateRequirement(requirementId, requirementUpdateDto);
 
         response = new ResponseDto(true, "요구사항 항목 수정", null);

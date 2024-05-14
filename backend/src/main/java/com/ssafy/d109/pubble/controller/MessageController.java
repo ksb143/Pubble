@@ -65,7 +65,7 @@ public class MessageController {
 
     // 해당 사번 유저에게 메세지 보내기
     @PostMapping("/{employeeId}")
-    public ResponseEntity<ResponseDto> sendMessage(@PathVariable("employeeId") String employeeId, MessageSendDto messageSendDto) {
+    public ResponseEntity<ResponseDto> sendMessage(@PathVariable("employeeId") String employeeId, @RequestBody MessageSendDto messageSendDto) {
         Optional<User> optionalReceiver = userRepository.findByEmployeeId(employeeId);
 
         if (optionalReceiver.isPresent()) {

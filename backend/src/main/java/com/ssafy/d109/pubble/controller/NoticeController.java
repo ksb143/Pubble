@@ -41,7 +41,7 @@ public class NoticeController {
     }
 
     @PostMapping()
-    public ResponseEntity<ResponseDto> createNotice(NoticeCreateDto noticeCreateDto) {
+    public ResponseEntity<ResponseDto> createNotice(@RequestBody NoticeCreateDto noticeCreateDto) {
         User user = commonUtil.getUser();
 
         if ("ADMIN".equals(user.getRole())) {
