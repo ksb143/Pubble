@@ -116,7 +116,7 @@ const MenuBar = ({
   }
 
   return (
-    <div className='flex w-full justify-around py-2 '>
+    <div className='flex w-full justify-around bg-white py-2 shadow-custom'>
       <div className='flex items-end gap-3'>
         <h1 className='text-2xl font-normal'>ID {requirementCode}</h1>
         <h1 className='text-2xl font-normal'>{requirementName}</h1>

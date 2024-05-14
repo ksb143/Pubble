@@ -1,85 +1,80 @@
 // 1. react 관련
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 // 2. library
-import { v4 as uuidv4 } from 'uuid';
-import {
-  BubbleMenu,
-  useEditor,
-  EditorContent,
-  Editor as TiptapEditor,
-} from '@tiptap/react';
-import { extensions } from '@/extensions/Extensions';
+import { useEditor, EditorContent } from '@tiptap/react';
+import { extensions } from '@/extensions/Extensions.ts';
 import FileHandler from '@tiptap-pro/extension-file-handler';
-import Collaboration from '@tiptap/extension-collaboration';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
+import { Collaboration } from '@tiptap/extension-collaboration';
 import * as Y from 'yjs';
+import Lottie from 'react-lottie';
 // 3. api
-import { getFileUrl, getImageUrl } from '@/apis/rich.ts';
+import { getImageUrl, getFileUrl } from '@/apis/rich.ts';
 // 4. store
 import useUserStore from '@/stores/userStore.ts';
 import useRichStore from '@/stores/richStore';
+import usePageInfoStore from '@/stores/pageInfoStore.ts';
 // 5. component
 import MenuBar from '@/components/rich/MenuBar.tsx';
-import Node from '@/components/rich/Node.tsx';
+import ImageUploadModal from '@/components/rich/ImageUploadModal.tsx';
+import LinkUploadModal from '@/components/rich/LinkUploadModal.tsx';
+import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
 // 6. image 등 assets
-import AddLineIcon from '@/assets/icons/add-line.svg?react';
-import { TNote } from '@/types/types.ts';
 import './RichPage.css';
-// 7. 환경변수
+import LoadingAnimation from '@/assets/lotties/loading.json';
+import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
 const { VITE_SCREENSHOT_API, VITE_TIPTAP_APP_ID } = import.meta.env;
 
-// 이니셜 노트
-const initialNotes: TNote[] = Array.from({ length: 20 }, (_, index) => ({
-  id: uuidv4(),
-  title: `Note ${index + 1}`,
-  defaultContent: '',
-}));
-
 const RichPage = () => {
-  // params
-  const { projectCode, requirementCode } = useParams<{
-    projectCode?: string;
-    requirementCode?: string;
-  }>();
+  // useState
+  const [isImageUploadModalOpen, setIsImageUploadModalOpen] = useState<boolean>(false);
+  const [isLinkUploadModalOpen, setIsLinkUploadModalOpen] = useState<boolean>(false);
+  const [linkTabType, setLinkTabType] = useState<string>('');
+  const [isFileUploadModalOpen, setIsFileUploadModalOpen] = useState<boolean>(false);
+  const { name, profileColor } = useUserStore();
+  const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } = useRichStore();
+  const [editorHeight, setEditorHeight] = useState('auto');
+  const { projectId, projectName, requirementId, requirementCode, requirementName } = usePageInfoStore();
 
-  // useStore
-  const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } =
-    useRichStore();
-  const projectName = '브레드 이발소  단장 프로젝트';
-  const requirementName = '좋아요 기능';
+  // 로티 기본 옵션
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: LoadingAnimation,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
 
-  // yjs
+  // 동시편집 기본 옵션
   const doc = new Y.Doc();
 
-  // 기본 에디터 설정
+  // 에디터 확장 기능
   const editor = useEditor({
+    editorProps: {
+      attributes: {
+        class: `focus:outline-none`,
+      },
+    },
     extensions: [
       ...extensions,
+      Collaboration.configure({
+        document: doc,
+      }),
       FileHandler.configure({
         onPaste: async (editor, files) => {
           for (const file of files) {
             if (file.type.startsWith('image/')) {
               try {
                 const imageUrl = await getImageUrl(file, requirementId);
-                editor
-                  .chain()
-                  .focus()
-                  .setResizableImage({ src: imageUrl, width: 300 })
-                  .run();
+                editor.chain().focus().setResizableImage({ src: imageUrl, width: 300 }).run();
               } catch (error) {
-                console.error('Image upload failed: ', error);
+                console.error('Image uplad failed: ', error);
               }
             } else {
               try {
                 const fileUrl = await getFileUrl(file, requirementId);
-                editor
-                  .chain()
-                  .focus()
-                  .insertContent(
-                    `<a href="${fileUrl}" target="_blank" download="${file.name}">${file.name}</a>`,
-                  )
-                  .run();
+                editor.chain().focus().insertContent(`<a href="${fileUrl}" target="_blank" download="${file.name}">${file.name}</a>`).run();
               } catch (error) {
                 console.error('File upload failed: ', error);
               }
@@ -91,78 +86,125 @@ const RichPage = () => {
             if (file.type.startsWith('image/')) {
               try {
                 const imageUrl = await getImageUrl(file, requirementId);
-                editor
-                  .chain()
-                  .focus()
-                  .setTextSelection(position)
-                  .setResizableImage({ src: imageUrl, width: 300 })
-                  .run();
+                editor.chain().focus().setTextSelection(position).setResizableImage({ src: imageUrl, width: 300 }).run();
               } catch (error) {
                 console.error('Image upload failed: ', error);
               }
             } else {
               try {
                 const fileUrl = await getFileUrl(file, requirementId);
-                editor
-                  .chain()
-                  .focus()
-                  .setTextSelection(position)
-                  .insertContent(
-                    `<a href="${fileUrl}" target="_blank" download="${file.name}">${file.name}</a>`,
-                  )
-                  .run();
+                editor.chain().focus().setTextSelection(position).insertContent(`<a href="${fileUrl}" target="_blank" download="${file.name}">${file.name}</a>`).run();
               } catch (error) {
                 console.error('File upload failed: ', error);
               }
             }
           }
         },
-        allowedMimeTypes: [
-          'text/plain',
-          'application/msword',
-          'application/pdf',
-          'image/jpeg',
-          'image/png',
-          'image/gif',
-        ],
-      }),
-      Collaboration.configure({
-        document: doc,
+        allowedMimeTypes: ['text/plain', 'application/msword', 'application/pdf', 'image/jpeg', 'image/png', 'image/gif'],
       }),
     ],
+    content: '',
   });
 
-  // 공동 편집
-  const accessToken = localStorage.getItem('accessToken');
+  // 에디터 길이 감지
   useEffect(() => {
-    const provider = new TiptapCollabProvider({
-      name: `${projectCode}${projectName}/${requirementCode}${requirementName}/${note.id}`,
-      appId: VITE_TIPTAP_APP_ID,
-      token: accessToken,
-      document: doc,
-    });
+    const handleEditorResize = () => {
+      const editorContent = document.querySelector('.ProseMirror') as HTMLElement;
+      if (editorContent) {
+        const contentHeight = editorContent.offsetHeight;
+        setEditorHeight(`${contentHeight}px`);
+      }
+    };
+    document.addEventListener('editorContentChanged', handleEditorResize);
     return () => {
-      provider.destroy();
+      document.removeEventListener('editorContentChanged', handleEditorResize);
     };
-  }, [editor]);
+  }, []);
 
-  // 노드 추가
-  const addNewNote = () => {
-    const newNote = {
-      id: uuidv4(),
-      title: `Note ${notes.length + 1}`,
-      defaultContent: '',
+  // 코드이미지 클릭 이벤트 감지
+  useEffect(() => {
+    const handleCodeImageClick = (event: CustomEvent) => {
+      const { html, css, javascript } = event.detail;
+      openCodePreviewModal(html, css, javascript);
     };
-    setNotes([...notes, newNote]);
+    document.addEventListener('codeImageClicked', handleCodeImageClick as EventListener);
+    return () => {
+      document.removeEventListener('codeImageClicked', handleCodeImageClick as EventListener);
+    };
+  }, [openCodePreviewModal]);
+
+  // url 스크린샷 집어넣는 함수
+  const fetchScreenshotData = async (url: string) => {
+    const response = await fetch(`https://api.screenshotone.com/animate?url=${encodeURIComponent(url)}&access_key=${VITE_SCREENSHOT_API}&format=gif`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch screenshot for URL: ${url}`);
+    }
+    try {
+      const blob = await response.blob();
+      const fileName = `screenshot-${new Date().getTime()}.gif`;
+      const file = new File([blob], fileName, { type: blob.type });
+      const imageUrl = await getImageUrl(file, requirementId);
+      return imageUrl;
+    } catch (error) {
+      console.error('Failed to upload image: ', error);
+    }
   };
+  // 이미지 삽입 함수
+  const handleImageInsert = (image: string) => {
+    editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
+    setIsImageUploadModalOpen(false);
+  };
+  // 파일 삽입 함수
+  const handleFileInsert = (fileUrl: string, fileName: string) => {
+    const linkHtml = `<a href="${fileUrl}" target="_blank" download="${fileName}">${fileName}</a>`;
+    editor?.chain().focus().insertContent(linkHtml).run();
+    setIsFileUploadModalOpen(false);
+  };
+  // 링크 삽입 함수
+  const handleLinkInsert = async (link: string, linkType: string) => {
+    if (linkType === 'link') {
+      editor?.chain().focus().setLink({ href: link, target: '_blank' }).run();
+    } else if (linkType === 'webImage') {
+      try {
+        const screenshotUrl = await fetchScreenshotData(link);
+        editor?.chain().focus().setResizableImage({ src: screenshotUrl, width: 300 }).run();
+      } catch (error) {
+        console.error('Failed to fetch screenshot for URL: ', error);
+        editor?.chain().focus().insertContent(`페이지 스크린샷 로드에 실패했습니다: ${link}`).run();
+      }
+    }
+    setIsLinkUploadModalOpen(false);
+  };
+  // 코드 이미지 캡쳐 함수
+  const captureCodeImage = (imageDataUrl: string, html: string, css: string, javascript: string) => {
+    editor
+      ?.chain()
+      .focus()
+      .insertContent({
+        type: 'extendedImage',
+        attrs: {
+          src: imageDataUrl,
+          html: html,
+          css: css,
+          javascript: javascript,
+        },
+      })
+      .run();
+    closeCodePreviewModal();
+  };
+
+  // 에디터가 없을 경우
+  if (!editor) {
+    return <Lottie options={defaultOptions} height={500} width={500} />;
+  }
 
   // 에디터가 있을 경우
   return (
     <div className='mx-12 mt-10 grid grid-cols-12'>
-      <div className='col-span-10 col-start-2 rounded-t bg-white shadow-custom'>
+      <div className='col-span-10 col-start-2'>
         <MenuBar
           editor={editor}
-          requirementCode={requirementCode || ''}
+          requirementCode={requirementCode}
           requirementName={requirementName}
           projectName={projectName}
           openImageUploadModal={() => setIsImageUploadModalOpen(true)}
@@ -173,19 +215,12 @@ const RichPage = () => {
           openFileUploadModal={() => setIsFileUploadModalOpen(true)}
         />
       </div>
-      <div className='col-span-10 col-start-2 mb-4 rounded-b bg-white shadow-custom'>
-        {initialNotes.map((note) => (
-          <Node
-            key={note.id}
-            note={note}
-            editor={editor} // 모든 Node 컴포넌트에 같은 에디터 인스턴스를 전달
-          />
-        ))}
-        <button
-          className='mt-4 flex w-full justify-center rounded bg-gray-100 py-2 text-center'
-          onClick={addNewNote}>
-          <AddLineIcon className='h-6 w-6 fill-gray-200' />
-        </button>
+      <div className='col-span-10 col-start-2 mb-4 h-screen bg-white p-6 shadow-custom' style={{ height: editorHeight }}>
+        <EditorContent editor={editor}></EditorContent>
+        <ImageUploadModal isOpen={isImageUploadModalOpen} onClose={() => setIsImageUploadModalOpen(false)} onInsert={handleImageInsert} requirementId={requirementId} />
+        <LinkUploadModal tabType={linkTabType} isOpen={isLinkUploadModalOpen} onClose={() => setIsLinkUploadModalOpen(false)} onInsert={handleLinkInsert} />
+        <FileUploadModal isOpen={isFileUploadModalOpen} onClose={() => setIsFileUploadModalOpen(false)} onInsert={handleFileInsert} requireUniqueId={requirementId} />
+        {isCodeModalOpen && <CodeEditorWithPreview isOpen={isCodeModalOpen} applyCodeCapture={captureCodeImage} requirementId={requirementId} />}
       </div>
     </div>
   );

@@ -1,7 +1,5 @@
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
-import { ResizableImageExtension } from '@/extensions/ResizableImageExtension.ts';
-import { ExtendedImageExtension } from '@/extensions/ExtendedImageExtension.ts';
 import Link from '@tiptap/extension-link';
 import Table from '@tiptap/extension-table';
 import TableCell from '@tiptap/extension-table-cell';
@@ -10,13 +8,14 @@ import TableRow from '@tiptap/extension-table-row';
 import { Color } from '@tiptap/extension-color';
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
+const lowlight = createLowlight(common);
 import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
 import { Dropcursor } from '@tiptap/extension-dropcursor';
+import { ResizableImageExtension } from '@/extensions/ResizableImageExtension.ts';
+import { ExtendedImageExtension } from '@/extensions/ExtendedImageExtension.ts';
 import UniqueID from '@tiptap-pro/extension-unique-id';
 import { v4 as uuidv4 } from 'uuid';
-
-const lowlight = createLowlight(common);
 
 export const extensions = [
   StarterKit,
