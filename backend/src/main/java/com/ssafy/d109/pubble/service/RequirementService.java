@@ -3,10 +3,12 @@ package com.ssafy.d109.pubble.service;
 import com.ssafy.d109.pubble.dto.projectDto.*;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.Requirement;
+import com.ssafy.d109.pubble.entity.RequirementDetail;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
+import com.ssafy.d109.pubble.repository.RequirementDetailRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,7 @@ public class RequirementService {
     private final RequirementRepository requirementRepository;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
+    private final RequirementDetailRepository detailRepository;
 
     public float getApprovalRatio(Integer projectId) {
 
@@ -122,7 +125,37 @@ public class RequirementService {
         return ProgressRatio.builder().lockRatio(lockRatio).approvalRatio(approvalRatio).changeRatio(changeRatio).build();
     }
 
+    public List<RequirementDetailDto> getRequirementDetailDtos(Integer requirementId) {
+        List<RequirementDetail> details = detailRepository.findAllByRequirement_requirementId(requirementId);
+        List<RequirementDetailDto> returns = new ArrayList<>();
+
+        for (RequirementDetail detail : details) {
+            RequirementDetailDto dto = RequirementDetailDto.builder()
+                    .requirementDetailId(detail.getRequirementDetailId())
+                    .content(detail.getContent())
+                    .status(detail.getStatus())
+                    .build();
+            returns.add(dto);
+        }
+        return returns;
+    }
+
+    @Transactional
+    protected void createDetailWhenCreateRequirement(Integer requirementId, List<String> contents) {
+        List<RequirementDetail> details = new ArrayList<>();
+
+        for (String content : contents) {
+            RequirementDetail detail = RequirementDetail.builder()
+                    .content(content)
+                    .status("u")
+                    .requirement(requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new))
+                    .build();
+            details.add(detail);
+        }
+    }
+
     // requirement 생성
+    @Transactional
     public void createRequirement(Integer projectId, RequirementCreateDto requirementCreateDto) {
         Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
         Optional<User> optionalAuthor = userRepository.findByEmployeeId(requirementCreateDto.getAuthorEId());
@@ -146,7 +179,6 @@ public class RequirementService {
                     .approval("u")
                     .code(requirementCreateDto.getCode())
                     .requirementName(requirementCreateDto.getRequirementName())
-                    .detail(requirementCreateDto.getDetail())
                     .manager(manager)
                     .author(author)
                     .targetUser(requirementCreateDto.getTargetUser())
@@ -155,6 +187,9 @@ public class RequirementService {
                     .project(project)
                     .build();
 
+            requirement = requirementRepository.save(requirement);
+            // 양방향 -> 단방향으로 수정
+            createDetailWhenCreateRequirement(requirement.getRequirementId(), requirementCreateDto.getDetailContents());
             requirementRepository.save(requirement);
         }
     }
@@ -174,7 +209,7 @@ public class RequirementService {
                 .approvalComment(requirement.getApprovalComment())
                 .code(requirement.getCode())
                 .requirementName(requirement.getRequirementName())
-                .detail(requirement.getDetail())
+                .details(getRequirementDetailDtos(requirementId))
                 .manager(managerInfo)
                 .targetUser(requirement.getTargetUser())
                 .createdAt(requirement.getCreatedAt())
@@ -197,9 +232,9 @@ public class RequirementService {
         if (udto.getRequirementName() != null) {
             requirement.setRequirementName(udto.getRequirementName());
         }
-        if (udto.getDetail() != null) {
-            requirement.setDetail(udto.getDetail());
-        }
+//        if (udto.getDetail() != null) {
+//            requirement.setDetail(udto.getDetail());
+//        }
         if (udto.getManagerEId() != null) {
             User manager = userRepository.findByEmployeeId(udto.getManagerEId()).orElseThrow(UserNotFoundException::new);
             requirement.setManager(manager);

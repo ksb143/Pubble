@@ -12,7 +12,7 @@ public class RequirementUpdateDto {
     private String isApproval;
     private String code;
     private String requirementName;
-    private String detail;
+//    private String detail;
     private String managerEId;
     private String authorEId;
     private String version; // ??

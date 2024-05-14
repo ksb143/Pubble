@@ -1,7 +1,10 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.ssafy.d109.pubble.dto.projectDto.CommentCreateDto;
+import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
 import com.ssafy.d109.pubble.dto.response.UserThreadListData;
+import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.UserThreadLockResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.UserThreadResponseDto;
 import com.ssafy.d109.pubble.entity.User;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/requirements")
+@RequestMapping("/requirements/details")
 @Log4j2
 public class UserThreadController {
 
@@ -27,6 +30,8 @@ public class UserThreadController {
     private final UserRepository userRepository;
     private final UserThreadRepository userThreadRepository;
 
+    private ResponseDto response;
+
     public UserThreadController(UserThreadService userThreadService, CommonUtil commonUtil, UserRepository userRepository, UserThreadRepository userThreadRepository) {
         this.userThreadService = userThreadService;
         this.commonUtil = commonUtil;
@@ -34,11 +39,11 @@ public class UserThreadController {
         this.userThreadRepository = userThreadRepository;
     }
 
-    @GetMapping("/{requirementId}/thread")
-    public ResponseEntity<UserThreadResponseDto> getAllThreads(@PathVariable Integer requirementId) {
+    @GetMapping("/{detailId}/threads")
+    public ResponseEntity<UserThreadResponseDto> getAllThreads(@PathVariable Integer detailId) {
 
         UserThreadResponseDto responseDto = new UserThreadResponseDto();
-        List<UserThreadDto> userThreadList = userThreadService.getAllUserThreads(requirementId);
+        List<UserThreadDto> userThreadList = userThreadService.getAllUserThreads(detailId);
 
         if (userThreadList == null ) {
             responseDto.setMessage("UserThread Failed");
@@ -59,14 +64,36 @@ public class UserThreadController {
 
     }
 
-    @PostMapping("/{requirementId}/thread/{userThreadId}")
-    public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer requirementId, @PathVariable Integer userThreadId) {
+    @PutMapping("/{detailId}/threads/{userThreadId}")
+    public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer detailId, @PathVariable Integer userThreadId) {
 
-        userThreadService.lockThread(requirementId, userThreadId);
+        userThreadService.lockThread(detailId, userThreadId);
         UserThreadLockResponseDto responseDto = new UserThreadLockResponseDto();
         responseDto.setMessage("Lock Success");
         responseDto.setData(true);
 
         return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
+
+
+    // 스레드 생성
+    @PostMapping("/{detailId}/threads")
+    public ResponseEntity<ResponseDto> createUserThread(@PathVariable Integer detailId) {
+        User user = commonUtil.getUser();
+        UserThreadDto userThread = userThreadService.createUserThread(user, detailId);
+
+        response = new ResponseDto(true, "새 스레드 생성", userThread);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    // 코멘트 작성
+    @PostMapping("/threads/{threadId}/comments")
+    public ResponseEntity<ResponseDto> createComment(@PathVariable Integer threadId, CommentCreateDto commentCreateDto) {
+        User user = commonUtil.getUser();
+        CommentResponseData commentResponseData = userThreadService.createComment(user, threadId, commentCreateDto);
+
+        response = new ResponseDto(true, "새 댓글 생성", commentResponseData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
 }

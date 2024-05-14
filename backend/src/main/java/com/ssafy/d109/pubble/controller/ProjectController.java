@@ -1,5 +1,6 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.amazonaws.Response;
 import com.ssafy.d109.pubble.dto.projectDto.*;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.entity.User;
@@ -125,4 +126,5 @@ public class ProjectController {
         response = new ResponseDto(true, "해당 요구사항 항목의 승인 상태 변경", null);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
+
 }

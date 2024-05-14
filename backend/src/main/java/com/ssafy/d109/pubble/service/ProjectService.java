@@ -139,7 +139,7 @@ public class ProjectService {
                         .approvalComment(requirement.getApprovalComment())
                         .code(requirement.getCode())
                         .requirementName(requirement.getRequirementName())
-                        .detail(requirement.getDetail())
+                        .details(requirementService.getRequirementDetailDtos(requirement.getRequirementId()))
                         .manager(managerInfo)
                         .targetUser(requirement.getTargetUser())
                         .createdAt(requirement.getCreatedAt())

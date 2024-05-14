@@ -1,5 +1,6 @@
 package com.ssafy.d109.pubble.service;
 
+import com.ssafy.d109.pubble.dto.projectDto.CommentCreateDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
 import com.ssafy.d109.pubble.entity.Comment;
@@ -9,6 +10,7 @@ import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadAlreadyLockedException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadNotFoundException;
 import com.ssafy.d109.pubble.repository.CommentRepository;
+import com.ssafy.d109.pubble.repository.RequirementDetailRepository;
 import com.ssafy.d109.pubble.repository.UserThreadRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.transaction.Transactional;
@@ -27,24 +29,27 @@ public class UserThreadService {
     private final CommentRepository commentRepository;
     private final CommonUtil commonUtil;
 
+    private final RequirementDetailRepository detailRepository;
 
-    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil) {
+
+    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil,   RequirementDetailRepository detailRepository) {
         this.userThreadRepository = userThreadRepository;
         this.commentRepository = commentRepository;
         this.commonUtil = commonUtil;
+        this.detailRepository = detailRepository;
     }
 
 
-    public List<UserThreadDto> getAllUserThreads(Integer requirementId) {
+    public List<UserThreadDto> getAllUserThreads(Integer detailId) {
 
-        List<UserThread> userThreads = userThreadRepository.findAllByRequirement_requirementId(requirementId);
+        List<UserThread> userThreads = userThreadRepository.findAllByRequirementDetail_RequirementDetailId(detailId);
         return userThreads.stream()
                 .map(this::convertUserThreadToDto)
                 .collect(Collectors.toList());
     }
 
 
-    public void lockThread(Integer requirementId, Integer userThreadId) {
+    public void lockThread(Integer detailId, Integer userThreadId) {
 
         UserThread currentThread = userThreadRepository.findUserThreadByUserThreadId(userThreadId).orElseThrow(UserThreadNotFoundException::new);
         Integer threadUser = currentThread.getUser().getUserId();
@@ -91,4 +96,28 @@ public class UserThreadService {
     }
 
 
+
+    public UserThreadDto createUserThread(User user, Integer detailId) {
+        UserThread userThread = UserThread.builder()
+                .lockYN("n")
+                .requirementDetail(detailRepository.findByRequirementDetailId(detailId))
+                .user(user)
+                .build();
+        userThreadRepository.save(userThread);
+        return convertUserThreadToDto(userThread);
+
+    }
+
+    public CommentResponseData createComment(User user, Integer userThreadId, CommentCreateDto commentCreateDto) {
+        UserThread userThread = userThreadRepository.findUserThreadByUserThreadId(userThreadId).orElseThrow();
+
+        Comment comment = Comment.builder()
+                .content(commentCreateDto.getContent())
+                .user(user)
+                .userThread(userThread)
+                .build();
+
+        commentRepository.save(comment);
+        return convertCommentToDto(comment);
+    }
 }

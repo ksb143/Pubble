@@ -32,7 +32,7 @@ public class Project {
     @Column(name = "status")
     private String status;
 
-    @Column(name = "code")
+    @Column(name = "code", unique = true)
     private String code;
 
     // 연관 관계
