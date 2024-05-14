@@ -3,7 +3,10 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 // 2. library 관련
 import { getProject } from "@/apis/project";
-// 3. component 관련
+// 3. api 관련
+import  ProjectAddModal  from "@/components/main/ProjectAddModal"
+// 4. store 관련
+// 5. component 관련
 import { Cell, Header, HeaderGroup, Row, ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,8 +14,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import  ProjectAddModal  from "@/components/main/ProjectAddModal"
-
+// type
 export type Project = {
   projectId: string
   startAt: string
@@ -22,7 +24,7 @@ export type Project = {
   progressRatio: number
   status: "in progress" | "complete" | "before start"
 }
-
+// column
 export const columns: ColumnDef<Project>[] = [
   {
     id: "select",
@@ -118,7 +120,7 @@ export const columns: ColumnDef<Project>[] = [
     },
   },
 ]
-
+// ProjectList
 const ProjectList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();

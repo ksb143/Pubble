@@ -1,36 +1,14 @@
 // 1. react 관련
-import { useMemo, useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// 2. library: react-table
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  SortingState,
-  getSortedRowModel,
-  ColumnFiltersState,
-  getFilteredRowModel,
-  VisibilityState,
-} from '@tanstack/react-table';
-// 2. library: lucide-react
+// 2. library 관련
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel, SortingState, getSortedRowModel, ColumnFiltersState, getFilteredRowModel, VisibilityState } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
-// 3. api
-// 4. store
-// 5. components
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  DropdownMenuLabel,
-  DropdownMenu,
-  DropdownMenuTrigger,
+// 3. api 관련
+// 4. store 관련
+// 5. components 관련
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DropdownMenuLabel, DropdownMenu, DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuCheckboxItem,

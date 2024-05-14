@@ -43,32 +43,30 @@ export const getRequirementDetail = async(pjtId: string, reqId: string) => {
   return data;
 }
 
-// Todo: 사실 정확히 어떤 함수인지 모르겠음. 준영님에게 내일 물어보기
-// 특정 프로젝트의 최신 요구사항 버전 확인 하기 - GET
+// 특정 프로젝트의 최신 버전 요구사항만 모아진 것 확인 하기 - GET
 export const getLatestRequirementVersion = async(pjtId: string) => {
   const { data } = await privateApi.get(`/projects/${pjtId}/requirements/recent`);
   return data;
 }
 
-// Todo: 타겟 유저의 EmplyeeID를 request body에 넣어서 보내야하는데, 사용하지 않기로 했으므로 없애야함.
+// 고려: 타겟 유저(string)를 request body에 넣어서 보내야하는데, 미리 잠재고객 혹은 잠재사용자 생각해서 보내기.
 // 특정 프로젝트의 새로운 요구사항 추가하기 - POST
 export const addRequirement = async(pjtId: string, pjtCode: string, reqTitle: string, reqDetail: string, reqManagerEId: string, reqAuthorEId: string, targetUserEId: string) => {
   const { data } = await privateApi.post(`/projects/${pjtId}/requirements`, {
-    code: pjtCode,
-    requirementName: reqTitle,
-    detail: reqDetail,
-    managerEId: reqManagerEId,
-    authorEId: reqAuthorEId,
-    targetUser: targetUserEId,
+    code: pjtCode, // 프로젝트 코드
+    requirementName: reqTitle, // 요구사항 이름
+    detail: reqDetail, // 요구사항 상세 내용
+    managerEId: reqManagerEId, // 요구사항 담당자
+    authorEId: reqAuthorEId, // 요구사항 작성자
+    targetUser: targetUserEId, // 요구사항 대상자
   });
   return data;
 }
 
-// Todo: version 이라는 requestBody에 정확히 무엇이 들어가는지 준영님에게 물어보기.
 // 특정 프로젝트의 특정 요구사항의 새 버전 생성 - POST
-export const updateRequirementVersion = async(pjtId: string, reqId: string, version: string) => {
+export const updateRequirementVersion = async(pjtId: string, reqId: string, option: string) => {
   const { data } = await privateApi.post(`/projects/${pjtId}/requirements/${reqId}/versions`,
-    version
+  option // 보류생성일 경우: h(hold), 복제생성일 경우: r(restore)
   );
   return data;
 }
