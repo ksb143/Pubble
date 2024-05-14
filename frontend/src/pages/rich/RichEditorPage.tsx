@@ -7,6 +7,7 @@ import { TiptapCollabProvider } from '@hocuspocus/provider';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import * as Y from 'yjs';
+import { SignJWT } from 'jose';
 // 3. api
 // 4. store
 import useUserStore from '@/stores/userStore.ts';
@@ -14,10 +15,10 @@ import usePageInfoStore from '@/stores/pageInfoStore.ts';
 // 5. component
 import MenuBar from '@/components/rich/MenuBar.tsx';
 // 6. image 등 assets
-const { VITE_TIPTAP_APP_ID } = import.meta.env;
+const { VITE_TIPTAP_APP_ID, VITE_TIPTAP_API_SECRET } = import.meta.env;
 
 const RichEditorPage = () => {
-  const { name, profileColor } = useUserStore();
+  const { name, profileColor, allowedDocumentNames } = useUserStore();
   const {
     projectId,
     projectName,
@@ -27,19 +28,15 @@ const RichEditorPage = () => {
   } = usePageInfoStore();
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('connecting');
+  const [jwt, setJwt] = useState('');
+  const [provider, setProvider] = useState<TiptapCollabProvider | null>(null);
   const currentUser = loading ? null : { name: name, color: profileColor };
-
   const ydoc = new Y.Doc();
-  const websocketProvider = new TiptapCollabProvider({
-    appId: VITE_TIPTAP_APP_ID,
-    name: `${projectId}/${requirementId}/${requirementCode}-${requirementName}`,
-    document: ydoc,
-  });
 
   const editor = useEditor({
     editorProps: {
       attributes: {
-        class: `focus:outline-none h-full`,
+        class: ``,
       },
     },
     extensions: [
@@ -48,7 +45,7 @@ const RichEditorPage = () => {
         document: ydoc,
       }),
       CollaborationCursor.configure({
-        provider: websocketProvider,
+        provider: provider,
       }),
     ],
   });
@@ -74,11 +71,56 @@ const RichEditorPage = () => {
     requirementName,
   ]);
 
+  // jwt 생성
+  useEffect(() => {
+    const generateJwt = async (userId: string) => {
+      if (VITE_TIPTAP_API_SECRET) {
+        const payload = {
+          userId: userId,
+          allowedDocumentNames: allowedDocumentNames,
+        };
+        const newJtw = await new SignJWT({
+          payload,
+        })
+          .setProtectedHeader({ alg: 'HS256' })
+          .setIssuedAt()
+          .setExpirationTime('1h')
+          .sign(new TextEncoder().encode(VITE_TIPTAP_API_SECRET));
+        setJwt(newJtw);
+      }
+    };
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      generateJwt(userId);
+    }
+  }, []);
+
+  // provider 설정
+  useEffect(() => {
+    if (editor && jwt) {
+      const collabProvider = new TiptapCollabProvider({
+        appId: VITE_TIPTAP_APP_ID,
+        name: `${projectId}/${requirementId}/${requirementCode}-${requirementName}`,
+        document: ydoc,
+        token: jwt,
+      });
+
+      setProvider(collabProvider);
+
+      return () => {
+        collabProvider.destroy();
+      };
+    }
+  }, []);
+
   // 상태값 감지
   useEffect(() => {
-    websocketProvider.on('status', (event: { status: string }) => {
-      setStatus(event.status);
-    });
+    if (provider) {
+      provider.on('status', (event: { status: string }) => {
+        console.log(event);
+        setStatus(event.status);
+      });
+    }
   }, []);
 
   // 현재 접속 유저 감지
@@ -90,7 +132,7 @@ const RichEditorPage = () => {
   }, [editor, currentUser]);
 
   return (
-    <div className='mx-32 my-4 flex h-screen flex-col rounded border-2 border-gray-200 bg-white'>
+    <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white text-white'>
       {editor && (
         <MenuBar
           editor={editor}

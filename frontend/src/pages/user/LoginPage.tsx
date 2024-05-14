@@ -69,6 +69,7 @@ const LoginPage = () => {
     try {
       const data = await login(loginEmployeeId, password);
       localStorage.setItem('accessToken', data.resData.accessToken);
+      localStorage.setItem('userId', loginEmployeeId);
       const decodeToken = parseJwt(data.resData.accessToken);
       // 이름, id, 부서, 직급, 고유 색 스토어 설정
       setName(decodeToken.name);
@@ -77,7 +78,7 @@ const LoginPage = () => {
       setPosition(decodeToken.position);
       setProfileColor(decodeToken.profileColor);
       setAllowedDocumentNames(decodeToken.allowedDocumentNames);
-      console.log(decodeToken);
+
       // 성공 후 페이지 리다이렉션
       navigate('/main');
     } catch (error: unknown) {
