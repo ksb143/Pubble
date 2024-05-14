@@ -1,5 +1,5 @@
 // 1. react 관련
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, DragEvent } from 'react';
 // 2. library
 import {
   BubbleMenu,
@@ -98,7 +98,7 @@ const Node = ({
   const editor = useEditor({
     editorProps: {
       attributes: {
-        class: 'p-2 mx-8 focus:outline-none',
+        class: `p-2 mx-8 focus:outline-none`,
       },
     },
     extensions: [
@@ -115,7 +115,7 @@ const Node = ({
                   .setResizableImage({ src: imageUrl, width: 300 })
                   .run();
               } catch (error) {
-                console.error('Image uplad failed: ', error);
+                console.error('Image upload failed: ', error);
               }
             } else {
               try {
@@ -186,11 +186,16 @@ const Node = ({
     },
   });
 
+  // 에디터 드래그 이벤트 감지
   useEffect(() => {
-    return () => {
-      editor?.destroy();
-    };
-  }, [editor]);
+    const editorEl = editor?.view.dom;
+
+    if (isDragging) {
+      editorEl?.classList.add('border-t-8', 'border-plblue');
+    } else {
+      editorEl?.classList.remove('border-t-8', 'border-blue-200');
+    }
+  }, [isDragging, editor]);
 
   // url 스크린샷 집어넣는 함수
   const fetchScreenshotData = async (url: string) => {
@@ -290,13 +295,18 @@ const Node = ({
   }, [openCodePreviewModal]);
 
   // 노드 드래그 시작 함수
-  const handleDragStart = (event: React.DragEvent, noteId: string) => {
+  const handleDragStart = (event: DragEvent, targetNoteId: string) => {
+    event.dataTransfer.setData('application/vnd.yourapp.note', targetNoteId);
     setIsDragging(true);
-    event.dataTransfer.setData('application/vnd.yourapp.note', noteId);
+  };
+
+  // 노드 드래그 타겟 위로 이동될 때 호출 핸들러
+  const handleDragOver = (event: DragEvent) => {
+    event.preventDefault();
   };
 
   // 노드 드래그 타겟 위로 이동될 때 호출 함수
-  const handleDrop = (event: React.DragEvent, targetNoteId: string) => {
+  const handleDrop = (event: DragEvent, targetNoteId: string) => {
     event.preventDefault();
     const draggedNoteId = event.dataTransfer.getData(
       'application/vnd.yourapp.note',
@@ -304,16 +314,6 @@ const Node = ({
     if (draggedNoteId !== targetNoteId) {
       switchNotes(draggedNoteId, targetNoteId);
     }
-  };
-
-  // 노드 드래그 타겟 위로 이동될 때 호출 핸들러
-  const handleDragOver = (event: React.DragEvent) => {
-    event.preventDefault();
-  };
-
-  // 노드 드래그 종료 함수
-  const handleDragEnd = () => {
-    setIsDragging(false);
   };
 
   // 노드 위치 교환 로직
@@ -337,11 +337,13 @@ const Node = ({
     <>
       <div
         id={`editor-${note.id}`}
-        className='group relative col-span-10 col-start-2 px-4 py-2'
+        className='group relative col-span-10 col-start-2 px-4 py-2 transition-all duration-300 ease-in-out'
         onDrop={(event) => handleDrop(event, note.id)}
         onDragOver={handleDragOver}
         onDragStart={(event) => handleDragStart(event, note.id)}
-        onDragEnd={handleDragEnd}>
+        onDragEnd={() => {
+          setIsDragging(false);
+        }}>
         <div
           className='absolute left-3.5 top-3.5 cursor-move opacity-0 group-hover:opacity-100'
           draggable='true'>
@@ -350,9 +352,7 @@ const Node = ({
             aria-label='Drag handle'
           />
         </div>
-        <EditorContent
-          className={`${isDragging ? 'border-b-4 border-gray-200' : ''}`}
-          editor={editor}></EditorContent>
+        <EditorContent editor={editor}></EditorContent>
         <BubbleMenu
           editor={editor || undefined}
           tippyOptions={{ placement: 'bottom' }}>
