@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // 2. library
 // 3. api
+import { getFCMToken } from '@/apis/notification.ts';
 // 4. store
 import useUserStore from '@/stores/userStore.ts';
 // 5. component
@@ -33,6 +34,8 @@ function App() {
       setPosition(position);
       setProfileColor(profileColor);
     }
+    // FCM 토큰 요청
+    getFCMToken();
   }, []);
 
   // jwt 디코드 함수
