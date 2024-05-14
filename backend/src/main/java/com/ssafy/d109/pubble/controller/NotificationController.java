@@ -5,10 +5,7 @@ import com.ssafy.d109.pubble.entity.Notification;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NotificationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/notification")
@@ -29,6 +26,12 @@ public class NotificationController {
         String token = tokenDto.getToken();
         notificationService.registerToken(token, currentUser);
 
+    }
+
+
+    @GetMapping("/{notificationId}/clear")
+    public void clearNotificationFromUser(@PathVariable Integer notificationId) {
+        notificationService.deleteNotification(notificationId);
     }
 
 

@@ -124,12 +124,19 @@ public class NotificationService {
 
     }
 
-    public void deleteNotification() {
-        User user = commonUtil.getUser();
-        Notification notification = notificationRepository.findNotificationByUser(user).orElseThrow(NotificationNotFoundException::new);
+     */
 
+    @Transactional
+    public void deleteNotification(Integer notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(NotificationNotFoundException::new);
+        User user = notification.getUser();
+        if (user != null) {
+            user.setNotification(null);
+            userRepository.saveAndFlush(user);  // User 엔티티 업데이트
+        }
         notificationRepository.delete(notification);
+        notificationRepository.flush();// Notification 엔티티 삭제
     }
 
-     */
 }
