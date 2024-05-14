@@ -1,6 +1,8 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.amazonaws.Response;
 import com.ssafy.d109.pubble.dto.projectDto.*;
+import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.ProjectService;
@@ -9,6 +11,7 @@ import com.ssafy.d109.pubble.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -124,5 +127,35 @@ public class ProjectController {
 
         response = new ResponseDto(true, "해당 요구사항 항목의 승인 상태 변경", null);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+
+    // 위의 안쓰는 url 부분들 줄여버릴지
+    // 세부사항 항목 추가
+    @PostMapping("/reuqirements/{requirement-id}")
+    public ResponseEntity<ResponseDto> addRequirementDetail(@PathVariable("requirement-id") Integer requirementId, @RequestBody String content) {
+        try {
+            requirementService.addRequirementDetail(requirementId, content);
+
+            response = new ResponseDto(true, "세부사항 항목 추가", null);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            response = new ResponseDto(true, "세부사항 추가 생성 실패", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+    }
+
+    // 세부사항 상태 변경
+    @PutMapping("/reuqirements/{requirementId}/details/{detailId}/status")
+    public ResponseEntity<ResponseDto> updateDetailStatus(@PathVariable Integer requirementId, @PathVariable Integer detailId, @RequestBody String command) {
+        Integer userId = commonUtil.getUser().getUserId();
+        try {
+            requirementService.updateDetailStatus(userId, requirementId, detailId, command);
+
+            response = new ResponseDto(true, "세부사항 상태 변경 완료", null);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            response = new ResponseDto(true, "세부사항 상태 변경 실패", e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
     }
 }

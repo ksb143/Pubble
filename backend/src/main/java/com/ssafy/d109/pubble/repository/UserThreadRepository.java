@@ -9,6 +9,7 @@ import java.util.Optional;
 public interface UserThreadRepository extends JpaRepository<UserThread, Integer> {
 
     List<UserThread> findAllByUser_userId(Integer userId);
-    List<UserThread> findAllByRequirement_requirementId(Integer requirementId);
+//    List<UserThread> findAllByRequirement_requirementId(Integer requirementId);
+    List<UserThread> findAllByRequirementDetail_RequirementDetailId(Integer detailId);
     Optional<UserThread> findUserThreadByUserThreadId(Integer userThreadId);
 }

@@ -52,7 +52,7 @@ public class PreviewService {
                 addCell(table, truncate(yesOrNo(requirement.getApproval())), font, 10);
                 addCell(table, truncate(requirement.getCode()), font, 10);
                 addCell(table, truncate(requirement.getRequirementName()), font, 10);
-                addCell(table, truncate(requirement.getDetail()), font, 10);
+                /* log INFO WARN addCell(table, truncate(requirement.getDetail()), font, 10); */
                 addCell(table, truncate(requirement.getManager().getName()), font, 10);
                 addCell(table, truncate(requirement.getVersion()), font, 10);
 

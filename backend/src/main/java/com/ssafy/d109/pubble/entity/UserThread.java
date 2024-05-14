@@ -22,12 +22,10 @@ public class UserThread {
 
     // 연관 관계
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requirementId")
-    private Requirement requirement;
+    @JoinColumn(name = "requirementDetailId")
+    private RequirementDetail requirementDetail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private User user;
-
-
+    private User user; // 스레드 생성한 사람이자, 스레드를 잠글 수 있는 사람
 }

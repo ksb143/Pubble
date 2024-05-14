@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -20,10 +21,9 @@ public class RequirementSummaryDto {
     private String approvalComment;
     private String code;
     private String requirementName;
-    private String detail;
+    private List<RequirementDetailDto> details;
     private UserInfoDto manager; // 담당자
     private String targetUser;
     private LocalDateTime createdAt;
-//    private Project project;
     private UserInfoDto author; // 작성자
 }
