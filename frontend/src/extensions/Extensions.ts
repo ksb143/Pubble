@@ -14,10 +14,9 @@ import Highlight from '@tiptap/extension-highlight';
 import { Dropcursor } from '@tiptap/extension-dropcursor';
 import { ResizableImageExtension } from '@/extensions/ResizableImageExtension.ts';
 import { ExtendedImageExtension } from '@/extensions/ExtendedImageExtension.ts';
-import UniqueID from '@tiptap-pro/extension-unique-id';
-import { v4 as uuidv4 } from 'uuid';
+import CharacterCount from '@tiptap/extension-character-count';
 
-export const extensions = [
+export const Extensions = [
   StarterKit,
   Dropcursor,
   Underline,
@@ -50,19 +49,5 @@ export const extensions = [
     },
     multicolor: true,
   }),
-  UniqueID.configure({
-    attributeName: 'id',
-    types: [
-      'paragraph',
-      'heading',
-      'blockquote',
-      'codeBlock',
-      'table',
-      'image',
-      'horizontalRule',
-      'embed',
-      'link',
-    ],
-    generateID: () => uuidv4(),
-  }),
+  CharacterCount,
 ];

@@ -7,7 +7,7 @@ import rasterizeHTML from 'rasterizehtml';
 // 3. api
 import { getImageUrl } from '@/apis/rich.ts';
 // 4. store
-import useRichStore from '@/stores/richStore';
+import useRichStore from '@/stores/richModalStore.ts';
 // 5. component
 // 6. image 등 assets
 import HTML5 from '@/assets/icons/html5-line.svg?react';

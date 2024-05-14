@@ -1,5 +1,5 @@
 // 1. react 관련
-import { useRef, useState } from 'react';
+import { useState, useRef } from 'react';
 // 2. library
 import { Editor } from '@tiptap/react';
 import styled from '@emotion/styled';
@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/popover';
 // 3. api
 // 4. store
-import useRichModalStore from '@/stores/richModalStore.ts';
+import useRichStore from '@/stores/richModalStore.ts';
 // 5. component
 import Grid from '@/components/rich/Grid';
 // 6. image 등 assets
@@ -34,6 +34,8 @@ import FileLineIcon from '@/assets/icons/file-line.svg?react';
 import LinkIcon from '@/assets/icons/link.svg?react';
 import CodeBlockIcon from '@/assets/icons/code-block.svg?react';
 import TableLIneIcon from '@/assets/icons/table-line.svg?react';
+import LinkUnlinkIcon from '@/assets/icons/link-unlink-m.svg?react';
+import WindowLineIcon from '@/assets/icons/window-line.svg?react';
 import CodeVIewIcon from '@/assets/icons/code-view.svg?react';
 
 const codeLangType = [
@@ -80,30 +82,41 @@ const HighlightInput = styled.input`
 
 interface MenuBarProps {
   editor: Editor;
-  projectName: string;
   requirementCode: string;
   requirementName: string;
+  projectName: string;
+  openImageUploadModal: () => void;
+  openLinkUploadModal: (tabType: string) => void;
+  openFileUploadModal: () => void;
 }
 
 const MenuBar = ({
   editor,
-  projectName,
   requirementCode,
   requirementName,
+  projectName,
+  openImageUploadModal,
+  openLinkUploadModal,
+  openFileUploadModal,
 }: MenuBarProps) => {
-  const { openCodePreviewModal, openLinkModal, openImageModal, openFileModal } =
-    useRichModalStore();
+  const { openCodePreviewModal } = useRichStore();
   const [row, setRow] = useState<number>(3);
   const [col, setCol] = useState<number>(3);
   const rowInput = useRef(null);
   const colInput = useRef(null);
+
+  // 셀 클릭 반영 함수
   const handleCellClick = (rowIndex: number, colIndex: number) => {
     setRow(rowIndex);
     setCol(colIndex);
   };
 
+  if (!editor) {
+    return null;
+  }
+
   return (
-    <div className='flex w-full justify-around rounded-t-sm bg-pubble py-2 '>
+    <div className='flex w-full justify-around bg-white py-2 shadow-custom'>
       <div className='flex items-end gap-3'>
         <h1 className='text-2xl font-normal'>ID {requirementCode}</h1>
         <h1 className='text-2xl font-normal'>{requirementName}</h1>
@@ -115,25 +128,25 @@ const MenuBar = ({
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
               disabled={!editor.can().chain().focus().toggleBold().run()}>
-              <BoldIcon className='h-6 w-6 fill-white' />
+              <BoldIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleItalic().run()}
               disabled={!editor.can().chain().focus().toggleItalic().run()}>
-              <ItalicIcon className='h-6 w-6 fill-white' />
+              <ItalicIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               disabled={!editor.can().chain().focus().toggleUnderline().run()}>
-              <UnderlineIcon className='h-6 w-6 fill-white' />
+              <UnderlineIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleStrike().run()}
               disabled={!editor.can().chain().focus().toggleStrike().run()}>
-              <StrikeIcon className='h-6 w-6 fill-white' />
+              <StrikeIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
             <label className='flex w-8 cursor-pointer items-end'>
-              <PaletteIcon className='h-6 w-6 fill-white' />
+              <PaletteIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
               <ColorInput
                 type='color'
                 onInput={(event) => {
@@ -145,7 +158,7 @@ const MenuBar = ({
               />
             </label>
             <label className='flex w-8 cursor-pointer items-end'>
-              <MarkPenIcon className='h-6 w-6 fill-white' />
+              <MarkPenIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
               <HighlightInput
                 type='color'
                 onInput={(event) => {
@@ -162,23 +175,37 @@ const MenuBar = ({
             </label>
           </div>
           <div className='flex items-center gap-3'>
-            <button onClick={openImageModal}>
-              <ImageLineIcon className='h-6 w-6 fill-white' />
+            <button onClick={openImageUploadModal}>
+              <ImageLineIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
-            <button onClick={openFileModal}>
-              <FileLineIcon className='h-6 w-6 fill-white' />
-            </button>
-            <button onClick={openLinkModal}>
-              <LinkIcon className='h-6 w-6 fill-white' />
+            <button onClick={() => openFileUploadModal()}>
+              <FileLineIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
             </button>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger>
-                <CodeBlockIcon className='h-6 w-6 fill-white' />
+                <LinkIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
               </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => openLinkUploadModal('link')}>
+                  <LinkUnlinkIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
+                  <span className='ml-2'>링크</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => openLinkUploadModal('webImage')}>
+                  <WindowLineIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
+                  <span className='ml-2'>웹이미지</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger>
+                <CodeBlockIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
+              </DropdownMenuTrigger>
+
               <DropdownMenuContent>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className='flex items-center'>
-                    <CodeVIewIcon className='h-5 w-5 fill-white' />
+                    <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                     <span className='ml-2'>언어 선택</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
@@ -208,7 +235,7 @@ const MenuBar = ({
                     openCodePreviewModal('', '', '');
                   }}
                   className='flex items-center'>
-                  <CodeVIewIcon className='h-5 w-5 fill-white' />
+                  <CodeVIewIcon className='h-5 w-5 stroke-gray-900 stroke-0' />
                   <span className='ml-2'>HTML블럭</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -216,7 +243,7 @@ const MenuBar = ({
             <Popover>
               <PopoverTrigger asChild>
                 <button>
-                  <TableLIneIcon className='h-6 w-6 fill-white' />
+                  <TableLIneIcon className='h-6 w-6 stroke-gray-900 stroke-0' />
                 </button>
               </PopoverTrigger>
               <PopoverContent>
