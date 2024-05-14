@@ -19,24 +19,24 @@ const RequirementPage = () => {
   } = usePageInfoStore();
 
   const goRich = () => {
-    navigate(`/project/${projectCode}/requirement/${requirementCode}/detail`);
+    // navigate(`/project/${projectCode}/requirement/${requirementCode}/detail`);
   };
 
-  useEffect(() => {
-    // 조회 api 호출
-    (async () => {
-      try {
-        const response = getRequirement(projectId, Number(requirementId));
-        console.log('요구사항 데이터 :', response);
-        // setRequirementId();
-        // setRequirementCode();
-        // setRequirementName();
-        // setIsRichPage(false);
-      } catch (error) {
-        console.log('요구사항 조회 실패 : ', error);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   // 조회 api 호출
+  //   (async () => {
+  //     try {
+  //       const response = getRequirement(projectId, Number(requirementId));
+  //       console.log('요구사항 데이터 :', response);
+  //       // setRequirementId();
+  //       // setRequirementCode();
+  //       // setRequirementName();
+  //       // setIsRichPage(false);
+  //     } catch (error) {
+  //       console.log('요구사항 조회 실패 : ', error);
+  //     }
+  //   })();
+  // }, []);
 
   return (
     <div className='flex h-full w-full items-center justify-center py-3'>
