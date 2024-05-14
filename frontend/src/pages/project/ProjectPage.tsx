@@ -24,7 +24,7 @@ const ProjectPage =()=>{
   }, [projectId, projectCode, projectName, setProjectId, setProjectCode, setProjectName]);
 
 
-  console.log({"projectId": projectId, "projectCode": projectCode, "projectName": projectName})
+  // console.log({"projectId": projectId, "projectCode": projectCode, "projectName": projectName})
   return(
     <div>
       <RequirementList projectId={projectId} projectName={projectName} projectCode={projectCode || '프로젝트 코드 예시' }/>

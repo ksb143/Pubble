@@ -184,7 +184,7 @@ const RequirementList = ({projectId, projectCode, projectName}: RequirementListP
             isLock: req.isLock,
             approval: req.approval,
             approvalComment: req.approvalComment,
-            requirementCode: req.code,
+            code: req.code,
             requirementName: req.requirementName,
             manager: {
               name: req.manager.name,
@@ -215,7 +215,8 @@ const RequirementList = ({projectId, projectCode, projectName}: RequirementListP
       console.error('Invalid requirement data');  
       return; // 유효하지 않은 데이터에 대해 처리 중단
     }
-    console.log({requirementId})
+    // console.log("requirementId : ", requirementId)
+    // console.log("requirementCode : ", code)
     navigate(`/project/${projectCode}/requirement/${code}`, {
       state: { requirementId }
     });
