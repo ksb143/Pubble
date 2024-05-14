@@ -1,16 +1,18 @@
 package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.*;
-import com.ssafy.d109.pubble.entity.Project;
-import com.ssafy.d109.pubble.entity.Requirement;
-import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
+import com.ssafy.d109.pubble.entity.*;
 import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
+import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,11 +21,14 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class RequirementService {
 
     private final RequirementRepository requirementRepository;
     private final ProjectRepository projectRepository;
+    private final ProjectAssignmentRepository projectAssignmentRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public float getApprovalRatio(Integer projectId) {
 
@@ -123,6 +128,7 @@ public class RequirementService {
     }
 
     // requirement 생성
+    @Transactional
     public void createRequirement(Integer projectId, RequirementCreateDto requirementCreateDto) {
         Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
         Optional<User> optionalAuthor = userRepository.findByEmployeeId(requirementCreateDto.getAuthorEId());
@@ -156,8 +162,33 @@ public class RequirementService {
                     .build();
 
             requirementRepository.save(requirement);
+            sendNotificationsToProjectParticipants(requirement);
+
         }
     }
+
+
+    private void sendNotificationsToProjectParticipants(Requirement requirement) {
+        // 푸시 알림 전송
+        List<ProjectAssignment> assignments = projectAssignmentRepository.findAllByProject_projectId(requirement.getProject().getProjectId());
+        for (ProjectAssignment assignment : assignments) {
+
+            User user = assignment.getUser();
+            if (user.getNotification() != null && user.getNotification().getToken() != null) {
+                try {
+                    notificationService.sendNotification(NotificationRequestDto.builder()
+                            .title("새로운 요구사항 추가")
+                            .message("프로젝트 [" + requirement.getProject().getProjectTitle() + "]에 새 요구사항이 추가되었습니다.")
+                            .build());
+                } catch (Exception e) {
+                    log.error("Notification sending failed for user " + user.getName());
+                    throw new NotificationSendingFailedException();
+                }
+            }
+
+        }
+    }
+
 
     public RequirementSummaryDto getRequirement(Integer requirementId) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
@@ -183,6 +214,7 @@ public class RequirementService {
 
         return requirementSummaryDto;
     }
+
 
     @Transactional
     public void updateRequirement(Integer requirementId, RequirementUpdateDto udto) {
