@@ -98,7 +98,7 @@ const Node = ({
   const editor = useEditor({
     editorProps: {
       attributes: {
-        class: `p-2 mx-8 focus:outline-none`,
+        class: `py-1 mx-2 w-full focus:outline-none`,
       },
     },
     extensions: [
@@ -334,24 +334,22 @@ const Node = ({
   };
 
   return (
-    <>
-      <div
-        id={`editor-${note.id}`}
-        className='group relative col-span-10 col-start-2 px-4 py-2 transition-all duration-300 ease-in-out'
-        onDrop={(event) => handleDrop(event, note.id)}
-        onDragOver={handleDragOver}
-        onDragStart={(event) => handleDragStart(event, note.id)}
-        onDragEnd={() => {
-          setIsDragging(false);
-        }}>
-        <div
-          className='absolute left-3.5 top-3.5 cursor-move opacity-0 group-hover:opacity-100'
-          draggable='true'>
-          <DraggableIcon
-            className='h-7 w-7 fill-gray-200'
-            aria-label='Drag handle'
-          />
-        </div>
+    <div
+      id={`editor-${note.id}`}
+      className='group relative col-span-10 col-start-2 flex w-full items-start px-4 py-4 transition-all duration-300 ease-in-out'
+      onDrop={(event: DragEvent) => handleDrop(event, note.id)}
+      onDragOver={handleDragOver}
+      onDragStart={(event: DragEvent) => handleDragStart(event, note.id)}
+      onDragEnd={() => {
+        setIsDragging(false);
+      }}>
+      <div className='opacity-0 group-hover:opacity-100'>
+        <DraggableIcon
+          className='h-7 w-7 fill-gray-200'
+          aria-label='Drag handle'
+        />
+      </div>
+      <div className='w-11/12'>
         <EditorContent editor={editor}></EditorContent>
         <BubbleMenu
           editor={editor || undefined}
@@ -376,15 +374,15 @@ const Node = ({
           onInsert={handleFileInsert}
           requireUniqueId={requirementId}
         />
+        {isCodeModalOpen && (
+          <CodeEditorWithPreview
+            isOpen={isCodeModalOpen}
+            applyCodeCapture={captureCodeImage}
+            requirementId={requirementId}
+          />
+        )}
       </div>
-      {isCodeModalOpen && (
-        <CodeEditorWithPreview
-          isOpen={isCodeModalOpen}
-          applyCodeCapture={captureCodeImage}
-          requirementId={requirementId}
-        />
-      )}
-    </>
+    </div>
   );
 };
 

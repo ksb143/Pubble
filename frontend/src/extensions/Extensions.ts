@@ -12,6 +12,7 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
 import { common, createLowlight } from 'lowlight';
 import TextStyle from '@tiptap/extension-text-style';
 import Highlight from '@tiptap/extension-highlight';
+import { Dropcursor } from '@tiptap/extension-dropcursor';
 import UniqueID from '@tiptap-pro/extension-unique-id';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -19,6 +20,7 @@ const lowlight = createLowlight(common);
 
 export const extensions = [
   StarterKit,
+  Dropcursor,
   Underline,
   Link.configure({
     HTMLAttributes: {
