@@ -14,17 +14,20 @@ const ProjectPage =()=>{
   const { prdId, projectId, projectTitle } = location.state;
   const projectCode = prdId;
   const projectName = projectTitle;
-  // store에서 projectId를 업데이트 하는 함수를 가져옴
+  // store에서 projectId, projectCode, projectName을 업데이트 하는 함수를 가져옴
   const { setProjectId, setProjectCode, setProjectName } = usePageInfoStore();
-  // 컴포넌트가 마운트 될 때, projectId 상태를 업데이트
+  // 컴포넌트가 마운트 될 때, projectId, projectCode, projectName을 업데이트
   useEffect(() => {
     setProjectId(projectId);
     setProjectCode(projectCode);
     setProjectName(projectName);
   }, [projectId, projectCode, projectName, setProjectId, setProjectCode, setProjectName]);
+  // // 스토어에 잘 저장되었는지 체크
+  // console.log('zustand 스토어에 잘 저장되었는지 체크')
+  // console.log("projectId : ", projectId)
+  // console.log("projectCode : ", projectCode)
+  // console.log("projectName : ", projectName)
 
-
-  // console.log({"projectId": projectId, "projectCode": projectCode, "projectName": projectName})
   return(
     <div>
       <RequirementList projectId={projectId} projectName={projectName} projectCode={projectCode || '프로젝트 코드 예시' }/>

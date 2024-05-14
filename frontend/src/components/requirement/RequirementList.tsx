@@ -7,6 +7,7 @@ import { MoreHorizontal } from 'lucide-react';
 // 3. api 관련
 import { getRequirement } from '@/apis/project.ts';
 // 4. store 관련
+import usePageInfoStore from "@/stores/pageInfoStore.ts";
 // 5. components 관련
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DropdownMenuLabel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
@@ -38,9 +39,10 @@ export type Requirement = {
   }
 
 interface RequirementListProps {
-    projectId: string
-    projectCode: string
-    projectName: string
+    projectId: string // 프로젝트 pk
+    projectCode: string // 프로젝트 코드
+    projectName: string // 프로젝트 이름
+
 }
 // cloumn 정의
 export const columns: ColumnDef<Requirement>[] = [
@@ -143,10 +145,18 @@ export const columns: ColumnDef<Requirement>[] = [
 
 // RequirementList: 특정 프로젝트의 요구사항을 개괄적으로 보는 컴포넌트
 const RequirementList = ({projectId, projectCode, projectName}: RequirementListProps) => {
+  // store에서 requirementId,requirementCode,requirementName를 업데이트 하는 함수를 가져옴
+  const { setRequirementId, setRequirementCode, setRequirementName } = usePageInfoStore()
+  // const { requirementId, requirementCode, requirementName } = usePageInfoStore.getState()
+  // // 스토어에 잘 저장되었는지 체크
+  // console.log('zustand 스토어에 잘 저장되었는지 체크')
+  // console.log("requirementId : ", requirementId)
+  // console.log("requirementCode : ", requirementCode)
+  // console.log("requirementName : ", requirementName)
+
+  // navigate
   const navigate = useNavigate();
-  
   // useState를 통한 상태변화 관리 들어가기
-  
   const [requirements, setRequirements] = useState<Requirement[]>([]); // 요구사항의 목록
   const [sorting, setSorting] = useState<SortingState>([]); // 정렬 상태
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // 필터링 상태
@@ -196,6 +206,12 @@ const RequirementList = ({projectId, projectCode, projectName}: RequirementListP
               profileColor: req.manager.profileColor
             },
           }));
+
+          // 첫번째 requirementId, requirementCode, requirementName를 가져와서 업데이트
+          setRequirementId(response.data[0].requirementId);
+          setRequirementCode(response.data[0].code);
+          setRequirementName(response.data[0].requirementName);
+
           setRequirements(requirementData);
         } else {
           setRequirements([]); // 데이터가 없는 경우 빈 배열 할당
@@ -207,7 +223,8 @@ const RequirementList = ({projectId, projectCode, projectName}: RequirementListP
     };
   
     fetchRequirements();
-  }, []);
+  }, [projectId, projectCode, setRequirementId, setRequirementCode, setRequirementName, setRequirements]);
+
 
   const handleRowClick = (requirement:Requirement) => {
     const { requirementId, code } = requirement;
