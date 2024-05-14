@@ -8,6 +8,7 @@ import com.ssafy.d109.pubble.entity.Notification;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
 import com.ssafy.d109.pubble.repository.NotificationRepository;
+import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -23,10 +24,12 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final CommonUtil commonUtil;
+    private final UserRepository userRepository;
 
-    public NotificationService(NotificationRepository notificationRepository, CommonUtil commonUtil) {
+    public NotificationService(NotificationRepository notificationRepository, CommonUtil commonUtil, UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
         this.commonUtil = commonUtil;
+        this.userRepository = userRepository;
     }
 
 
@@ -39,6 +42,9 @@ public class NotificationService {
         notification.confirmUser(currentUser);  // 사용자 확인
 
         notificationRepository.save(notification);  // Notification 객체 저장
+
+        currentUser.setNotification(notification);
+        userRepository.save(currentUser);
 
         return "Token Saved Successfully";
     }
@@ -90,6 +96,7 @@ public class NotificationService {
 
         } catch (NotificationNotFoundException e) {
             log.error("Notification token not found for user", e);
+            throw new NotificationNotFoundException();
         }
     }
 
@@ -117,12 +124,19 @@ public class NotificationService {
 
     }
 
-    public void deleteNotification() {
-        User user = commonUtil.getUser();
-        Notification notification = notificationRepository.findNotificationByUser(user).orElseThrow(NotificationNotFoundException::new);
+     */
 
+    @Transactional
+    public void deleteNotification(Integer notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(NotificationNotFoundException::new);
+        User user = notification.getUser();
+        if (user != null) {
+            user.setNotification(null);
+            userRepository.saveAndFlush(user);  // User 엔티티 업데이트
+        }
         notificationRepository.delete(notification);
+        notificationRepository.flush();// Notification 엔티티 삭제
     }
 
-     */
 }

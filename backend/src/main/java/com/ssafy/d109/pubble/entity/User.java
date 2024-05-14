@@ -47,6 +47,9 @@ public class User {
     @Column(name = "profileColor")
     private String profileColor;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "notificationId")  // 외래 키 컬럼 이름 지정
+    private Notification notification;
 
     public Set<String> getRoles() {
         return Set.of(this.role);
