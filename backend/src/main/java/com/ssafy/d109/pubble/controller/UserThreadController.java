@@ -64,10 +64,10 @@ public class UserThreadController {
 
     }
 
-    @PutMapping("/{detailId}/threads/{userThreadId}")
-    public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer detailId, @PathVariable Integer userThreadId) {
+    @PutMapping("/threads/{userThreadId}/lock")
+    public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer userThreadId) {
 
-        userThreadService.lockThread(detailId, userThreadId);
+        userThreadService.lockThread(userThreadId);
         UserThreadLockResponseDto responseDto = new UserThreadLockResponseDto();
         responseDto.setMessage("Lock Success");
         responseDto.setData(true);
@@ -88,8 +88,9 @@ public class UserThreadController {
 
     // 코멘트 작성
     @PostMapping("/threads/{threadId}/comments")
-    public ResponseEntity<ResponseDto> createComment(@PathVariable Integer threadId, CommentCreateDto commentCreateDto) {
+    public ResponseEntity<ResponseDto> createComment(@PathVariable Integer threadId, @RequestBody CommentCreateDto commentCreateDto) {
         User user = commonUtil.getUser();
+        System.out.println("commentCreateDto = " + commentCreateDto.getContent());
         CommentResponseData commentResponseData = userThreadService.createComment(user, threadId, commentCreateDto);
 
         response = new ResponseDto(true, "새 댓글 생성", commentResponseData);

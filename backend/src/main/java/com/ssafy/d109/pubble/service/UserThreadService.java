@@ -4,6 +4,7 @@ import com.ssafy.d109.pubble.dto.projectDto.CommentCreateDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
 import com.ssafy.d109.pubble.entity.Comment;
+import com.ssafy.d109.pubble.entity.RequirementDetail;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.entity.UserThread;
 import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
@@ -49,7 +50,7 @@ public class UserThreadService {
     }
 
 
-    public void lockThread(Integer detailId, Integer userThreadId) {
+    public void lockThread(Integer userThreadId) {
 
         UserThread currentThread = userThreadRepository.findUserThreadByUserThreadId(userThreadId).orElseThrow(UserThreadNotFoundException::new);
         Integer threadUser = currentThread.getUser().getUserId();
@@ -110,6 +111,7 @@ public class UserThreadService {
 
     public CommentResponseData createComment(User user, Integer userThreadId, CommentCreateDto commentCreateDto) {
         UserThread userThread = userThreadRepository.findUserThreadByUserThreadId(userThreadId).orElseThrow();
+        System.out.println("commentCreateDto = " + commentCreateDto.getContent());
 
         Comment comment = Comment.builder()
                 .content(commentCreateDto.getContent())

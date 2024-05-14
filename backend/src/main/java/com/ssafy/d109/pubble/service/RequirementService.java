@@ -7,6 +7,7 @@ import com.ssafy.d109.pubble.entity.RequirementDetail;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementDetailRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
@@ -14,6 +15,7 @@ import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -142,15 +144,13 @@ public class RequirementService {
 
     @Transactional
     protected void createDetailWhenCreateRequirement(Integer requirementId, List<String> contents) {
-        List<RequirementDetail> details = new ArrayList<>();
-
         for (String content : contents) {
             RequirementDetail detail = RequirementDetail.builder()
                     .content(content)
                     .status("u")
                     .requirement(requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new))
                     .build();
-            details.add(detail);
+            detailRepository.save(detail);
         }
     }
 
@@ -253,32 +253,47 @@ public class RequirementService {
     // update version by command(h:hold / r:restore)
     @Transactional
     public void updateVersion(Integer requirementId, String command) {
-        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
-        if (optionalRequirement.isPresent()) {
-            Requirement requirement = optionalRequirement.get();
+        int holdCommand = 0;
+        int restoreCommand = 0;
 
-            int holdCommand = 0;
-            int restoreCommand = 0;
-            String approval = "h";
-
-            if ("h".equals(command)) {
-                holdCommand += 1;
-            } else if ("r".equals(command)) {
-                restoreCommand += 1;
-            }
-
-            String[] parts = requirement.getVersion().split("\\.");
-            Integer front = Integer.parseInt(parts[1]) + holdCommand;
-            Integer back = Integer.parseInt(parts[2]) + restoreCommand;
-
-            String newVersion = String.format("V.%d.%d", front, back);
-
-            // tobuild로 id, version 제외, 복제 저장
-            requirementRepository.save(requirement.toBuilder().requirementId(null).version(newVersion).approval(approval).build());
-
-            // orderIndex는 차후 논의
+        if ("h".equals(command)) {
+            holdCommand += 1;
+        } else if ("r".equals(command)) {
+            restoreCommand += 1;
         }
+
+        String[] parts = requirement.getVersion().split("\\.");
+        Integer front = Integer.parseInt(parts[1]) + holdCommand;
+        Integer back = Integer.parseInt(parts[2]) + restoreCommand;
+
+        String newVersion = String.format("V.%d.%d", front, back);
+
+        // tobuild로 id, version 제외, 복제 저장
+        Requirement requirement2 = requirementRepository.save(requirement
+                .toBuilder()
+                .requirementId(null)
+                .version(newVersion)
+                .approval("u")
+                .build());
+
+        // 기존 requirement 상태 갱ㅅ니
+        requirement.setVersion(command);
+
+        List<RequirementDetail> details = detailRepository.findAllByRequirement_requirementId(requirementId);
+        for (RequirementDetail detail : details) {
+            if (!"d".equals(detail.getStatus())) {
+                detailRepository.save(detail
+                        .toBuilder() // 추가 설정 외의 것(content, status)는 그대로 사용
+                        .requirementDetailId(null)
+                        .requirement(requirement2)
+                        .build());
+            }
+        }
+
+        // orderIndex는 차후 논의
+
     }
 
     @Transactional
@@ -324,5 +339,26 @@ public class RequirementService {
         }
 
         return requirementSummaryDtos;
+    }
+
+    public void addRequirementDetail(Integer requirementId, String content) {
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
+
+        detailRepository.save(RequirementDetail.builder()
+                .content(content)
+                .status("u")
+                .requirement(requirement)
+                .build());
+    }
+
+    @Transactional
+    public void updateDetailStatus(Integer userId, Integer requirementId, Integer detailId, String command) {
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
+
+        if (userId.equals(requirement.getAuthor().getUserId())) {
+            RequirementDetail detail = detailRepository.findByRequirementDetailId(detailId);
+            detail.setStatus(command);
+            detailRepository.save(detail);
+        }
     }
 }

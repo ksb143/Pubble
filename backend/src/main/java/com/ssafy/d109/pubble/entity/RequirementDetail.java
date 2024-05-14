@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "requirementDetail")
 public class RequirementDetail {
 
@@ -20,8 +20,8 @@ public class RequirementDetail {
     @Column(name = "content")
     private String content; // 내용
 
-    @Column(name = "status", length = 16)
-    private String status;
+    @Column(name = "status", length = 1)
+    private String status; // 상태 표시 - 일단 d = 삭제됨만 생각중
 
 //    @Column(name = "createdAt", updatable = false, nullable = false)
 //    @CreationTimestamp
