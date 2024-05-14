@@ -1,12 +1,10 @@
 package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.CommentCreateDto;
+import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
-import com.ssafy.d109.pubble.entity.Comment;
-import com.ssafy.d109.pubble.entity.RequirementDetail;
-import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.entity.UserThread;
+import com.ssafy.d109.pubble.entity.*;
 import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadAlreadyLockedException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadNotFoundException;
@@ -29,15 +27,17 @@ public class UserThreadService {
     private final UserThreadRepository userThreadRepository;
     private final CommentRepository commentRepository;
     private final CommonUtil commonUtil;
+    private final NotificationService notificationService;
 
     private final RequirementDetailRepository detailRepository;
 
 
-    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil,   RequirementDetailRepository detailRepository) {
+    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil,   RequirementDetailRepository detailRepository, NotificationService notificationService) {
         this.userThreadRepository = userThreadRepository;
         this.commentRepository = commentRepository;
         this.commonUtil = commonUtil;
         this.detailRepository = detailRepository;
+        this.notificationService = notificationService;
     }
 
 
@@ -92,7 +92,8 @@ public class UserThreadService {
         dto.setCommentId(comment.getCommentId());
         dto.setContent(comment.getContent());
         dto.setUserId(comment.getUser().getUserId());
-
+        
+        // userInfo 참고
         return dto;
     }
 
@@ -120,6 +121,24 @@ public class UserThreadService {
                 .build();
 
         commentRepository.save(comment);
+
+        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getIsMentioned());
         return convertCommentToDto(comment);
+    }
+
+
+    private void sendNotificationForMention(String content, Boolean isMentioned) {
+
+        if (!isMentioned) {
+            return;
+        }
+
+        NotificationRequestDto notificationDto = NotificationRequestDto.builder()
+                .title("멘션 알림")
+                .message(content)
+                .build();
+        notificationService.sendNotification(notificationDto);
+
+
     }
 }

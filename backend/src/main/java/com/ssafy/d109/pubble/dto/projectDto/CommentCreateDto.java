@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CommentCreateDto {
     private String content;
+    private Boolean isMentioned;
 }
