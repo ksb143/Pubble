@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // 2. library 관련
 import { getProject } from "@/apis/project";
 // 3. component 관련
-import { Cell, Header, HeaderGroup, Row, ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable, TableInstance } from "@tanstack/react-table"
+import { Cell, Header, HeaderGroup, Row, ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -26,7 +26,7 @@ export type Project = {
 export const columns: ColumnDef<Project>[] = [
   {
     id: "select",
-    header: ({ table }: { table: TableInstance<Project> }) => (
+    header: ({ table }) => (
       <Checkbox
         checked={
           table.getIsAllPageRowsSelected() ||
@@ -36,7 +36,7 @@ export const columns: ColumnDef<Project>[] = [
         aria-label="Select all"
       />
     ),
-    cell: ({ row }:{ row: Row<Project> }) => (
+    cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
@@ -204,7 +204,7 @@ const ProjectList = () => {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup: HeaderGroup<Project>) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header: Header<Project>, index: number) => {
+                {headerGroup.headers.map((header: Header<Project, unknown>) => {
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
@@ -228,7 +228,7 @@ const ProjectList = () => {
                   data-state={row.getIsSelected() && "selected"}
                   onClick={()=> handleRowClick(row.original.projectId)}
                 >
-                  {row.getVisibleCells().map((cell: Cell<Project>, index: number) => (
+                  {row.getVisibleCells().map((cell: Cell<Project, unknown>) => (
                     <TableCell 
                       key={cell.id}
                       >
