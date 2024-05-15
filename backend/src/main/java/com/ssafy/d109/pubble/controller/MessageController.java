@@ -2,6 +2,7 @@ package com.ssafy.d109.pubble.controller;
 
 import com.ssafy.d109.pubble.dto.messageDto.MessageResponseDto;
 import com.ssafy.d109.pubble.dto.messageDto.MessageSendDto;
+import com.ssafy.d109.pubble.dto.messageDto.MessageStatusDto;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.repository.UserRepository;
@@ -44,19 +45,22 @@ public class MessageController {
 
     // 하나의 메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨
     @PutMapping("/{messageId}")
-    public ResponseEntity<ResponseDto> updateMessage(@PathVariable("messageId")Integer messageId, @RequestBody String command) {
-        messageService.updateMessage(messageId, command);
+    public ResponseEntity<ResponseDto> updateMessage(@PathVariable("messageId")Integer messageId, @RequestBody MessageStatusDto dto) {
+        String status = dto.getStatus();
 
         String msg;
-        if ("r".equals(command)) {
+        if ("r".equals(status)) {
             msg = "메세지 읽음 처리";
-        } else if ("d".equals(command)) {
+            messageService.updateMessage(messageId, status);
+        } else if ("d".equals(status)) {
             msg = "메세지 삭제 처리";
-        } else if ("u".equals(command)) {
+            messageService.updateMessage(messageId, status);
+        } else if ("u".equals(status)) {
             msg = "메세지 읽지 않음 처리";
+            messageService.updateMessage(messageId, status);
         } else {
-            System.out.println("command = " + command);
-            msg = "알 수 없는 상태정보 입력";
+            System.out.println("command = " + status);
+            msg = "알 수 없는 상태정보 입력 : " + status;
         }
 
         response = new ResponseDto(true, msg, null);
