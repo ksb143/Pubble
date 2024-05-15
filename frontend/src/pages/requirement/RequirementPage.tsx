@@ -28,10 +28,11 @@ const RequirementPage = () => {
     (async () => {
       try {
         const response = await getRequirement(projectId, requirementId);
+        console.log(response.data);
         setPageType('requirement', {
-          requirementId: response.requirementId,
-          requirementCode: response.code,
-          requirementName: response.requirementName,
+          requirementId: response.data.requirementId,
+          requirementCode: response.data.code,
+          requirementName: response.data.requirementName,
           isRichPage: false,
         });
       } catch (error) {

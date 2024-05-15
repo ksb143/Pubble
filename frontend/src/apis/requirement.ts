@@ -5,7 +5,7 @@ export const getRequirement = async (
   projectId: number,
   requirementId: number,
 ) => {
-  const { data } = await privateApi.post(
+  const { data } = await privateApi.get(
     `/projects/${projectId}/requirements/${requirementId}`,
   );
   return data;
