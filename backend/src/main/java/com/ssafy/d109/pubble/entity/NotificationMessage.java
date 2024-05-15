@@ -1,10 +1,7 @@
 package com.ssafy.d109.pubble.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CollectionId;
 
 import java.time.LocalDateTime;
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 @Table(name = "notificationMessage")
 public class NotificationMessage {
 
@@ -40,5 +38,6 @@ public class NotificationMessage {
 
     @Column(name = "senderId")
     private Integer senderId;
+
 
 }

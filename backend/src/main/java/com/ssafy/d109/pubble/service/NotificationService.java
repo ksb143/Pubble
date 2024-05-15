@@ -5,9 +5,12 @@ import com.google.firebase.messaging.WebpushConfig;
 import com.google.firebase.messaging.WebpushNotification;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.entity.Notification;
+import com.ssafy.d109.pubble.entity.NotificationMessage;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.notification.NotificationMessageNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
+import com.ssafy.d109.pubble.repository.NotificationMessageRepository;
 import com.ssafy.d109.pubble.repository.NotificationRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;
@@ -26,11 +29,13 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final CommonUtil commonUtil;
     private final UserRepository userRepository;
+    private final NotificationMessageRepository notificationMessageRepository;
 
-    public NotificationService(NotificationRepository notificationRepository, CommonUtil commonUtil, UserRepository userRepository) {
+    public NotificationService(NotificationRepository notificationRepository, CommonUtil commonUtil, UserRepository userRepository, NotificationMessageRepository notificationMessageRepository) {
         this.notificationRepository = notificationRepository;
         this.commonUtil = commonUtil;
         this.userRepository = userRepository;
+        this.notificationMessageRepository = notificationMessageRepository;
     }
 
 
@@ -66,18 +71,6 @@ public class NotificationService {
                     .build();
 
 
-            /*
-            String response = FirebaseMessaging.getInstance().sendAsync(message).get();
-            log.info(">>>>>Send Message: " + response);
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("Failed to send message due to interruption or execution error", e);
-        } catch (NotificationNotFoundException e) {
-            log.error("Notification token not found for user", e);
-        }
-
-             */
-
-
             // 비동기로 메시지 보내기
             CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
                 try {
@@ -110,23 +103,6 @@ public class NotificationService {
     }
 
 
-
-    /*
-    @Transactional
-    public void saveNotification(String token) {
-        User user = commonUtil.getUser();
-
-        Notification notification = Notification.builder()
-                .token(token)
-                .build();
-
-        notification.confirmUser(user);
-        notificationRepository.save(notification);
-
-    }
-
-     */
-
     @Transactional
     public void deleteNotification(Integer notificationId) {
         Notification notification = notificationRepository.findById(notificationId)
@@ -139,5 +115,14 @@ public class NotificationService {
         notificationRepository.delete(notification);
         notificationRepository.flush();// Notification 엔티티 삭제
     }
+
+    @Transactional
+    public void updateChecked(Integer notificationMsgId) {
+        NotificationMessage notificationMsg = notificationMessageRepository.findByNotificationMessageId(notificationMsgId)
+                .orElseThrow(NotificationMessageNotFoundException::new);
+        notificationMsg.setIsChecked(true);
+
+    }
+
 
 }
