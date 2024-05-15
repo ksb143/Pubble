@@ -23,6 +23,7 @@ import Lottie from 'react-lottie';
 import { getImageUrl, getFileUrl } from '@/apis/rich.ts';
 // 4. store
 import useRichStore from '@/stores/richStore';
+import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import MenuBar from '@/components/rich/MenuBar.tsx';
 import BubbleMenuBar from '@/components/rich/BubbleMenuBar.tsx';
@@ -48,6 +49,7 @@ const RichPage = () => {
     useState<boolean>(false);
   const { isCodeModalOpen, openCodePreviewModal, closeCodePreviewModal } =
     useRichStore();
+  const { setPageType } = usePageInfoStore();
 
   // 파라미터
   // const { projectId } = useParams<{ projectId: string }>();
@@ -255,6 +257,13 @@ const RichPage = () => {
       .run();
     closeCodePreviewModal();
   };
+
+  // 페이지 정보 세팅
+  useEffect(() => {
+    setPageType('rich', {
+      isRichPage: true,
+    });
+  }, []);
 
   // 코드이미지 클릭 이벤트 감지
   useEffect(() => {
