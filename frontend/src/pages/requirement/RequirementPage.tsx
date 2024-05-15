@@ -1,34 +1,53 @@
 // 1. react 관련
 import { useEffect } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
+import { getRequirement } from '@/apis/requirement';
 // 4. store
+import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. components
-import { Requirement } from '@/components/requirement/RequirementList';
 
 const RequirementPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { requirement } = location.state as { requirement: Requirement };
-  const { projectId, requirementId } = useParams();
+  const {
+    projectId,
+    projectCode,
+    requirementCode,
+    requirementName,
+    setPageType,
+  } = usePageInfoStore();
+  const requirementId = location.state?.requirementId;
+
   const goRich = () => {
-    // 전달 state: requirementName
-    navigate(`/project/${projectId}/requirement/${requirementId}/detail`, {
-      state: { requirement },
-    });
+    navigate(`/project/${projectCode}/requirement/${requirementCode}/detail`);
   };
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await getRequirement(projectId, requirementId);
+        setPageType('requirement', {
+          requirementId: response.requirementId,
+          requirementCode: response.code,
+          requirementName: response.requirementName,
+          isRichPage: false,
+        });
+      } catch (error) {
+        console.log('요구사항 정보 조회 실패 : ', error);
+      }
+    })();
+  }, []);
+
   return (
     <div className='flex h-full w-full items-center justify-center py-3'>
       <div className='h-full w-1/3 rounded bg-white p-6 shadow'>
         <div className='mb-4 flex text-2xl font-normal'>
           <p>
-            {requirement.requirementId} {requirement.requirementName}
+            {requirementCode} {requirementName}
           </p>
         </div>
-        <p>{requirement.description}</p>
         <button
           className='w-1/4 rounded bg-pubble py-3 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
           onClick={goRich}>
