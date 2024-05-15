@@ -16,12 +16,7 @@ interface ProfileProps {
   profileColor: string;
 }
 
-const Profile = ({
-  width = '3rem',
-  height = '3rem',
-  name,
-  profileColor,
-}: ProfileProps) => {
+const Profile = ({ width, height, name, profileColor }: ProfileProps) => {
   const textColor = getTextColor(profileColor); // 프로필 배경색에 따른 텍스트 색상 설정
 
   // 프로필 스타일
