@@ -3,6 +3,7 @@ package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.*;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
+import com.ssafy.d109.pubble.dto.responseDto.EditableProjectsResponseDto;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
@@ -191,5 +192,48 @@ public class ProjectService {
             Project project = optionalProject.get();
             project.setStatus(status);
         }
+    }
+
+    public List<EditableProjectsResponseDto> getEditableProjects(Integer userId) {
+        List<Object[]> projectsAndRequirements = projectRepository.findEditableProjectsAndRequirementsByUserId(userId);
+        List<EditableProjectsResponseDto> dtos = new ArrayList<>();
+
+        for (Object[] pr : projectsAndRequirements) {
+            Project project = (Project) pr[0];
+            Requirement requirement = (Requirement) pr[1];
+
+            EditableProjectsResponseDto dto = EditableProjectsResponseDto.builder()
+                    .projectId(project.getProjectId())
+                    .projectCode(project.getCode())
+                    .requirementId(requirement != null ? requirement.getRequirementId() : null)
+                    .requirementCode(requirement != null ? requirement.getCode() : null)
+                    .build();
+
+            dtos.add(dto);
+        }
+
+        return dtos;
+
+    }
+
+    public List<EditableProjectsResponseDto> getUneditableProjects(Integer userId) {
+        List<Object[]> projectsAndRequirements = projectRepository.findUneditableProjectsAndRequirementsByUserId(userId);
+        List<EditableProjectsResponseDto> dtos = new ArrayList<>();
+
+        for (Object[] pr : projectsAndRequirements) {
+            Project project = (Project) pr[0];
+            Requirement requirement = (Requirement) pr[1];
+
+            EditableProjectsResponseDto dto = EditableProjectsResponseDto.builder()
+                    .projectId(project.getProjectId())
+                    .projectCode(project.getCode())
+                    .requirementId(requirement != null ? requirement.getRequirementId() : null)
+                    .requirementCode(requirement != null ? requirement.getCode() : null)
+                    .build();
+
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 }

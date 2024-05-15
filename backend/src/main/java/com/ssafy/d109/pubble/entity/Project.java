@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,4 +40,9 @@ public class Project {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner")
     private User owner;
+
+    // Project 엔티티 내에 추가
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    private List<Requirement> requirements;
+
 }

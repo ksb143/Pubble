@@ -1,6 +1,7 @@
 package com.ssafy.d109.pubble.security.jwt;
 
 import com.ssafy.d109.pubble.dto.projectDto.ProjectListDto;
+import com.ssafy.d109.pubble.dto.responseDto.EditableProjectsResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
@@ -85,6 +86,19 @@ public class JWTUtil {
         for (ProjectListDto dto : projectListDtos) {
             reponseDto.add(dto.getProjectId() + dto.getProjectTitle() + "/*");
         }
+
+
+        List<EditableProjectsResponseDto> editables =  projectService.getEditableProjects(user.getUserId());
+        for (EditableProjectsResponseDto e : editables) {
+            editableProjects.add(e.getProjectId() + "/" + e.getProjectCode() + "/" + e.getRequirementId() + "/" + e.getRequirementCode() + "/*");
+        }
+
+        List<EditableProjectsResponseDto> uneditables = projectService.getUneditableProjects(user.getUserId());
+        for (EditableProjectsResponseDto ue : uneditables) {
+            uneditableProjects.add(ue.getProjectId() + "/" + ue.getProjectCode() + "/" + ue.getRequirementId() + "/" + ue.getRequirementCode() + "/*");
+        }
+
+
 
         return Jwts.builder()
                 .claim("category", category)
