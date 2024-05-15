@@ -52,7 +52,7 @@ const Navbar = () => {
         <div className='flex items-center'>
           <div className='mr-8'>프로젝트 참여 인원 및 현재 접속자 표시</div>
           <div
-            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-900/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
+            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
             onClick={() => toggleMenu('message')}>
             <Envelope
               className={`h-8 w-8 stroke-gray-900 ${activeMenu === 'message' ? 'stroke-[1.5]' : 'stroke-1'}`}
@@ -60,7 +60,7 @@ const Navbar = () => {
           </div>
 
           <div
-            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-900/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
+            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
             onClick={() => toggleMenu('notification')}>
             <Bell
               className={`h-8 w-8 fill-gray-900 stroke-gray-900 ${activeMenu === 'notification' ? 'stroke-[6]' : 'stroke-2'}`}
