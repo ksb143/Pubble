@@ -7,6 +7,7 @@ import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.UserLocationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -43,8 +44,8 @@ public class StompController {
     @MessageMapping("/project/{projectId}/leave")
     public void leave(@DestinationVariable Integer projectId) {
         User user = commonUtil.getUser();
-        String leaveUserEID = userLocationService.leave(user, projectId);
-        sendingOperations.convertAndSend("/sub/project/" + projectId + "/leave", leaveUserEID);
+        String leavedUserEID = userLocationService.leave(user, projectId);
+        sendingOperations.convertAndSend("/sub/project/" + projectId + "/leave", leavedUserEID);
     }
 
     @GetMapping("/project/{projectId}/current-user")
@@ -52,7 +53,7 @@ public class StompController {
         List<UserLocationInfo> currentUserLocations = userLocationService.getCurrentUserLocations(projectId);
 
         response = new ResponseDto(true, "현재 프로젝트에 접속중인 유저들의 정보", currentUserLocations);
-
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
 
