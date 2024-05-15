@@ -10,5 +10,6 @@ export const getLuminance = (colorHex: string): number => {
 export const getTextColor = (backgroundColor: string): string => {
   const luminance = getLuminance(backgroundColor);
   // 배경색이 밝으면 검은색 텍스트, 아니면 흰색 텍스트를 반환
-  return luminance > 186 ? '#000000' : '#ffffff';
+  const textColor = luminance > 186 ? '#000000' : '#ffffff';
+  return textColor;
 };
