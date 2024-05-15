@@ -6,6 +6,7 @@ import com.google.firebase.messaging.WebpushNotification;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.entity.Notification;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
 import com.ssafy.d109.pubble.repository.NotificationRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
@@ -34,26 +35,26 @@ public class NotificationService {
 
 
     // 사용자의 기기에서 생성된 FCM 토큰을 서버에 등록하고 저장 (currentUser가 수행)
+    @Transactional
     public String registerToken(String token, User currentUser) {
 
         Notification notification = notificationRepository.findNotificationByUser(currentUser)
                 .orElse(Notification.builder().token(token).build());
-        notification.setToken(token);  // 기존 또는 새 토큰 업데이트
-        notification.confirmUser(currentUser);  // 사용자 확인
-
-        notificationRepository.save(notification);  // Notification 객체 저장
-
+        notification.setToken(token);
+        notification.setUser(currentUser);
         currentUser.setNotification(notification);
-        userRepository.save(currentUser);
 
-        return "Token Saved Successfully";
+        userRepository.save(currentUser);
+        notificationRepository.save(notification);
+
+        return "TSS: Token Saved Successfully 라는 뜻ㅋ";
     }
 
 
-    public void sendNotification(NotificationRequestDto reqDto) {
+    public void sendNotification(NotificationRequestDto reqDto, String receiverId) {
 
         try {
-            String token = getNotificationToken();
+            String token = getNotificationToken(receiverId);
             Message message = Message.builder()
                     .setWebpushConfig(WebpushConfig.builder()
                             .setNotification(WebpushNotification.builder()
@@ -101,8 +102,8 @@ public class NotificationService {
     }
 
 
-    private String getNotificationToken() {
-        User user = commonUtil.getUser();
+    private String getNotificationToken(String receiverId) {
+        User user = userRepository.findByEmployeeId(receiverId).orElseThrow(UserNotFoundException::new);
         return notificationRepository.findNotificationByUser(user)
                 .map(Notification::getToken)
                 .orElseThrow(NotificationNotFoundException::new);

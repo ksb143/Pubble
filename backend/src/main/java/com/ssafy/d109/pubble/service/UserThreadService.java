@@ -1,6 +1,7 @@
 package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.CommentCreateDto;
+import com.ssafy.d109.pubble.dto.requestDto.NotificationReceiverRequestDto;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
@@ -122,14 +123,14 @@ public class UserThreadService {
 
         commentRepository.save(comment);
 
-        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getIsMentioned());
+        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getReceiverInfo());
         return convertCommentToDto(comment);
     }
 
 
-    private void sendNotificationForMention(String content, Boolean isMentioned) {
+    private void sendNotificationForMention(String content, NotificationReceiverRequestDto receiverInfo) {
 
-        if (!isMentioned) {
+        if (!receiverInfo.getIsMentioned()) {
             return;
         }
 
@@ -137,7 +138,7 @@ public class UserThreadService {
                 .title("멘션 알림")
                 .message(content)
                 .build();
-        notificationService.sendNotification(notificationDto);
+        notificationService.sendNotification(notificationDto, receiverInfo.getReceiverId());
 
 
     }

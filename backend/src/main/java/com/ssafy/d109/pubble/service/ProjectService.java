@@ -99,7 +99,7 @@ public class ProjectService {
                         .build();
                 CompletableFuture.runAsync(() -> {
                     try {
-                        notificationService.sendNotification(reqDto);
+                        notificationService.sendNotification(reqDto, user1.getEmployeeId());
                     } catch (Exception e) {
                         log.error("Failed to send notification", e);
                     }

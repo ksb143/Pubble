@@ -9,13 +9,10 @@ import com.ssafy.d109.pubble.entity.RequirementDetail;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
-import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
+import com.ssafy.d109.pubble.repository.*;
 import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
-import com.ssafy.d109.pubble.repository.ProjectRepository;
-import com.ssafy.d109.pubble.repository.RequirementDetailRepository;
-import com.ssafy.d109.pubble.repository.RequirementRepository;
-import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,6 +34,7 @@ public class RequirementService {
     private final UserRepository userRepository;
     private final RequirementDetailRepository detailRepository;
     private final NotificationService notificationService;
+    private final NotificationRepository notificationRepository;
 
     public float getApprovalRatio(Integer projectId) {
 
@@ -211,12 +209,14 @@ public class RequirementService {
         for (ProjectAssignment assignment : assignments) {
 
             User user = assignment.getUser();
-            if (user.getNotification() != null && user.getNotification().getToken() != null) {
+            Notification notification = notificationRepository.findNotificationByUser(user).orElseThrow(NotificationNotFoundException::new);
+
+            if (notification.getToken() != null) {
                 try {
                     notificationService.sendNotification(NotificationRequestDto.builder()
                             .title("새로운 요구사항 추가")
                             .message("프로젝트 [" + requirement.getProject().getProjectTitle() + "]에 새 요구사항이 추가되었습니다.")
-                            .build());
+                            .build(), user.getEmployeeId());
                 } catch (Exception e) {
                     log.error("Notification sending failed for user " + user.getName());
                     throw new NotificationSendingFailedException();

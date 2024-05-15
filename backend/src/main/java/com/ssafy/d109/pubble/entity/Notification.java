@@ -28,6 +28,7 @@ public class Notification {
 
     public void confirmUser(User user) {
         this.user = user;
+        user.setNotification(this);
     }
 
 

@@ -64,7 +64,7 @@ public class MessageService {
                     .title(messageSendDto.getTitle())
                     .message(messageSendDto.getContent())
                     .token(receiver.getNotification().getToken())
-                    .build());
+                    .build(), receiver.getEmployeeId());
         } catch (Exception e) {
             // 로깅, 알림 재시도 또는 사용자에게 피드백
             log.error("Error sending notification", e);
