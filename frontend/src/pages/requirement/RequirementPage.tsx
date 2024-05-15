@@ -1,4 +1,4 @@
-// 1. react 관련
+// 1. react
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 // 2. library
@@ -6,7 +6,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getRequirement } from '@/apis/requirement';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
-// 5. components
+// 5. component
+// 6. asset
 
 const RequirementPage = () => {
   const location = useLocation();
