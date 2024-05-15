@@ -1,40 +1,41 @@
 /** @jsxImportSource @emotion/react */
+// 1. react
+import { useState } from 'react';
+// 2. library
 import { css } from '@emotion/react';
+import Lottie from 'react-lottie';
+// 3. api
+// 4. store
+// 5. component
+import NotificationList from '@/components/navbar/NotificationList';
+// 6. assets
 import Xmark from '@/assets/icons/x-mark.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
-import Profile from '@/components/layout/Profile';
+import NoData from '@/assets/lotties/no-data.json';
 
+// 알림 모달 상태 타입 정의
 interface NotificationProps {
   isOpen: boolean;
   closeMenu: () => void;
 }
 
-interface ListItemProps {
-  text: string;
-}
-
+// 상단바 높이를 제외한 화면 높이
 const dialogStyle = css`
   height: calc(100vh - 64px);
 `;
 
-// ToDo: 로직 연결하면서 컴포넌트로 분리하기
-const ListItem = ({ text }: ListItemProps) => (
-  <li className='flex items-center justify-between border-b px-2 py-6 last-of-type:border-none'>
-    <div className='flex flex-grow items-center'>
-      <Profile width='3rem' height='3rem' />
-      <p className='flex-grow px-2'>{text}</p>
-    </div>
-    <div className='flex flex-col items-end'>
-      <p>2024-05-04</p>
-      <p>15:04</p>
-    </div>
-  </li>
-);
-
-const items = Array.from({ length: 10 }, (_, index) => `Test${index + 1}`);
-
-// ToDo : 불러온 데이터가 있는지 여부 => 삼항연산자 or 조건부 렌더링
 const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
+  const [notificationList, setNotificationList] = useState([]); // 알림 리스트
+
+  // 로티 기본 옵션
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: NoData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
   return (
     <>
       <div
@@ -51,9 +52,17 @@ const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
           />
         </div>
         <ul className='flex flex-col'>
-          {items.map((item) => (
-            <ListItem key={item} text={item} />
-          ))}
+          {notificationList.length === 0 && (
+            <>
+              <Lottie options={defaultOptions} height={200} width={200} />
+              <p className='flex justify-center'>받은 알림이 없습니다</p>
+            </>
+          )}
+          {notificationList.length > 0 && (
+            <>
+              <NotificationList data={notificationList} />
+            </>
+          )}
         </ul>
       </div>
     </>

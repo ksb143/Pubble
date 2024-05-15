@@ -1,17 +1,25 @@
 /** @jsxImportSource @emotion/react */
+// 1. react
+// 2. library
 import { css } from '@emotion/react';
-import useUserStore from '@/stores/userStore';
+// 3. api
+import { getTextColor } from '@/utils/profile';
+// 4. store
+// 5. component
+// 6. assets
 
+// 프로필 타입 정의
 interface ProfileProps {
-  width: string; // 예: '48px'
-  height: string; // 예: '48px'
+  width: string; // 단위 포함, 예: '3rem'
+  height: string; // 단위 포함, 예: '3rem'
+  name: string;
+  profileColor: string;
 }
 
-const Profile = ({ width = '3rem', height = '3rem' }: ProfileProps) => {
-  // ToDo : 현재는 로그인한 유저의 정보로 설정
-  // 추후에는 props로 유저의 정보를 받아와야함
-  const { name, profileColor, textColor } = useUserStore();
+const Profile = ({ width, height, name, profileColor }: ProfileProps) => {
+  const textColor = getTextColor(profileColor); // 프로필 배경색에 따른 텍스트 색상 설정
 
+  // 프로필 스타일
   const profileStyle = css`
     display: flex;
     height: ${height};

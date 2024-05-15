@@ -1,62 +1,31 @@
 // 1. react 관련
-import React from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom";
 // 2. library 관련
-// 3. component 관련
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-
+import { getProject } from "@/apis/project";
+// 3. api 관련
+import  ProjectAddModal  from "@/components/main/ProjectAddModal"
+// 4. store 관련
+// 5. component 관련
+import { Cell, Header, HeaderGroup, Row, ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
+// import { MoreHorizontal } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
-const projects: Project[] = [
-  {
-    id: "aaaaaaaa",
-    startDate: "2022-01-01",
-    endDate: "2022-01-01",
-    projectId: "OldOlive",
-    memberCount: 5,
-    status: "in progress",
-  },
-]
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+// Project type 정의
 export type Project = {
-  id: string
-  startDate: string
-  endDate: string
-  projectId: string
-  memberCount: number
-  status: "in progress" | "complete" | "before start"
+  projectId: string // 프로젝트 pk
+  prdId: string // 프로젝트 code
+  startAt: string // 프로젝트 시작일
+  endAt: string // 프로젝트 종료일
+  projectTitle: string // 프로젝트 이름
+  people: number // 프로젝트 참여자
+  progressRatio: number // 프로젝트 진행률
+  status: "in progress" | "complete" | "before start" // 프로젝트 상태
 }
-
+// column 정의
 export const columns: ColumnDef<Project>[] = [
   {
     id: "select",
@@ -66,107 +35,101 @@ export const columns: ColumnDef<Project>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
     ),
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
         aria-label="Select row"
       />
     ),
     enableSorting: false,
     enableHiding: false,
+  }, 
+  {
+    accessorKey: "prdId",
+    header: "프로젝트 코드",
+    cell: ({ row }) => <div>{row.getValue("prdId")}</div>,
   },
   {
-    accessorKey: "projectId",
-    header: "프로젝트이름",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("projectId")}</div>
-    ),
+    accessorKey: "projectTitle",
+    header: "프로젝트 이름",
+    cell: ({ row }) => <div>{row.getValue("projectTitle")}</div>,
+  },
+  {
+    accessorKey: "people",
+    header: "구성원 수",
+    cell: ({ row }) => <div>{(row.getValue("people") as string[]).length}</div>,
+  },
+  {
+    accessorKey: "progressRatio",
+    header: "진행률",
+    cell: ({ row }) => <div>{row.getValue("progressRatio")}</div>,
   },
   {
     accessorKey: "status",
     header: "상태",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+    cell: ({ row }) => <div>{row.getValue("status")}</div>,
+  },
+  {
+    accessorKey: "startAt",
+    header: "시작일",
+    cell: ({ row }:{ row: Row<Project> }) => (
+      <div className="capitalize">{(row.getValue("startAt") as string).split('T')[0]}</div>
     ),
   },
   {
-    accessorKey: "memberCount",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          구성원 수
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
-    },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("memberCount")}</div>,
+    accessorKey: "endAt",
+    header: "종료일",
+    cell: ({ row }:{ row: Row<Project> }) => (
+      <div className="capitalize">{(row.getValue("endAt") as string).split('T')[0]}</div>
+    ),
   },
-  {
-    accessorKey: "startDate",
-    header: () => <div className="text-right">시작일</div>,
-    cell: ({ row }) => {
-      const startDate = row.getValue("startDate") as string;
-      // 날짜 형식으로 포맷
-      const formatted = new Intl.DateTimeFormat("ko-KR").format(new Date(startDate));
 
-      return <div className="text-right font-medium">{formatted}</div>;
-    },
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const project = row.original
+  // {
+  //   id: "actions",
+  //   enableHiding: false,
+  //   cell: ({ row }:{ row: Row<Project> }) => {
 
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>부가기능</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(project.projectId)}
-            >
-              프로젝트 이름 복사
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>프로젝트 현황 확인</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    },
-  },
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant="ghost" className="h-8 w-8 p-0">
+  //             <span className="sr-only">Open menu</span>
+  //             <MoreHorizontal className="h-4 w-4" />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align="end">
+  //           <DropdownMenuLabel>부가기능</DropdownMenuLabel>
+  //             <DropdownMenuItem>프로젝트 현황 확인</DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     )
+  //   },
+  // },
 ]
-
+// ProjectList: 특정 사용자의 프로젝트를 개괄적으로 보는 컴포넌트
 const ProjectList = () => {
-  
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  const handleRowClick = (projectId: string)=>{
-
-    navigate(`/project/${projectId}`);
-  }
-
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+  
+  // useState를 통한 상태변화 관리 들어가기
+  // 프로젝트의 목록
+  const [projects, setProjects] = useState<Project[]>([])
+  // 정렬 상태
+  const [sorting, setSorting] = useState<SortingState>([])
+  // 필터링 상태
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+    [])
+  // 열 표시 상태
   const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
-
+    useState<VisibilityState>({})
+  // 행 선택 상태
+  const [rowSelection, setRowSelection] = useState({})
+  // 테이블 상태
   const table = useReactTable({
     data: projects,
     columns,
@@ -185,16 +148,66 @@ const ProjectList = () => {
       rowSelection,
     },
   })
+  // useEffect를 활용한 사용자의 프로젝트 목록 보기.
+  useEffect(() => {
+    // 사용자의 프로젝트 목록 불러오기.
+    const fetchProjects = async()=>{
+      // 사용자의 프로젝트 목록 불러오기.
+      const response = await getProject();
+      // 프로젝트 데이터 정의
+      console.log("1",response.data)
+      const projectData = response.data.map((pjt: Project) => ({
+        projectId: pjt.projectId, //프로젝트 pk
+        prdId: pjt.prdId, // 프로젝트 코드
+        startAt: pjt.startAt, //프로젝트 시작일
+        endAt: pjt.endAt, //프로젝트 종료일
+        projectTitle: pjt.projectTitle, //프로젝트 이름
+        people: pjt.people, //프로젝트 구성원 수
+        progressRatio: pjt.progressRatio, //프로젝트 진행률
+        status: pjt.status, //프로젝트 상태
+      }))
+      setProjects(projectData);
+      // 프로젝트 목록 상태 변경
+      console.log("2",projectData)
+    };
+    fetchProjects();
+  }, [])
+  // 사용자의 프로젝트 목록에 새로운 프로젝트 추가하기. // 프로젝트 생성 모달 true. 
+  const handleAddProject = () => {
+    // 프로젝트 생성 모달 true.
+    setIsModalOpen(true);
+  };
+  // 프로젝트 생성 모달 닫기.
+  const handleCloseModal = () => {
+    // 프로젝트 생성 모달 false.
+    setIsModalOpen(false);
+  };
+
+  // 특정 프로젝트 행 클릭시, 특정 프로젝트에 진입할 수 있도록 하는 함수.
+  const handleRowClick = (row: Row<Project>) => {
+    const { prdId, projectId, projectTitle } = row.original;
+    console.log("Clicked project ID:", prdId);
+    if (prdId && projectTitle) {
+      navigate(`/project/${prdId}`, { state: { prdId, projectId, projectTitle } });
+    } else {
+      console.error("Missing prdId or projectTitle in the data");
+    }
+  };
 
   return (
     
-    <div className="w-full overflow-hidden px-2 max-h-[500px]">
+    <div className="w-full px-2 ">
+      {/* 프로젝트 생성 모달 */}
+      <ProjectAddModal isOpen={isModalOpen} onClose={handleCloseModal} />
+      {/* 프로젝트 추가 버튼 */}
+      <Button onClick={handleAddProject}>프로젝트 추가</Button>
       <div className="flex items-center py-2">
+        {/* 프로젝트 이름 검색 입력창 */}
         <Input
-          placeholder="프로젝트 이름을 입력해주세요."
-          value={(table.getColumn("projectId")?.getFilterValue() as string) ?? ""}
+          placeholder="프로젝트 이름을 입력해주요."
+          value={(table.getColumn("projectTitle")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("projectId")?.setFilterValue(event.target.value)
+            table.getColumn("projectTitle")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -203,9 +216,9 @@ const ProjectList = () => {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map((headerGroup: HeaderGroup<Project>) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map((header: Header<Project, unknown>) => {
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
@@ -220,16 +233,18 @@ const ProjectList = () => {
               </TableRow>
             ))}
           </TableHeader>
+          {/* 테이블 몸체 */}
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                
+              table.getRowModel().rows.map((row: Row<Project> ) => (
+                // 테이블 행
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={()=> handleRowClick(row.original.projectId)}
+                  onClick={() => handleRowClick(row)}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map((cell: Cell<Project, unknown>) => (
+                    // 테이블 셀
                     <TableCell 
                       key={cell.id}
                       >
@@ -240,15 +255,15 @@ const ProjectList = () => {
                     </TableCell>
                   ))}
                 </TableRow>
-                
+                // 테이블 행 끝
               ))
             ) : (
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-14 text-center"
                 >
-                  No results.
+                  프로젝트가 없습니다.
                 </TableCell>
               </TableRow>
             )}

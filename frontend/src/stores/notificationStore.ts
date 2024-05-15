@@ -1,23 +1,14 @@
 import create from 'zustand';
 
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  receivedAt: Date;
-}
-
+// 알림 수신 여부 타입 정의
 interface NotificationState {
-  notifications: Notification[];
-  addNotification: (notification: Notification) => void;
-  clearNotifications: () => void;
+  hasNewNotification: boolean;
+  setHasNewNotification: (hasNew: boolean) => void;
 }
 
-export const useNotificationStore = create<NotificationState>((set) => ({
-  notifications: [],
-  addNotification: (notification) =>
-    set((state) => ({
-      notifications: [...state.notifications, notification],
-    })),
-  clearNotifications: () => set({ notifications: [] }),
+const useNotificationStore = create<NotificationState>((set) => ({
+  hasNewNotification: false,
+  setHasNewNotification: (hasNew) => set({ hasNewNotification: hasNew }),
 }));
+
+export default useNotificationStore;

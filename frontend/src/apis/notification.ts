@@ -1,49 +1,58 @@
 import { privateApi } from '@/utils/http-commons.ts';
-import { getToken, getMessaging, onMessage } from 'firebase/messaging';
-import { app } from '@/firebaseConfig.ts';
-
-export const messaging = getMessaging(app);
+import { getToken, messaging, onMessage } from '@/firebaseConfig';
+import useNotificationStore from '@/stores/notificationStore';
 
 // FCM 토큰 전송 함수
 export const sendFCMToken = async (token: string) => {
-  console.log('토큰 전송 api');
-  const { data } = await privateApi.post(`notification/token`, { token });
-  return data;
+  await privateApi.post(`notification/token`, { token });
 };
 
 // FCM 토큰 요청 함수
 export const getFCMToken = async () => {
   try {
+    // 알림 권한 요청
     const permission = await Notification.requestPermission();
 
+    // 알림 권한이 허용된 경우
     if (permission === 'granted') {
+      // FCM 토큰 요청
       const currentToken = await getToken(messaging, {
         vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
       });
+      // FCM 토큰을 받은 경우
       if (currentToken) {
-        console.log('Token:', currentToken);
-        sendFCMToken(currentToken); // (토큰을 서버로 전송하는 로직)
+        // 서버로 토큰 전송
+        sendFCMToken(currentToken);
       } else {
-        alert('토큰 등록이 불가능 합니다. 생성하려면 권한을 허용해주세요');
+        alert('알림 권한을 허용해주세요!');
       }
-    } else if (permission === 'denied') {
-      alert(
-        'web push 권한이 차단되었습니다. 알림을 사용하시려면 권한을 허용해주세요',
-      );
     }
   } catch (error) {
-    console.error('푸시 토큰 가져오는 중에 에러 발생', error);
+    console.log('토큰 요청 중 에러 발생 : ', error);
   }
 };
 
-onMessage(messaging, (payload) => {
-  console.log('알림 도착 ', payload);
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-  };
+// FCM 메시지 수신 리스너
+export const setupFCMListener = () => {
+  const subscribe = onMessage(messaging, (payload) => {
+    console.log('알림 수신 데이터 : ', payload);
+    if (payload.notification) {
+      const notificationTitle = payload.notification.title || '알림 제목';
+      const notificationOptions = {
+        body: payload.notification.body || '알림 내용',
+      };
 
-  if (Notification.permission === 'granted') {
-    new Notification(notificationTitle, notificationOptions);
-  }
-});
+      // 브라우저 알림 권한이 허용되었으면
+      if (Notification.permission === 'granted') {
+        new Notification(notificationTitle, notificationOptions);
+      }
+
+      useNotificationStore.setState({ hasNewNotification: true });
+    } else {
+      // payload.notification이 없는 경우
+      console.log('알림없음. 데이터 메세지 수신 :', payload.data);
+    }
+
+    return subscribe;
+  });
+};

@@ -1,5 +1,7 @@
 import { initializeApp } from 'firebase/app';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 
+// Firebase 콘솔에서 주는 설정
 const firebaseConfig = {
   apiKey: 'AIzaSyA-jlbMvTl34uffdBao_ToX8cxDwqSiA4k',
   authDomain: 'pubble-push.firebaseapp.com',
@@ -10,4 +12,7 @@ const firebaseConfig = {
   measurementId: 'G-RDDYCM82CV',
 };
 
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+export { messaging, getToken, onMessage };

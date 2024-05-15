@@ -1,17 +1,18 @@
-// 1. react 관련
+// 1. react
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // 2. library
 // 3. api
-import { getFCMToken } from '@/apis/notification.ts';
+import { getFCMToken } from '@/apis/notification';
 // 4. store
-import useUserStore from '@/stores/userStore.ts';
+import useUserStore from '@/stores/userStore';
 // 5. component
 import User from '@/routers/User';
 import Project from '@/routers/Project';
+import Admin from '@/routers/Admin';
 import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
-// 6. image 등 assets
+// 6. assets
 
 function App() {
   const {
@@ -34,6 +35,7 @@ function App() {
       setPosition(position);
       setProfileColor(profileColor);
     }
+
     // FCM 토큰 요청
     getFCMToken();
   }, []);
@@ -66,6 +68,8 @@ function App() {
           <Route path='/main' element={<MainPage />} />
           {/* 프로젝트 페이지들*/}
           <Route path='/project/*' element={<Project />} />
+          {/* 관리자 페이지 */}
+          <Route path='/admin/*' element={<Admin />} />
         </Route>
       </Routes>
     </Router>
