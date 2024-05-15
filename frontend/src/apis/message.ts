@@ -16,3 +16,15 @@ export const updateMessageStatus = async (
   const { data } = await privateApi.put(`/messages/${messageId}`, { status });
   return data;
 };
+
+// 쪽지 보내기 함수
+export const sendMessage = async (
+  employeeId: string,
+  title: string,
+  content: string,
+) => {
+  await privateApi.post(`/messages/${employeeId}`, {
+    title: title,
+    content: content,
+  });
+};
