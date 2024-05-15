@@ -77,6 +77,8 @@ public class JWTUtil {
         String position = user.getPosition();
 
         List<String> reponseDto = new ArrayList<>();
+        List<String> editableProjects = new ArrayList<>();
+        List<String> uneditableProjects = new ArrayList<>();
 
 
         List<ProjectListDto> projectListDtos = projectService.getProjectList(user.getUserId());
@@ -93,6 +95,8 @@ public class JWTUtil {
                 .claim("department", department)
                 .claim("position", position)
                 .claim("allowedDocumentNames", reponseDto)
+                .claim("editable", editableProjects)
+                .claim("uneditable", uneditableProjects)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

@@ -12,6 +12,7 @@ public interface ProjectAssignmentRepository extends JpaRepository<ProjectAssign
     List<ProjectAssignment> findAllByUser_userId(Integer userId);
     List<ProjectAssignment> findAllByProject_projectId(Integer projectId);
 
+
     @Query("SELECT pa.project FROM ProjectAssignment pa WHERE pa.user.userId = :userId")
     List<Project> findAllProjectsByUserId(Integer userId);
 
