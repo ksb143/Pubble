@@ -3,7 +3,7 @@
 // 2. library
 import { css } from '@emotion/react';
 // 3. api
-import { getTextColor } from '@/utils/profile-textcolor';
+import { getTextColor } from '@/utils/profile';
 // 4. store
 // 5. component
 // 6. assets

@@ -2,9 +2,9 @@
 import { useState, useEffect } from 'react';
 // 2. library
 // 3. api
-import { sendMessage } from '@/apis/message.ts';
+import { sendMessage } from '@/apis/message';
 import { getUser } from '@/apis/user';
-import { autocompleteUser } from '@/utils/search-autocomplete';
+import { autocompleteUser } from '@/utils/search';
 // 4. store
 // 5. component
 // 6. assets
