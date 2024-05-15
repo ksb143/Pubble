@@ -1,5 +1,5 @@
 // 색상의 밝기 계산 함수
-const getLuminance = (colorHex: string): number => {
+export const getLuminance = (colorHex: string): number => {
   const r = parseInt(colorHex.slice(1, 3), 16);
   const g = parseInt(colorHex.slice(3, 5), 16);
   const b = parseInt(colorHex.slice(5, 7), 16);
