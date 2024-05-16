@@ -31,7 +31,6 @@ const RichEditorPage = () => {
   const {
     projectId,
     projectName,
-    projectCode,
     requirementId,
     requirementCode,
     requirementName,
@@ -76,7 +75,7 @@ const RichEditorPage = () => {
   const ydoc = new Y.Doc();
   const websocketProvider = new TiptapCollabProvider({
     appId: VITE_TIPTAP_APP_ID,
-    name: `${projectId}/${projectCode}/${requirementId}/${requirementCode}`,
+    name: `test-page`,
     document: ydoc,
     token: tiptapToken,
     onAuthenticationFailed(reason) {
