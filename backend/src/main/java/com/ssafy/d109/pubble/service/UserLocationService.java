@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class UserLocationService {
 
-    private final ConcurrentHashMap<Integer, List<UserLocationInfo>> projectUserLocations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, UserLocationInfo>> projectUserLocations = new ConcurrentHashMap<>();
 
     public UserLocationInfo enter(User user, Integer projectId, UserLocationRequestDto dto) {
         UserLocationInfo userLocationInfo = UserLocationInfo.builder()
@@ -24,19 +24,18 @@ public class UserLocationService {
                 .locationUrl(dto.getLocationUrl())
                 .build();
 
-        projectUserLocations.computeIfAbsent(projectId, k -> new ArrayList<>()).add(userLocationInfo);
+        projectUserLocations.computeIfAbsent(projectId, k -> new ConcurrentHashMap<>()).put(user.getEmployeeId(), userLocationInfo);
         return userLocationInfo;
     }
 
     public UserLocationInfo move(User user, Integer projectId, UserLocationRequestDto dto) {
-        List<UserLocationInfo> userLocations = projectUserLocations.get(projectId);
+        ConcurrentHashMap<String, UserLocationInfo> userLocations = projectUserLocations.get(projectId);
         if (userLocations != null) {
-            userLocations.stream()
-                    .filter(uli -> uli.getUserInfoDto().getEmployeeId().equals(user.getEmployeeId()))
-                    .forEach(uli -> {
-                        uli.setLocationName(dto.getLocationName());
-                        uli.setLocationUrl(dto.getLocationUrl());
-                    });
+            UserLocationInfo userLocationInfo = userLocations.get(user.getEmployeeId());
+            if (userLocationInfo != null) {
+                userLocationInfo.setLocationName(dto.getLocationName());
+                userLocationInfo.setLocationUrl(dto.getLocationUrl());
+            }
         }
 
         return UserLocationInfo.builder()
@@ -47,14 +46,20 @@ public class UserLocationService {
     }
 
     public String leave(User user, Integer projectId) {
-        List<UserLocationInfo> userLocations = projectUserLocations.get(projectId);
+        ConcurrentHashMap<String, UserLocationInfo> userLocations = projectUserLocations.get(projectId);
         if (userLocations != null) {
-            userLocations.removeIf(uli -> uli.getUserInfoDto().getEmployeeId().equals(user.getEmployeeId()));
+            userLocations.remove(user.getEmployeeId());
         }
         return user.getEmployeeId();
     }
 
     public List<UserLocationInfo> getCurrentUserLocations(Integer projectId) {
-        return projectUserLocations.get(projectId);
+        ConcurrentHashMap<String, UserLocationInfo> userLocations = projectUserLocations.get(projectId);
+        List<UserLocationInfo> userLocationInfos = new ArrayList<>();
+        if (userLocations == null) {
+            return userLocationInfos;
+        }
+        userLocationInfos.addAll(userLocations.values());
+        return userLocationInfos;
     }
 }
