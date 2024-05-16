@@ -38,63 +38,50 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
+// import { Checkbox } from '@/components/ui/checkbox';
 
-// Requirement type 정의
-export type Requirement = {
-  // 프로젝트에 대한 내용
-  projectId: number | null; // 프로젝트의 아이디
-  projectTitle: string | null; // 프로젝트의 제목
-  startAt: string | null; // 프로젝트의 시작일
-  endAt: string | null; // 프로젝트의 종료일
-  status: string | null; // 프로젝트의 상태
-  code: string | null; // 프로젝트의 코드
-  // 프로젝트 참여자 정보
-  people: Array<{
-    name: string | null; // 프로젝트의 담당자의 이름 ex) "최지원"
-    employeeId: string | null; // 프로젝트의 담당자의 사번 ex) "SSAFY1001"
-    department: string | null; // 프로젝트의 담당자의 부서 ex) "D109"
-    position: string | null; // 프로젝트의 담당자의 직위 ex) "총무"
-    role: string | null; // 프로젝트의 담당자의 역할 ex) "ADMIN"
-    isApprovable: 'y' | 'n' | null; // 프로젝트의 담당자의 승인 가능 여부 ex) "n"
-    profileColor: string | null; // 프로젝트의 담당자의 프로필 색상 ex) "#FF9933"
-  }>;
-  // 요구사항들의 개요에 관한 내용
-  requirementSummaryDtos: Array<{
-    requirementId: number | null; // 요구사항의 아이디
-    orderIndex: number | null; // 요구사항의 순서
-    version: string | null; // 요구사항의 버전
-    isLock: 'u' | 'l' | null; // 요구사항의 잠금 여부
-    approval: 'u' | 'h' | 'a' | null; // 요구사항의 승인 여부
-    approvalComment: string | null; // 요구사항의 승인 코멘트
-    detail: Array<{
-      requirementDetailId: number | null; // 요구사항의 상세아이디
-      content: string | null; // 요구사항의 상세설명
-      status: 'u' | 'd' | null; // 요구사항의 상세설명의 상태
-    }>;
-    // 요구사항 담당자 관련
-    manager: Array<{
-      name: string | null; // 요구사항의 담당자의 이름 ex) "최지원"
-      employeeId: string | null; // 요구사항의 담당자의 사번 ex) "SSAFY1001"
-      department: string | null; // 요구사항의 담당자의 부서 ex) "D109"
-      position: string | null; // 요구사항의 담당자의 직위 ex) "총무"
-      role: string | null; // 요구사항의 담당자의 역할 ex) "ADMIN"
-      isApprovable: 'y' | 'n' | null; // 요구사항의 담당자의 승인 가능 여부 ex) "n"
-      profileColor: string | null; // 요구사항의 담당자의 프로필 색상 ex) "#FF9933"
-    }>;
-    targetUse: string | null; // 요구사항의 목적
-    createdAt: string | null; // 요구사항의 생성일
-    // 요구사항 작성자 관련
-    author: Array<{
-      name: string | null; // 요구사항의 작성자의 이름 ex) "최지원"
-      employeeId: string | null; // 요구사항의 작성자의 사번 ex) "SSAFY1001"
-      department: string | null; // 요구사항의 작성자의 부서 ex) "D109"
-      position: string | null; // 요구사항의 작성자의 직위 ex) "총무"
-      role: string | null; // 요구사항의 작성자의 역할 ex) "ADMIN"
-      isApprovable: 'y' | 'n' | null; // 요구사항의 작성자의 승인 가능 여부 ex) "n"
-      profileColor: string | null; // 요구사항의 작성자의 프로필 색상 ex) "#FF9933"
-    }>;
-  }>;
+// Person 타입 정의
+type Person = {
+  name: string;
+  employeeId: string;
+  department: string;
+  position: string;
+  role: string;
+  isApprovable: 'y' | 'n';
+  profileColor: string;
+};
+
+type Detail = {
+  requirementDetailId: number;
+  content: string;
+  status: 'u' | 'd';
+};
+
+type Summary = {
+  requirementId: number;
+  orderIndex: number;
+  version: string;
+  isLock: 'u' | 'l';
+  approval: 'u' | 'h' | 'a';
+  approvalComment: string | null;
+  detail: Detail[];
+  manager: Person;
+  targetUse: string;
+  createdAt: string;
+  author: Person;
+  requirementName: string;
+  code: string;
+};
+
+type Requirement = {
+  projectId: number;
+  projectTitle: string;
+  startAt: string;
+  endAt: string;
+  status: string;
+  code: string;
+  people: Person[];
+  requirementSummaryDtos: Summary[];
 };
 
 // RequirementList component의 props 정의
@@ -105,113 +92,83 @@ interface RequirementListProps {
 }
 
 // RequirementList component의 columns 정의
-export const columns: ColumnDef<Requirement>[] = [
-  {
-    // 선택된 행의 체크박스
-    id: 'select',
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && 'indeterminate')
-        }
-        onCheckedChange={(value: boolean) =>
-          table.toggleAllPageRowsSelected(!!value)
-        }
-        aria-label='Select all'
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
-        aria-label='Select row'
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  // 승인여부 컬럼
+export const columns: ColumnDef<Summary>[] = [
   {
     accessorKey: 'approval',
     header: '승인여부',
     cell: (info) => info.getValue(),
   },
-  // 잠금여부 컬럼
   {
     accessorKey: 'isLock',
     header: '잠금여부',
     cell: (info) => info.getValue(),
   },
-  // 항목ID 컬럼
   {
-    accessorKey: 'requirementId',
-    header: '항목ID',
+    accessorKey: 'code',
+    header: '요구사항 코드',
     cell: (info) => info.getValue(),
   },
-  // 요구사항이름 컬럼
   {
     accessorKey: 'requirementName',
-    header: '요구사항이름',
+    header: '요구사항 이름',
     cell: (info) => info.getValue(),
   },
-  // 상세설명 컬럼
   {
     accessorKey: 'detail',
     header: '상세설명',
-    cell: (info) => info.getValue(),
+    cell: (info) => {
+      const details = info.getValue() as Detail[];
+      return details ? details.map((d) => d.content).join(', ') : '';
+    },
   },
-  // 담당자 컬럼
   {
     accessorKey: 'manager.name',
     header: '담당자',
     cell: (info) => info.getValue(),
   },
-  // 작성자 컬럼
   {
-    accessorKey: 'author',
+    accessorKey: 'author.name',
     header: '작성자',
     cell: (info) => info.getValue(),
   },
-  // 현재버전 컬럼
   {
     accessorKey: 'version',
-    header: '현재버전',
+    header: '현재 버전',
     cell: (info) => info.getValue(),
   },
-  // 액션 컬럼
-  // {
-  //   id: 'actions',
-  //   cell: ({ row }) => {
-  //     return (
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button variant='ghost' className='h-8 w-8 p-0'>
-  //             <span className='sr-only'>Open menu</span>
-  //             <FiMoreHorizontal className='h-4 w-4' />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align='end'>
-  //           <DropdownMenuLabel></DropdownMenuLabel>
-  //           <DropdownMenuItem
-  //             onClick={
-  //               () => console.log(`Delete 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
-  //             }>
-  //             삭제하기
-  //           </DropdownMenuItem>
-  //           <DropdownMenuItem
-  //             onClick={
-  //               () =>
-  //                 console.log(`이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
-  //             }>
-  //             버전확인
-  //           </DropdownMenuItem>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     );
-  //   },
-  // },
 ];
+// 액션 컬럼
+// {
+//   id: 'actions',
+//   cell: ({ row }) => {
+//     return (
+//       <DropdownMenu>
+//         <DropdownMenuTrigger asChild>
+//           <Button variant='ghost' className='h-8 w-8 p-0'>
+//             <span className='sr-only'>Open menu</span>
+//             <FiMoreHorizontal className='h-4 w-4' />
+//           </Button>
+//         </DropdownMenuTrigger>
+//         <DropdownMenuContent align='end'>
+//           <DropdownMenuLabel></DropdownMenuLabel>
+//           <DropdownMenuItem
+//             onClick={
+//               () => console.log(`Delete 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
+//             }>
+//             삭제하기
+//           </DropdownMenuItem>
+//           <DropdownMenuItem
+//             onClick={
+//               () =>
+//                 console.log(`이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
+//             }>
+//             버전확인
+//           </DropdownMenuItem>
+//         </DropdownMenuContent>
+//       </DropdownMenu>
+//     );
+//   },
+// },
 
 const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
   const { setPageType } = usePageInfoStore();
@@ -229,7 +186,7 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
   const [rowSelection, setRowSelection] = useState({});
   // table 상태
   const table = useReactTable({
-    data: requirements,
+    data: requirements.flatMap((r) => r.requirementSummaryDtos),
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -248,72 +205,96 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
   });
   // useEffect를 활용한... 사용자의 요구사항 목록 화면 UI 갱신
   useEffect(() => {
-    // fetchProjects 함수 정의
     const fetchRequirements = async () => {
-      // 요구사항 목록 데이터 추출
       try {
         const response = await getLatestRequirementVersion(pId);
-        // 만약 데이터가 있다면
-        if (response.data && response.data.length > 0) {
-          // 요구사항 목록 데이터 추출
-          const requirementData = response.data.map((req: Requirement) => ({
-            projectId: req.projectId,
-            projectTitle: req.projectTitle,
-            startAt: req.startAt,
-            endAt: req.endAt,
-            status: req.status,
-            code: req.code,
-            people: req.people,
-            requirementSummaryDtos: req.requirementSummaryDtos.map(
-              (summary) => ({
+        console.log(response);
+
+        if (response.data) {
+          const requirementData: Requirement = {
+            projectId: response.data.projectId,
+            projectTitle: response.data.projectTitle,
+            startAt: response.data.startAt,
+            endAt: response.data.endAt,
+            status: response.data.status,
+            code: response.data.code,
+            people: response.data.people.map((person: any) => ({
+              name: person.name,
+              employeeId: person.employeeId,
+              department: person.department,
+              position: person.position,
+              role: person.role,
+              isApprovable: person.isApprovable,
+              profileColor: person.profileColor,
+            })),
+            requirementSummaryDtos: response.data.requirementSummaryDtos.map(
+              (summary: any) => ({
                 requirementId: summary.requirementId,
                 orderIndex: summary.orderIndex,
                 version: summary.version,
                 isLock: summary.isLock,
                 approval: summary.approval,
                 approvalComment: summary.approvalComment,
-                detail: summary.detail,
-                manager: summary.manager,
+                detail: summary.details.map((detail: any) => ({
+                  requirementDetailId: detail.requirementDetailId,
+                  content: detail.content,
+                  status: detail.status,
+                })),
+                manager: {
+                  name: summary.manager.name,
+                  employeeId: summary.manager.employeeId,
+                  department: summary.manager.department,
+                  position: summary.manager.position,
+                  role: summary.manager.role,
+                  isApprovable: summary.manager.isApprovable,
+                  profileColor: summary.manager.profileColor,
+                },
                 targetUse: summary.targetUse,
                 createdAt: summary.createdAt,
-                author: summary.author,
+                author: {
+                  name: summary.author.name,
+                  employeeId: summary.author.employeeId,
+                  department: summary.author.department,
+                  position: summary.author.position,
+                  role: summary.author.role,
+                  isApprovable: summary.author.isApprovable,
+                  profileColor: summary.author.profileColor,
+                },
+                requirementName: summary.requirementName,
+                code: summary.code,
               }),
             ),
-          }));
-          // 요구사항 목록 데이터 업데이트
-          console.log('requirementData1: ', requirementData);
-          setRequirements(requirementData);
-          console.log('requirementData2: ', requirementData);
+          };
+
+          setRequirements([requirementData]);
         } else {
-          // 데이터가 없는 경우, 빈 배열로 요구사항 목록 데이터 설정
           setRequirements([]);
         }
       } catch (error) {
         console.error('Failed to fetch requirements:', error);
-        // 에러 발생 시, 빈 배열로 요구사항 목록 데이터 설정
         setRequirements([]);
       }
     };
     fetchRequirements();
   }, [pId, pCode]);
 
-  console.log('requirements: ', requirements);
+  useEffect(() => {
+    if (requirements.length > 0) {
+      console.log('프로젝트 시작기간: ', requirements[0]?.startAt);
+      console.log('프로젝트 종료기간: ', requirements[0]?.endAt);
+    }
+  }, [requirements]);
 
-  const handleRowClick = (requirement: Requirement) => {
-    const { code } = requirement;
+  const handleRowClick = (summary: Summary) => {
+    const { code } = summary;
     const rCode = code;
-    const requirementId = requirement.requirementSummaryDtos[0]?.requirementId;
-    // 요구사항코드가 존재 하지 않는 경우
-    if (!requirementId) {
-      // 콘솔에 에러 메시지 반환
+    const rId = summary.requirementId;
+    if (!rId) {
       console.error('Invalid requirement data');
       return;
     }
-    // 요구사항 코드가 존재하는 경우
-    // 요구사항 상세 정보 페이지로 이동
-    // 기존에는 state로 정보를 다음 페이지에 넘겼는데, 이제 모두 store 사용하므로 state 파라미터는 사용하지 않음
     setPageType('requirement', {
-      requirementId: requirementId,
+      requirementId: rId,
     });
     navigate(`/project/${pCode}/requirement/${rCode}`);
   };
@@ -321,7 +302,10 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
   return (
     <div className='p-8 text-center'>
       <p className='mb-4 text-2xl font-bold'>{pName || '예시 프로젝트 제목'}</p>
-      <p className='mb-8 text-lg'>프로젝트 기간</p>
+      <p className='mb-8 text-lg'>
+        {requirements.length > 0 &&
+          `${new Date(requirements[0].startAt).toLocaleDateString('ko-KR')} ~ ${new Date(requirements[0].endAt).toLocaleDateString('ko-KR')}`}
+      </p>
       <div className='rounded-md border'>
         <div className='flex items-center px-5 py-5'>
           <Input
@@ -389,12 +373,10 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  role='button'
+                  onClick={() => handleRowClick(row.original)}
                   className='cursor-pointer hover:bg-gray-100'>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      onClick={() => handleRowClick(row.original)}>
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
