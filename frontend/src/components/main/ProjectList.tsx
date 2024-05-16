@@ -16,11 +16,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
-// usePageInfoStore를 사용하기 위해 새롭게 정의
-const usePageStore = usePageInfoStore;
+
 // Project type 정의
 export type Project = {
-  projectId: string // 프로젝트 pk
+  projectId: number // 프로젝트 pk
   prdId: string // 프로젝트 code
   startAt: string // 프로젝트 시작일
   endAt: string // 프로젝트 종료일
@@ -118,6 +117,7 @@ export const columns: ColumnDef<Project>[] = [
 ]
 // ProjectList: 특정 사용자의 프로젝트를 개괄적으로 보는 컴포넌트
 const ProjectList = () => {
+  const { setPageType } = usePageInfoStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
   
@@ -171,12 +171,7 @@ const ProjectList = () => {
         }));
         // 현재 컴포넌트에서 사용하는 '프로젝트 목록 배열'(=Project[])의 상태 업데이트 시행
         setProjects(projectData);
-        // 정보를 받아 왔으므로, store에 프로젝트 정보 업데이트
-        usePageStore.setState({
-          projectId: projectData[0].projectId,
-          projectCode: projectData[0].prdId,
-          projectName: projectData[0].projectTitle,
-        });
+
       // 데이터가 없는 경우
       } else {
         // 빈 배열로 프로젝트 목록 데이터 설정
@@ -217,6 +212,11 @@ const ProjectList = () => {
     if (pCode && pName) {
       // 프로젝트 상세 정보 페이지로 이동
       // ps1.기존에는 state로 정보를 다음 페이지에 넘겼는데, 이제 모두 store 사용하므로 state 파라미터는 사용하지 않음
+      setPageType('project', {
+        projectId: pId,
+        projectCode: pCode,
+        projectName: pName,
+      });
       navigate(`/project/${pCode}`);
     } else {
       console.error("Missing prdId or projectTitle in the data");

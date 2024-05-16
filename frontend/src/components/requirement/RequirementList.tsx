@@ -15,8 +15,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 
-// usePageInfoStore를 사용하기 위해 새롭게 정의
-const usePageStore = usePageInfoStore;
 // Requirement type 정의
 export type Requirement = {
   description: string; // 요구사항의 설명
@@ -157,6 +155,7 @@ export const columns: ColumnDef<Requirement>[] = [
 
 
 const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
+  const { setPageType } = usePageInfoStore();
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
   // 요구사항의 목록
@@ -193,7 +192,7 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
     // fetchProjects 함수 정의
     const fetchRequirements = async () => {
       // 요구사항 목록 데이터 추출
-      try {const response = await getRequirement(pId, pCode);
+      try { const response = await getRequirement(pId, pCode) ;
         // 만약 데이터가 있다면
         if (response.data && response.data.length > 0) {
           // 요구사항 목록 데이터 추출
@@ -208,13 +207,8 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
             requirementName: req.requirementName,
             manager: req.manager,
           }));
-          // 요구사항 목록 데이터 설정
+          // 요구사항 목록 데이터 업데이트
           setRequirements(requirementData);
-          usePageStore.setState({
-            requirementId: requirementData[0].requirementId,
-            requirementCode: requirementData[0].code,
-            requirementName: requirementData[0].requirementName,
-          });
         // 데이터가 없는 경우
         } else {
           // 빈 배열로 요구사항 목록 데이터 설정
@@ -242,8 +236,10 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
     // 요구사항 코드가 존재하는 경우
     // 요구사항 상세 정보 페이지로 이동
     // 기존에는 state로 정보를 다음 페이지에 넘겼는데, 이제 모두 store 사용하므로 state 파라미터는 사용하지 않음
-    navigate(`/project/${pCode}/requirement/${rCode}`, 
-    {state: {requirementId}});
+    setPageType('requirement', {
+      requirementId: requirementId,
+    });
+    navigate(`/project/${pCode}/requirement/${rCode}`);
   };
 
   return (
