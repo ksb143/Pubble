@@ -67,28 +67,6 @@ public class ProjectRequirementController {
 //    }
 
 
-    /* getRequirementSpecific : 특정 버전의 요구사항을 반환해주는 메서드
-     * @params : Integer projectId 가 포함된 request DTO
-     * @return : 요구사항 NB-001 의 특정 버전 정보
-     * */
-    @Operation(summary = "특정 버전의 요구사항을 반환")
-    @PostMapping("/{code}/{version}")
-    public ResponseEntity<ResponseDto> getRequirementSpecific(@RequestBody RequirementHistoryDto requirementHistoryDto,
-                                                              @PathVariable("code") String requirementCode,
-                                                              @PathVariable("version") String requirementVersion) {
-        try {
-            Integer projectId = requirementHistoryDto.getProjectId();
-            RequirementSummaryDto requirementSummaryDto = requirementService.getRequirementSpecific(projectId, requirementCode, requirementVersion);
-
-            response = new ResponseDto(true, "요구사항 항목 조회", requirementSummaryDto);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
 
 
 
