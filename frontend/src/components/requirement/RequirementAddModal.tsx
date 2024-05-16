@@ -17,27 +17,22 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-interface ProjectAddModalProps {
+interface RequirementAddModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
+const RequirementAddModal = ({ isOpen, onClose }: RequirementAddModalProps) => {
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
   const [participant, setParticipant] = useState('');
   const [startAt, setStartAt] = useState('');
   const [endAt, setEndAt] = useState('');
 
-  const handleAddProject = async () => {
+  const handleAddProject = () => {
     const participantsArray = participant.split(',').map((part) => part.trim());
     console.log('api 호출시작');
-    try {
-      await addProject(title, code, participantsArray, startAt, endAt);
-      console.log('api 호출 성공');
-      onClose(); // 프로젝트 생성 후 모달 닫기
-    } catch (error) {
-      console.error('api 호출 실패', error);
-    }
+    addProject(title, code, participantsArray, startAt, endAt);
+    console.log('api 호출종료');
   };
 
   return (
@@ -45,7 +40,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>프로젝트 생성</DialogTitle>
+          <DialogTitle>요구사항 생성</DialogTitle>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
           <div className='grid grid-cols-4 items-center gap-4'>
@@ -54,7 +49,6 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             </Label>
             <Input
               id='projectTitle'
-              placeholder='ex) 올리브올드 홈페이지'
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               className='col-span-3'
@@ -62,11 +56,10 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
           </div>
           <div className='grid grid-cols-4 items-center gap-4'>
             <Label htmlFor='projectCode' className='text-right'>
-              CODE
+              Code
             </Label>
             <Input
               id='projectCode'
-              placeholder='ex) OliveOld'
               value={code}
               onChange={(e) => setCode(e.target.value)}
               className='col-span-3'
@@ -78,7 +71,6 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             </Label>
             <Input
               id='projectParticipant'
-              placeholder='ex) SSAFY1001, SSAFY1002'
               value={participant}
               onChange={(e) => setParticipant(e.target.value)}
               className='col-span-3'
@@ -90,7 +82,6 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             </Label>
             <Input
               id='startAt'
-              type='date'
               value={startAt}
               onChange={(e) => setStartAt(e.target.value)}
               className='col-span-3'
@@ -102,7 +93,6 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             </Label>
             <Input
               id='endAt'
-              type='date'
               value={endAt}
               onChange={(e) => setEndAt(e.target.value)}
               className='col-span-3'
@@ -118,4 +108,4 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
   );
 };
 
-export default ProjectAddModal;
+export default RequirementAddModal;

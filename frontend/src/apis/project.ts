@@ -20,8 +20,8 @@ export const addProject = async (
 ) => {
   const { data } = await privateApi.post('/projects', {
     projectTitle: pjtTitle,
-    startAt: pjtStartDate,
-    endAt: pjtEndDate,
+    startAt: pjtStartDate + 'T00:00:00',
+    endAt: pjtEndDate + 'T23:59:59',
     code: pjtCode,
     participantsEID: pjtParticipants,
     status: 'before start',
