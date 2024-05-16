@@ -212,11 +212,20 @@ public class RequirementService {
             Notification notification = notificationRepository.findNotificationByUser(user).orElseThrow(NotificationNotFoundException::new);
 
             if (notification.getToken() != null) {
+                NotificationRequestDto dto = NotificationRequestDto.builder()
+                        .title("새로운 요구사항 추가")
+                        .message("프로젝트 [" + requirement.getProject().getProjectTitle() + "]에 새 요구사항이 추가되었습니다.")
+                        .type("NEW_REQUIREMENT")
+                        .build();
                 try {
-                    notificationService.sendNotification(NotificationRequestDto.builder()
-                            .title("새로운 요구사항 추가")
-                            .message("프로젝트 [" + requirement.getProject().getProjectTitle() + "]에 새 요구사항이 추가되었습니다.")
-                            .build(), user.getEmployeeId());
+                    notificationService.sendNotification(dto, user.getEmployeeId());
+                    notificationService.saveNotificationMessage(dto.getMessage(),
+                            NotificationType.NEW_REQUIREMENT,
+                            null, user.getUserId(),
+                            assignment.getProject(),
+                            requirement,
+                            null
+                            );
                 } catch (Exception e) {
                     log.error("Notification sending failed for user " + user.getName());
                     throw new NotificationSendingFailedException();

@@ -38,6 +38,16 @@ public class NotificationMessage {
 
     @Column(name = "senderId")
     private Integer senderId;
+    @ManyToOne
+    @JoinColumn(name = "projectId")
+    private Project project;
 
+    @ManyToOne
+    @JoinColumn(name = "requirementId")
+    private Requirement requirement;
+
+    @ManyToOne
+    @JoinColumn(name = "userThreadId")
+    private UserThread userThread;
 
 }

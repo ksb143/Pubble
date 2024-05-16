@@ -14,6 +14,7 @@ public class NotificationRequestDto {
     private String title;
     private String message;
     private String token;
+    private String type;
 
 
 }

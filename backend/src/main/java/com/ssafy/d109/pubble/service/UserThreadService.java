@@ -6,11 +6,13 @@ import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
 import com.ssafy.d109.pubble.entity.*;
+import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadAlreadyLockedException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadNotFoundException;
 import com.ssafy.d109.pubble.repository.CommentRepository;
 import com.ssafy.d109.pubble.repository.RequirementDetailRepository;
+import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.repository.UserThreadRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.transaction.Transactional;
@@ -31,14 +33,16 @@ public class UserThreadService {
     private final NotificationService notificationService;
 
     private final RequirementDetailRepository detailRepository;
+    private final UserRepository userRepository;
 
 
-    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil,   RequirementDetailRepository detailRepository, NotificationService notificationService) {
+    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil, RequirementDetailRepository detailRepository, NotificationService notificationService, UserRepository userRepository) {
         this.userThreadRepository = userThreadRepository;
         this.commentRepository = commentRepository;
         this.commonUtil = commonUtil;
         this.detailRepository = detailRepository;
         this.notificationService = notificationService;
+        this.userRepository = userRepository;
     }
 
 
@@ -123,23 +127,34 @@ public class UserThreadService {
 
         commentRepository.save(comment);
 
-        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getReceiverInfo());
+        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getReceiverInfo(), user, comment);
         return convertCommentToDto(comment);
     }
 
 
-    private void sendNotificationForMention(String content, NotificationReceiverRequestDto receiverInfo) {
+    private void sendNotificationForMention(String content, NotificationReceiverRequestDto receiverInfo, User sender, Comment comment) {
 
         if (!receiverInfo.getIsMentioned()) {
             return;
         }
 
+        String employeeId = receiverInfo.getReceiverId();
+        User receiver = userRepository.findByEmployeeId(employeeId).orElseThrow(UserNotFoundException::new);
+
         NotificationRequestDto notificationDto = NotificationRequestDto.builder()
                 .title("멘션 알림")
                 .message(content)
+                .type("MENTION")
                 .build();
         notificationService.sendNotification(notificationDto, receiverInfo.getReceiverId());
-
+        notificationService.saveNotificationMessage(content,
+                NotificationType.MENTION,
+                receiver.getUserId(),
+                sender.getUserId(),
+                null,
+                null,
+                comment.getUserThread()
+                );
 
     }
 }

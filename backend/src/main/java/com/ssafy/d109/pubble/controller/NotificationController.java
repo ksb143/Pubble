@@ -6,6 +6,8 @@ import com.ssafy.d109.pubble.entity.Notification;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NotificationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,10 +38,16 @@ public class NotificationController {
         notificationService.deleteNotification(notificationId);
     }
 
-    @PostMapping("/check")
-    public ResponseEntity<NotificationMessageResponseDto> check() {
-        // 리스트를 줘야 하나? 모르겠당....
-        return null;
+    @GetMapping("/list")
+    public ResponseEntity<Page<NotificationMessageResponseDto>> getNotificationList(Pageable pageable) {
+        Page<NotificationMessageResponseDto> notifications = notificationService.getNotifications(pageable);
+
+        return ResponseEntity.ok(notifications);
+    }
+
+    @PutMapping("/{notificationMessageId}/check")
+    public void checkNotificationMessage(@PathVariable Integer notificationMessageId) {
+        notificationService.updateChecked(notificationMessageId);
     }
 
 
