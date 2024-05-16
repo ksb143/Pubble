@@ -1,5 +1,6 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.ssafy.d109.pubble.dto.projectDto.ProjectRequirementsDto;
 import com.ssafy.d109.pubble.dto.projectDto.RequirementSummaryDto;
 import com.ssafy.d109.pubble.dto.requestDto.RequirementHistoryDto;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
@@ -35,15 +36,37 @@ public class ProjectRequirementController {
     @PostMapping("/{code}/history")
     public ResponseEntity<ResponseDto> getRequirementHistory(@RequestBody RequirementHistoryDto requirementHistoryDto, @PathVariable("code") String requirementCode) {
         Integer projectId = requirementHistoryDto.getProjectId();
-        System.out.println(requirementHistoryDto);
-        System.out.println(requirementCode);
-        System.out.println(projectId);
-        log.info("requirementHistoryDto:{}", requirementHistoryDto);
-        log.info("projectId:{}", projectId);
-        List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, requirementCode);
+        try {
+            List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, requirementCode);
+            response = new ResponseDto(true, "요구사항의 변화 내역 조회 성공", requirementSummaryDtos);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
 
-        response = new ResponseDto(true, "코드에 해당하는 요구사항 항목 기록 반환", requirementSummaryDtos);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+
+    /* getRequirementCurrent : 최신 버전의 요구사항만 반환해주는 메서드
+    * @params : Integer projectId 가 포함된 request DTO
+    * @return : 요구사항 NB-001 의 최신 버전 정보
+    * */
+    @Operation(summary = "최신 버전의 요구사항만 반환")
+    @PostMapping("/{code}/current")
+    public ResponseEntity<ResponseDto> getRequirementCurrent(@RequestBody RequirementHistoryDto requirementHistoryDto, @PathVariable("code") String requirementCode) {
+        Integer projectId = requirementHistoryDto.getProjectId();
+        try {
+            ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
+            response = new ResponseDto(true, "최신 버전의 요구사항만 조회 성공", projectRequirementsDto);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
 
 }
