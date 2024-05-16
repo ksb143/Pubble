@@ -25,33 +25,33 @@ export const addProject = async(pjtTitle: string, pjtCode: string, pjtParticipan
 
 // 특정한 project의 상황을 확인하는 대시보드 보기 - GET
 // 참고: 보안상 pjtId(백엔드 table pk)를 header에 넣어서 보내는게 더 낫지만 일단 params에 붙여서 보냄.
-export const getProjectStatus = async(pjtId: string) => {
+export const getProjectStatus = async(pjtId: number) => {
   const { data } = await privateApi.get(`/projects/${pjtId}/dashboards`, {
   });
   return data; 
 } 
 
 // 특정 프로젝트의 모든 요구사항 목록 보기 - GET
-export const getRequirement = async(pjtId: string, pjtCode: string) => {
+export const getRequirement = async(pjtId: number, pjtCode: string) => {
   const { data } = await privateApi.get(`/projects/${pjtId}/requirements?code=${pjtCode}`);
   return data;
 }
 
 // 특정 프로젝트의 특정 요구사항 상세 보기 - GET
-export const getRequirementDetail = async(pjtId: string, reqId: string) => {
+export const getRequirementDetail = async(pjtId: number, reqId: number) => {
   const { data } = await privateApi.get(`/projects/${pjtId}/requirements/${reqId}`);
   return data;
 }
 
 // 특정 프로젝트의 최신 버전 요구사항만 모아진 것 확인 하기 - GET
-export const getLatestRequirementVersion = async(pjtId: string) => {
+export const getLatestRequirementVersion = async(pjtId: number) => {
   const { data } = await privateApi.get(`/projects/${pjtId}/requirements/recent`);
   return data;
 }
 
 // 고려: 타겟 유저(string)를 request body에 넣어서 보내야하는데, 미리 잠재고객 혹은 잠재사용자 생각해서 보내기.
 // 특정 프로젝트의 새로운 요구사항 추가하기 - POST
-export const addRequirement = async(pjtId: string, pjtCode: string, reqTitle: string, reqDetail: string, reqManagerEId: string, reqAuthorEId: string, targetUserEId: string) => {
+export const addRequirement = async(pjtId: number, pjtCode: string, reqTitle: string, reqDetail: string, reqManagerEId: string, reqAuthorEId: string, targetUserEId: string) => {
   const { data } = await privateApi.post(`/projects/${pjtId}/requirements`, {
     code: pjtCode, // 프로젝트 코드
     requirementName: reqTitle, // 요구사항 이름
@@ -64,7 +64,7 @@ export const addRequirement = async(pjtId: string, pjtCode: string, reqTitle: st
 }
 
 // 특정 프로젝트의 특정 요구사항의 새 버전 생성 - POST
-export const updateRequirementVersion = async(pjtId: string, reqId: string, option: string) => {
+export const updateRequirementVersion = async(pjtId: number, reqId: number, option: string) => {
   const { data } = await privateApi.post(`/projects/${pjtId}/requirements/${reqId}/versions`,
   option // 보류생성일 경우: h(hold), 복제생성일 경우: r(restore)
   );

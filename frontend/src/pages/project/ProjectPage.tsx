@@ -1,41 +1,37 @@
 // 1. react 관련
-import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-// 2. library
-// 3. api
-// import { getRequirement } from '@/apis/project';
-// 4. store
-import usePageInfoStore from '@/stores/pageInfoStore.ts';
-// 5. components
+// 4. store 관련
+import usePageInfoStore from '@/stores/pageInfoStore';
+// 5. component 관련
 import RequirementList from '@/components/requirement/RequirementList';
 
+// 개별 프로젝트 페이지를 보여주는 페이지 컴포넌트
 const ProjectPage = () => {
-  const location = useLocation();
-  const { prdId, projectId, projectTitle } = location.state;
-  const projectCode = prdId;
-  const projectName = projectTitle;
-  // store에서 projectId, projectCode, projectName을 업데이트 하는 함수를 가져옴
+  // page 컴포넌트 이므로, setPageType을 설정해준다. 
   const { setPageType } = usePageInfoStore();
-  // 컴포넌트가 마운트 될 때, projectId, projectCode, projectName을 업데이트
+  // 이 페이지에서 사용하는 상태값들을 가져온다.
+  // pId, pCode, pName 를,,, store에서 가져와 정의한다.
+  const pId = usePageInfoStore.getState().projectId;
+  const pCode = usePageInfoStore.getState().projectCode;
+  const pName = usePageInfoStore.getState().projectName;
+  // setPageType의 type과 argument를 업데이트한다. useEffect를 사용하여.
   useEffect(() => {
+    // setPageType의 type은 'project'이고, argument들은 { projectId: p-Id , projectCode: p-Code, projectName: p-Name }이다.
+    // 이를 업데이트한다.
     setPageType('project', {
-      projectId: projectId,
-      projectCode: projectCode,
-      projectName: projectName,
+      projectId: pId,
+      projectCode: pCode,
+      projectName: pName,
     });
-  }, [projectId, projectCode, projectName, setPageType]);
-  // // 스토어에 잘 저장되었는지 체크
-  // console.log('zustand 스토어에 잘 저장되었는지 체크')
-  // console.log("projectId : ", projectId)
-  // console.log("projectCode : ", projectCode)
-  // console.log("projectName : ", projectName)
+  }, [pId, pCode, pName, setPageType]);
+
 
   return (
     <div>
       <RequirementList
-        projectId={projectId}
-        projectName={projectName}
-        projectCode={projectCode || '프로젝트 코드 예시'}
+        pId={pId}
+        pCode={pCode}
+        pName={pName}
       />
     </div>
   );

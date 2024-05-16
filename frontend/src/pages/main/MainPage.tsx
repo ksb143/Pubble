@@ -9,9 +9,11 @@ import ProjectList from '@/components/main/ProjectList';
 import Calendar from '@/components/main/Calendar';
 // 6. image 등 assets
 const MainDashboardPage = () => {
+  // page 컴포넌트 이므로, setPageType을 설정해준다
   const { setPageType } = usePageInfoStore();
 
   useEffect(() => {
+    // 초기화 시켜준다. 이때, type은 init 이고, argument는 필요없다.
     setPageType('init');
   }, []);
 
