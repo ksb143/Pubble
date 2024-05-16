@@ -45,7 +45,7 @@ public class RequirementService {
 
         List<Requirement> requirements = requirementRepository.findLatestRequirementsForProjectByProjectId(projectId);
 
-        for(Requirement requirement : requirements) {
+        for (Requirement requirement : requirements) {
             if (requirement.getApproval().equals("a")) {
                 approved += 1;
             } else {
@@ -80,7 +80,7 @@ public class RequirementService {
 
         List<Requirement> requirements = requirementRepository.findLatestRequirementsForProjectByProjectId(projectId);
 
-        for(Requirement requirement : requirements) {
+        for (Requirement requirement : requirements) {
             if (requirement.getIsLock().equals("l")) {
                 locked += 1;
             } else {
@@ -345,7 +345,7 @@ public class RequirementService {
 
         if (optionalRequirement.isPresent()) {
             Requirement requirement = optionalRequirement.get();
-            if ("u".equals(lock)){
+            if ("u".equals(lock)) {
                 requirement.setIsLock("u");
             } else if ("l".equals(lock)) {
                 requirement.setIsLock("l");
@@ -376,7 +376,7 @@ public class RequirementService {
         List<Requirement> requirements = requirementRepository.findByProject_ProjectIdAndCode(projectId, requirementCode);
         List<RequirementSummaryDto> requirementSummaryDtos = new ArrayList<>();
 
-        for(Requirement requirement : requirements) {
+        for (Requirement requirement : requirements) {
             RequirementSummaryDto requirementSummaryDto = getRequirement(requirement.getRequirementId());
             requirementSummaryDtos.add(requirementSummaryDto);
         }
@@ -404,13 +404,4 @@ public class RequirementService {
             detailRepository.save(detail);
         }
     }
-
-
-    /* getRequirementSpecific : 특정 버전의 요구사항을 반환해주는 메서드
-     * @params : Integer projectId 가 포함된 request DTO
-     * @return : 요구사항 NB-001 의 특정 버전 정보
-     * */
-    public RequirementSummaryDto getRequirementSpecific(Integer projectId, String requirementCode, String requirementVersion) {
-        requirementRepository.findRequirementByCodeAndVersion(requirementCode, requirementVersion).orElseThrow(RequirementNotFoundException::new);
-
-    }
+}
