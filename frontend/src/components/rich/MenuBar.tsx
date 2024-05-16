@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/popover';
 // 3. api
 // 4. store
-import useRichModalStore from '@/stores/richModalStore.ts';
 // 5. component
 import Grid from '@/components/rich/Grid';
 // 6. image 등 assets
@@ -83,6 +82,10 @@ interface MenuBarProps {
   projectName: string;
   requirementCode: string;
   requirementName: string;
+  openCodeEditorWithPreviewModal: () => void;
+  openImageModal: () => void;
+  openFileModal: () => void;
+  openLinkModal: () => void;
 }
 
 const MenuBar = ({
@@ -90,9 +93,11 @@ const MenuBar = ({
   projectName,
   requirementCode,
   requirementName,
+  openCodeEditorWithPreviewModal,
+  openImageModal,
+  openFileModal,
+  openLinkModal,
 }: MenuBarProps) => {
-  const { openCodePreviewModal, openLinkModal, openImageModal, openFileModal } =
-    useRichModalStore();
   const [row, setRow] = useState<number>(3);
   const [col, setCol] = useState<number>(3);
   const rowInput = useRef(null);
@@ -204,9 +209,7 @@ const MenuBar = ({
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuItem
-                  onClick={() => {
-                    openCodePreviewModal('', '', '');
-                  }}
+                  onClick={openCodeEditorWithPreviewModal}
                   className='flex items-center'>
                   <CodeVIewIcon className='h-5 w-5 fill-white' />
                   <span className='ml-2'>HTML블럭</span>

@@ -1,37 +1,40 @@
 // 1. react 관련
-import {
-  memo, useCallback, useEffect, useMemo, useState,
-} from 'react'
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 // 2. library
-import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
-import { watchPreviewContent, CollabHistoryVersion } from '@tiptap-pro/extension-collaboration-history'
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import {
+  watchPreviewContent,
+  CollabHistoryVersion,
+} from '@tiptap-pro/extension-collaboration-history';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
-
-import * as Dialog from '@radix-ui/react-dialog'
+import * as Dialog from '@radix-ui/react-dialog';
 // 3. api
 // 4. store
 // 5. component
-import VersionItem from '@/components/rich/VersionItem.tsx'
+import VersionItem from '@/components/rich/VersionItem.tsx';
 // 6. image 등 assets
 
 const getVersionName = (version: CollabHistoryVersion) => {
   if (version.name) {
-    return version.name
+    return version.name;
   }
 
   if (version.version === 0) {
-    return 'Initial version'
+    return 'Initial version';
   }
 
-  return `Version ${version.version}`
-}
+  return `Version ${version.version}`;
+};
 
 interface VersioningModalProps {
   versions: CollabHistoryVersion[];
   isOpen: boolean;
   onClose: () => void;
-  onRevert: (version: number, versionData: CollabHistoryVersion | undefined) => void;
+  onRevert: (
+    version: number,
+    versionData: CollabHistoryVersion | undefined,
+  ) => void;
   currentVersion: number;
   latestVersion: number;
   provider: TiptapCollabProvider;
@@ -39,98 +42,118 @@ interface VersioningModalProps {
 
 const VersioningModal = memo(
   ({ versions, isOpen, onClose, onRevert, provider }: VersioningModalProps) => {
-    const [currentVersionId, setCurrentVersionId] = useState<number | null>(null)
-    const isCurrentVersion = versions && versions.length > 0 ? currentVersionId === versions[versions.length - 1].version : false
+    const [currentVersionId, setCurrentVersionId] = useState<number | null>(
+      null,
+    );
+    const isCurrentVersion =
+      versions && versions.length > 0
+        ? currentVersionId === versions[versions.length - 1].version
+        : false;
 
     const editor = useEditor({
       editable: false,
       content: '',
       extensions: [StarterKit],
-    })
+    });
 
-    const reversedVersions = useMemo(() => versions.slice().reverse(), [versions])
+    const reversedVersions = useMemo(
+      () => versions.slice().reverse(),
+      [versions],
+    );
 
-    const handleVersionChange = useCallback((newVersion: number) => {
-      setCurrentVersionId(newVersion)
+    const handleVersionChange = useCallback(
+      (newVersion: number) => {
+        setCurrentVersionId(newVersion);
 
-      provider.sendStateless(JSON.stringify({
-        action: 'version.preview',
-        version: newVersion,
-      }))
-    }, [provider])
+        provider.sendStateless(
+          JSON.stringify({
+            action: 'version.preview',
+            version: newVersion,
+          }),
+        );
+      },
+      [provider],
+    );
 
     const versionData = useMemo(() => {
       if (!versions.length) {
-        return null
+        return null;
       }
 
-      return versions.find(v => v.version === currentVersionId)
-    }, [currentVersionId, editor, provider])
+      return versions.find((v) => v.version === currentVersionId);
+    }, [currentVersionId, editor, provider]);
 
     useEffect(() => {
       if (isOpen && currentVersionId === null && versions.length > 0) {
-        const initialVersion = versions[versions.length - 1].version
+        const initialVersion = versions[versions.length - 1].version;
 
-        setCurrentVersionId(initialVersion)
+        setCurrentVersionId(initialVersion);
 
-        provider.sendStateless(JSON.stringify({
-          action: 'version.preview',
-          version: initialVersion,
-        }))
+        provider.sendStateless(
+          JSON.stringify({
+            action: 'version.preview',
+            version: initialVersion,
+          }),
+        );
       }
-    }, [currentVersionId, versions, isOpen])
+    }, [currentVersionId, versions, isOpen]);
 
     useEffect(() => {
       if (isOpen) {
-        const unbindContentWatcher = watchPreviewContent(provider, content => {
-          if (editor) {
-            editor.commands.setContent(content)
-          }
-        })
+        const unbindContentWatcher = watchPreviewContent(
+          provider,
+          (content) => {
+            if (editor) {
+              editor.commands.setContent(content);
+            }
+          },
+        );
 
         return () => {
-          unbindContentWatcher()
-        }
+          unbindContentWatcher();
+        };
       }
-    }, [isOpen, provider, editor])
+    }, [isOpen, provider, editor]);
 
     const onOpenChange = useCallback(
       (open: boolean) => {
         if (!open) {
-          onClose()
-          setCurrentVersionId(null)
-          editor?.commands.clearContent()
+          onClose();
+          setCurrentVersionId(null);
+          editor?.commands.clearContent();
         }
       },
       [onClose, editor],
-    )
+    );
 
     const handleRevert = useCallback(() => {
-      const accepted = confirm('버전을 되돌리시면 버전이 지정되지 않은 모든 변경 사항은 삭제됩니다.')
+      const accepted = confirm(
+        '버전을 되돌리시면 버전이 지정되지 않은 모든 변경 사항은 삭제됩니다.',
+      );
 
       if (accepted) {
         if (currentVersionId && versionData) {
-          onRevert(currentVersionId, versionData)
+          onRevert(currentVersionId, versionData);
         }
-        onClose()
+        onClose();
       }
-    }, [onRevert, currentVersionId, onClose])
+    }, [onRevert, currentVersionId, onClose]);
 
     return (
       <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed top-0 left-0 w-full h-full z-10 opacity-30 bg-black" />
-          <Dialog.Content className="bg-white fixed -translate-y-1/2 -translate-x-1/2 overflow-hidden z-20 top-1/2 w-3/5 left-1/2 rounded transform h-2/3">
-            <div className="flex overflow-hidden w-full h-full">
-              <div className="overflow-auto w-3/5 h-full">
-                <div className="flex flex-col h-full">
+          <Dialog.Overlay className='fixed left-0 top-0 z-10 h-full w-full bg-black opacity-30' />
+          <Dialog.Content className='fixed left-1/2 top-1/2 z-20 h-2/3 w-3/5 -translate-x-1/2 -translate-y-1/2 transform overflow-hidden rounded bg-white'>
+            <div className='flex h-full w-full overflow-hidden'>
+              <div className='h-full w-3/5 overflow-auto'>
+                <div className='flex h-full flex-col'>
                   <EditorContent editor={editor} />
                 </div>
               </div>
-              <div className="w-2/5 p-8 h-full">
-                <div className="flex flex-col h-full gap-1">
-                  <div className="h-3/4 overflow-auto">
-                    {reversedVersions.map(v => (
+              <div className='h-full w-2/5 p-8'>
+                <div className='flex h-full flex-col gap-1'>
+                  <div className='h-3/4 overflow-auto'>
+                    {reversedVersions.map((v) => (
                       <VersionItem
                         date={new Date(v.date)}
                         title={getVersionName(v)}
@@ -141,11 +164,18 @@ const VersioningModal = memo(
                     ))}
                   </div>
                   <hr />
-                  <div className="h-1/4 flex flex-col gap-3 mt-4">
-                    <button className={`py-2 bg-pubble ${(versionData && !isCurrentVersion) ? 'hover:bg-dpubble' : ''} text-white rounded`} type="button" disabled={!versionData || isCurrentVersion} onClick={handleRevert}>
+                  <div className='mt-4 flex h-1/4 flex-col gap-3'>
+                    <button
+                      className={`bg-pubble py-2 ${versionData && !isCurrentVersion ? 'hover:bg-dpubble' : ''} rounded text-white`}
+                      type='button'
+                      disabled={!versionData || isCurrentVersion}
+                      onClick={handleRevert}>
                       버전 되돌리기
                     </button>
-                    <button className="py-2 bg-gray-200 text-black hover:bg-gray-800 rounded hover:text-white" type="button" onClick={onClose}>
+                    <button
+                      className='rounded bg-gray-200 py-2 text-black hover:bg-gray-800 hover:text-white'
+                      type='button'
+                      onClick={onClose}>
                       버전 히스토리 닫기
                     </button>
                   </div>
@@ -155,10 +185,10 @@ const VersioningModal = memo(
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-    )
+    );
   },
-)
+);
 
-VersioningModal.displayName = 'VersioningModal'
+VersioningModal.displayName = 'VersioningModal';
 
-export default VersioningModal
+export default VersioningModal;

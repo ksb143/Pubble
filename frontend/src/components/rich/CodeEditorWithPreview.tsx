@@ -1,21 +1,28 @@
 // 1. react 관련
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 // 2. library
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Editor from '@monaco-editor/react';
 import rasterizeHTML from 'rasterizehtml';
+import * as Dialog from '@radix-ui/react-dialog';
 // 3. api
 import { getImageUrl } from '@/apis/rich.ts';
 // 4. store
-import useRichStore from '@/stores/richModalStore.ts';
 // 5. component
 // 6. image 등 assets
 import HTML5 from '@/assets/icons/html5-line.svg?react';
 import CSS3 from '@/assets/icons/css3-line.svg?react';
 import JS from '@/assets/icons/javascript-line.svg?react';
 
+interface CodePreview {
+  html: string;
+  css: string;
+  javascript: string;
+}
+
 interface CodeEditorWithPreviewProps {
   isOpen: boolean;
+  onClose: () => void;
   applyCodeCapture: (
     imageDataUrl: string,
     html: string,
@@ -23,24 +30,22 @@ interface CodeEditorWithPreviewProps {
     javascript: string,
   ) => void;
   requirementId: number;
+  codePreview: CodePreview;
 }
 
 const CodeEditorWithPreview = ({
   isOpen,
+  onClose,
   applyCodeCapture,
   requirementId,
+  codePreview,
 }: CodeEditorWithPreviewProps) => {
-  const { setHtml, setCss, setJavascript, javascript, html, css } =
-    useRichStore();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const { html, css, javascript } = codePreview;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [srcDoc, setSrcDoc] = useState<string>('');
-
-  useEffect(() => {
-    if (isOpen && dialogRef.current) {
-      dialogRef.current.showModal();
-    }
-  }, [isOpen]);
+  const [htmlValue, setHtmlValue] = useState<string>(html);
+  const [cssValue, setCssValue] = useState<string>(css);
+  const [jsValue, setJsValue] = useState<string>(javascript);
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -53,27 +58,22 @@ const CodeEditorWithPreview = ({
   useEffect(() => {
     const sourceDoc = `
       <html>
-        <head><style>${css}</style></head>
-        <body>${html}<script>${javascript}</script></body>
+        <head><style>${cssValue}</style></head>
+        <body>${htmlValue}<script>${jsValue}</script></body>
       </html>
     `;
     setSrcDoc(sourceDoc);
-  }, [html, css, javascript]);
+  }, [htmlValue, cssValue, jsValue]);
 
-  // html 반영 함수
-  const handleHtmlChange = (value: string | undefined) => {
-    if (value !== undefined) setHtml(value);
-  };
-
-  // css 반영 함수
-  const handleCssChange = (value: string | undefined) => {
-    if (value !== undefined) setCss(value);
-  };
-
-  // javascript 반영 함수
-  const handleJsChange = (value: string | undefined) => {
-    if (value !== undefined) setJavascript(value);
-  };
+  // 오픈 변경 함수
+  const onOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        onClose();
+      }
+    },
+    [onClose],
+  );
 
   // SVG 이미지 데이터 URL을 받아 Canvas 그리고 URL 변환 함수
   const convertSvgToImage = (svgDataUrl: string): Promise<string> => {
@@ -104,8 +104,8 @@ const CodeEditorWithPreview = ({
   const applyChanges = async () => {
     const sourceDoc = `
     <html>
-      <head><style>${css}</style></head>
-      <body>${html}<script>${javascript}</script></body>
+      <head><style>${cssValue}</style></head>
+      <body>${htmlValue}<script>${jsValue}</script></body>
     </html>
   `;
     const canvas = document.createElement('canvas');
@@ -124,79 +124,83 @@ const CodeEditorWithPreview = ({
 
       const uploadedImageUrl = await getImageUrl(imageFile, requirementId);
 
-      applyCodeCapture(uploadedImageUrl, html, css, javascript);
+      applyCodeCapture(uploadedImageUrl, htmlValue, cssValue, jsValue);
+      onClose();
     } catch (error) {
       console.error('Error rendering HTML to image:', error);
-    }
-
-    if (dialogRef.current) {
-      dialogRef.current.close();
+      alert('코드 미리보기 이미지 생성에 실패했습니다.');
     }
   };
 
   return (
-    <dialog
-      ref={dialogRef}
-      className='z-10 flex flex-col items-center justify-center gap-5 rounded border-2 border-gray-200 bg-white p-4 shadow-custom'>
-      <div className='flex gap-5'>
-        <Tabs className='w-1/2' defaultValue='html'>
-          <TabsList>
-            <TabsTrigger key='html' className='w-24' value='html'>
-              <HTML5 className='h-5 w-5 fill-red-600 stroke-1' />
-              HTML
-            </TabsTrigger>
-            <TabsTrigger key='css' className='w-24' value='css'>
-              <CSS3 className='h-5 w-5 fill-pubble stroke-1' />
-              CSS
-            </TabsTrigger>
-            <TabsTrigger key='js' className='w-24' value='javascript'>
-              <JS className='h-5 w-5 fill-yellow-600 stroke-1' />
-              JS
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent key='html-content' value='html'>
-            <Editor
-              defaultLanguage='xml'
-              theme='vs-dark'
-              height='300px'
-              value={html}
-              onChange={handleHtmlChange}
-            />
-          </TabsContent>
-          <TabsContent key='css-content' value='css'>
-            <Editor
-              defaultLanguage='css'
-              theme='vs-dark'
-              height='300px'
-              value={css}
-              onChange={handleCssChange}
-            />
-          </TabsContent>
-          <TabsContent key='js-content' value='javascript'>
-            <Editor
-              defaultLanguage='javascript'
-              theme='vs-dark'
-              height='300px'
-              value={javascript}
-              onChange={handleJsChange}
-            />
-          </TabsContent>
-        </Tabs>
-        <div className='w-1/2 rounded border-4 p-10'>
-          <iframe
-            srcDoc={srcDoc}
-            title='preview'
-            sandbox='allow-scripts allow-same-origin'
-            style={{ width: '100%', border: 'none', height: '300px' }}
-          />
-        </div>
-      </div>
-      <button
-        onClick={applyChanges}
-        className='rounded bg-pubble px-10 py-2 text-white hover:bg-dpubble hover:shadow-custom hover:outline-4 hover:outline-gray-200'>
-        적용
-      </button>
-    </dialog>
+    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className='fixed left-0 top-0 z-10 h-full w-full opacity-100'>
+          <Dialog.Content className='fixed left-1/2 top-1/2 z-20 flex h-2/3 w-3/4 -translate-x-1/2 -translate-y-1/2 transform flex-col items-center gap-3 rounded bg-white p-6 shadow-custom'>
+            <div className='flex gap-3'>
+              <Tabs className='w-1/2' defaultValue='html'>
+                <TabsList>
+                  <TabsTrigger key='html' className='w-24' value='html'>
+                    <HTML5 className='h-5 w-5 fill-red-600 stroke-1' />
+                    HTML
+                  </TabsTrigger>
+                  <TabsTrigger key='css' className='w-24' value='css'>
+                    <CSS3 className='h-5 w-5 fill-pubble stroke-1' />
+                    CSS
+                  </TabsTrigger>
+                  <TabsTrigger key='js' className='w-24' value='javascript'>
+                    <JS className='h-5 w-5 fill-yellow-600 stroke-1' />
+                    JS
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent key='html-content' value='html'>
+                  <Editor
+                    defaultLanguage='xml'
+                    theme='vs-dark'
+                    height='250px'
+                    value={html}
+                    onChange={(value) => setHtmlValue(value || '')}
+                  />
+                </TabsContent>
+                <TabsContent key='css-content' value='css'>
+                  <Editor
+                    defaultLanguage='css'
+                    theme='vs-dark'
+                    height='250px'
+                    value={css}
+                    onChange={(value) => setCssValue(value || '')}
+                  />
+                </TabsContent>
+                <TabsContent key='js-content' value='javascript'>
+                  <Editor
+                    defaultLanguage='javascript'
+                    theme='vs-dark'
+                    height='250px'
+                    value={javascript}
+                    onChange={(value) => setJsValue(value || '')}
+                  />
+                </TabsContent>
+              </Tabs>
+              <div className='w-1/2 rounded border-4 p-10'>
+                <iframe
+                  srcDoc={srcDoc}
+                  title='preview'
+                  sandbox='allow-scripts allow-same-origin'
+                  style={{ width: '100%', border: 'none', height: '250px' }}
+                />
+              </div>
+            </div>
+            <div className='w-1/3 '>
+              <button
+                onClick={applyChanges}
+                className='rounded bg-pubble px-10 py-2 text-white hover:bg-dpubble hover:shadow-custom hover:outline-4 hover:outline-gray-200'>
+                적용
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Overlay>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 };
 
