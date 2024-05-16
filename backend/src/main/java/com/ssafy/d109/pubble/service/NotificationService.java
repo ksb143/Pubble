@@ -4,17 +4,25 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.WebpushConfig;
 import com.google.firebase.messaging.WebpushNotification;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
-import com.ssafy.d109.pubble.entity.Notification;
-import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.dto.responseDto.NotificationMessageResponseDto;
+import com.ssafy.d109.pubble.dto.responseDto.SenderInfoDto;
+import com.ssafy.d109.pubble.dto.responseDto.TypeDataDto;
+import com.ssafy.d109.pubble.entity.*;
+import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.notification.NotificationMessageNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
+import com.ssafy.d109.pubble.repository.NotificationMessageRepository;
 import com.ssafy.d109.pubble.repository.NotificationRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.google.firebase.messaging.Message;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -25,56 +33,47 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final CommonUtil commonUtil;
     private final UserRepository userRepository;
+    private final NotificationMessageRepository notificationMessageRepository;
 
-    public NotificationService(NotificationRepository notificationRepository, CommonUtil commonUtil, UserRepository userRepository) {
+    public NotificationService(NotificationRepository notificationRepository, CommonUtil commonUtil, UserRepository userRepository, NotificationMessageRepository notificationMessageRepository) {
         this.notificationRepository = notificationRepository;
         this.commonUtil = commonUtil;
         this.userRepository = userRepository;
+        this.notificationMessageRepository = notificationMessageRepository;
     }
 
 
     // 사용자의 기기에서 생성된 FCM 토큰을 서버에 등록하고 저장 (currentUser가 수행)
+    @Transactional
     public String registerToken(String token, User currentUser) {
 
         Notification notification = notificationRepository.findNotificationByUser(currentUser)
                 .orElse(Notification.builder().token(token).build());
-        notification.setToken(token);  // 기존 또는 새 토큰 업데이트
-        notification.confirmUser(currentUser);  // 사용자 확인
-
-        notificationRepository.save(notification);  // Notification 객체 저장
-
+        notification.setToken(token);
+        notification.setUser(currentUser);
         currentUser.setNotification(notification);
-        userRepository.save(currentUser);
 
-        return "Token Saved Successfully";
+        userRepository.save(currentUser);
+        notificationRepository.save(notification);
+
+        return "TSS: Token Saved Successfully 라는 뜻ㅋ";
     }
 
 
-    public void sendNotification(NotificationRequestDto reqDto) {
+    public void sendNotification(NotificationRequestDto reqDto, String receiverId) {
 
         try {
-            String token = getNotificationToken();
+            String token = getNotificationToken(receiverId);
             Message message = Message.builder()
                     .setWebpushConfig(WebpushConfig.builder()
                             .setNotification(WebpushNotification.builder()
                                     .setTitle(reqDto.getTitle())
                                     .setBody(reqDto.getMessage())
+                                    .putCustomData("type", reqDto.getType())
                                     .build())
                             .build())
                     .setToken(token)
                     .build();
-
-
-            /*
-            String response = FirebaseMessaging.getInstance().sendAsync(message).get();
-            log.info(">>>>>Send Message: " + response);
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("Failed to send message due to interruption or execution error", e);
-        } catch (NotificationNotFoundException e) {
-            log.error("Notification token not found for user", e);
-        }
-
-             */
 
 
             // 비동기로 메시지 보내기
@@ -101,30 +100,13 @@ public class NotificationService {
     }
 
 
-    private String getNotificationToken() {
-        User user = commonUtil.getUser();
+    private String getNotificationToken(String receiverId) {
+        User user = userRepository.findByEmployeeId(receiverId).orElseThrow(UserNotFoundException::new);
         return notificationRepository.findNotificationByUser(user)
                 .map(Notification::getToken)
                 .orElseThrow(NotificationNotFoundException::new);
     }
 
-
-
-    /*
-    @Transactional
-    public void saveNotification(String token) {
-        User user = commonUtil.getUser();
-
-        Notification notification = Notification.builder()
-                .token(token)
-                .build();
-
-        notification.confirmUser(user);
-        notificationRepository.save(notification);
-
-    }
-
-     */
 
     @Transactional
     public void deleteNotification(Integer notificationId) {
@@ -138,5 +120,90 @@ public class NotificationService {
         notificationRepository.delete(notification);
         notificationRepository.flush();// Notification 엔티티 삭제
     }
+
+
+    @Transactional
+    public void updateChecked(Integer notificationMsgId) {
+        NotificationMessage notificationMsg = notificationMessageRepository.findByNotificationMessageId(notificationMsgId)
+                .orElseThrow(NotificationMessageNotFoundException::new);
+        notificationMsg.setIsChecked(true);
+
+    }
+
+
+    @Transactional
+    public NotificationMessage saveNotificationMessage(
+            String content,
+            NotificationType type,
+            Integer receiverId,
+            Integer senderId,
+            Project project,
+            Requirement requirement,
+            UserThread userThread
+            ) {
+        NotificationMessage notificationMessage = NotificationMessage.builder()
+                .createdAt(LocalDateTime.now())
+                .isChecked(false)
+                .content(content)
+                .type(type)
+                .receiverId(receiverId)
+                .senderId(senderId)
+                .project(project)
+                .requirement(requirement)
+                .userThread(userThread)
+                .build();
+
+        return notificationMessageRepository.save(notificationMessage);
+    }
+
+
+    public Page<NotificationMessageResponseDto> getNotifications(Pageable pageable) {
+
+        return notificationMessageRepository.findAll(pageable).map(this::convertToDto);
+    }
+
+
+    private NotificationMessageResponseDto convertToDto(NotificationMessage notificationMsg) {
+        User sender = userRepository.findByUserId(notificationMsg.getSenderId()).orElseThrow(UserNotFoundException::new);
+
+        TypeDataDto typeData = new TypeDataDto();
+        switch (notificationMsg.getType()) {
+            case PROJECT:
+            case NEW_REQUIREMENT:
+                typeData.setProjectId(notificationMsg.getProject().getProjectId());
+                typeData.setProjectCode(notificationMsg.getProject().getCode());
+                typeData.setRequirementId(notificationMsg.getRequirement().getRequirementId());
+                typeData.setRequirementCode(notificationMsg.getRequirement().getCode());
+                break;
+            case MENTION:
+                typeData.setProjectId(notificationMsg.getProject().getProjectId());
+                typeData.setProjectCode(notificationMsg.getProject().getCode());
+                typeData.setRequirementId(notificationMsg.getRequirement().getRequirementId());
+                typeData.setRequirementCode(notificationMsg.getRequirement().getCode());
+                typeData.setThreadId(notificationMsg.getUserThread().getUserThreadId());
+                break;
+            case MESSAGE:
+                break;
+
+        }
+
+        NotificationMessageResponseDto dto = NotificationMessageResponseDto.builder()
+                .isChecked(notificationMsg.getIsChecked())
+                .content(notificationMsg.getContent())
+                .createdAt(notificationMsg.getCreatedAt())
+                .type(notificationMsg.getType())
+                .typeData(typeData)
+                .senderInfo(SenderInfoDto.builder()
+                        .name(sender.getName())
+                        .employeeId(sender.getEmployeeId())
+                        .position(sender.getPosition())
+                        .department(sender.getDepartment())
+                        .profileColor(sender.getProfileColor())
+                        .build())
+                .build();
+
+        return dto;
+    }
+
 
 }

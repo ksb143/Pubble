@@ -7,3 +7,6 @@
 0:0:0:0:0:0:0:1 - - [16/May/2024:14:56:36 +0900] "POST /api/requirements/NB-001/history HTTP/1.1" 200 979 605354
 0:0:0:0:0:0:0:1 - - [16/May/2024:14:58:41 +0900] "POST /api/requirements/NB-001/history HTTP/1.1" 200 979 320659
 0:0:0:0:0:0:0:1 - - [16/May/2024:15:23:06 +0900] "POST /api/requirements/NB-001/history HTTP/1.1" 200 979 331472
+0:0:0:0:0:0:0:1 - - [16/May/2024:08:58:06 +0900] "POST /api/users/signin HTTP/1.1" 201 3570 1132257
+0:0:0:0:0:0:0:1 - - [16/May/2024:08:58:20 +0900] "GET /api/test/test HTTP/1.1" 200 31 31485
+0:0:0:0:0:0:0:1 - - [16/May/2024:09:14:57 +0900] "POST /api/users/signin HTTP/1.1" 201 597 695393

@@ -8,6 +8,7 @@ import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+
+import static com.ssafy.d109.pubble.entity.NotificationType.PROJECT;
 
 @Service
 @RequiredArgsConstructor
@@ -96,13 +99,16 @@ public class ProjectService {
                 // 알림 메시지 생성 및 발송
                 NotificationRequestDto reqDto = NotificationRequestDto.builder()
                         .title("새로운 프로젝트 참여 알림")
-                        .message(user.getName() + " " + user.getPosition() + "님, '" + project.getProjectTitle() + "' 프로젝트에 참여하게 되었습니다.")
+                        .message(user1.getName() + " " + user1.getPosition() + "님, '" + project.getProjectTitle() + "' 프로젝트에 참여하게 되었습니다.")
+                        .type("PROJECT")
                         .build();
                 CompletableFuture.runAsync(() -> {
                     try {
-                        notificationService.sendNotification(reqDto);
+                        notificationService.sendNotification(reqDto, user1.getEmployeeId());
+                        notificationService.saveNotificationMessage(reqDto.getMessage(), PROJECT, user1.getUserId(), null, project, null, null);
                     } catch (Exception e) {
                         log.error("Failed to send notification", e);
+                        throw new NotificationSendingFailedException();
                     }
                 });
             }

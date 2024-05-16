@@ -5,6 +5,7 @@ import com.ssafy.d109.pubble.dto.messageDto.MessageSendDto;
 import com.ssafy.d109.pubble.dto.projectDto.UserInfoDto;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.entity.Message;
+import com.ssafy.d109.pubble.entity.NotificationType;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.repository.MessageRepository;
 import jakarta.transaction.Transactional;
@@ -57,14 +58,21 @@ public class MessageService {
                 .build();
 
         messageRepository.save(message);
+        NotificationRequestDto dto = NotificationRequestDto.builder()
+                .title(messageSendDto.getTitle())
+                .message(messageSendDto.getContent())
+                .token(receiver.getNotification().getToken())
+                .type("message")
+                .build();
 
         try {
             // 푸시 알림 비동기 전송
-            notificationService.sendNotification(NotificationRequestDto.builder()
-                    .title(messageSendDto.getTitle())
-                    .message(messageSendDto.getContent())
-                    .token(receiver.getNotification().getToken())
-                    .build());
+            notificationService.sendNotification(dto, receiver.getEmployeeId());
+            notificationService.saveNotificationMessage(dto.getMessage(),
+                                                        NotificationType.MESSAGE,
+                                                        null,
+                                                        message.getSender().getUserId(),
+                                                        null, null, null);
         } catch (Exception e) {
             // 로깅, 알림 재시도 또는 사용자에게 피드백
             log.error("Error sending notification", e);

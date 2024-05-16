@@ -1,10 +1,14 @@
 package com.ssafy.d109.pubble.controller;
 
 import com.ssafy.d109.pubble.dto.requestDto.FCMTokenRequestDto;
+import com.ssafy.d109.pubble.dto.responseDto.NotificationMessageResponseDto;
 import com.ssafy.d109.pubble.entity.Notification;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NotificationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -32,6 +36,18 @@ public class NotificationController {
     @GetMapping("/{notificationId}/clear")
     public void clearNotificationFromUser(@PathVariable Integer notificationId) {
         notificationService.deleteNotification(notificationId);
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<Page<NotificationMessageResponseDto>> getNotificationList(Pageable pageable) {
+        Page<NotificationMessageResponseDto> notifications = notificationService.getNotifications(pageable);
+
+        return ResponseEntity.ok(notifications);
+    }
+
+    @PutMapping("/{notificationMessageId}/check")
+    public void checkNotificationMessage(@PathVariable Integer notificationMessageId) {
+        notificationService.updateChecked(notificationMessageId);
     }
 
 
