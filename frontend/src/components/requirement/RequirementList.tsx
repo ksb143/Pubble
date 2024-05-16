@@ -4,13 +4,38 @@ import { useNavigate } from 'react-router-dom';
 // 2. library 관련
 import { FiMoreHorizontal } from 'react-icons/fi';
 // 3. api 관련
-import { getRequirement } from '@/apis/project';
+import { getLatestRequirementVersion } from '@/apis/project';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
-import { ColumnDef, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel, SortingState, getSortedRowModel, ColumnFiltersState, getFilteredRowModel, VisibilityState } from '@tanstack/react-table';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenuLabel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getPaginationRowModel,
+  SortingState,
+  getSortedRowModel,
+  ColumnFiltersState,
+  getFilteredRowModel,
+  VisibilityState,
+} from '@tanstack/react-table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenuLabel,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+} from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,7 +53,7 @@ export type Requirement = {
   detail: string | null; // 요구사항의 상세설명
   description: string | null; // 요구사항의 설명
   manager: {
-    name: string | null; // 요구사항의 담당자의 이름 ex) "최지원"    
+    name: string | null; // 요구사항의 담당자의 이름 ex) "최지원"
     employeeId: string | null; // 요구사항의 담당자의 사번 ex) "SSAFY1001"
     department: string | null; // 요구사항의 담당자의 부서 ex) "D109"
     position: string | null; // 요구사항의 담당자의 직위 ex) "총무"
@@ -56,7 +81,9 @@ export const columns: ColumnDef<Requirement>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-        onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(!!value)}
+        onCheckedChange={(value: boolean) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
         aria-label='Select all'
       />
     ),
@@ -152,8 +179,7 @@ export const columns: ColumnDef<Requirement>[] = [
   },
 ];
 
-
-const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
+const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
   const { setPageType } = usePageInfoStore();
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
@@ -186,12 +212,13 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
       rowSelection,
     },
   });
-// useEffect를 활용한... 사용자의 요구사항 목록 화면 UI 갱신
+  // useEffect를 활용한... 사용자의 요구사항 목록 화면 UI 갱신
   useEffect(() => {
     // fetchProjects 함수 정의
     const fetchRequirements = async () => {
       // 요구사항 목록 데이터 추출
-      try { const response = await getRequirement(pId, pCode) ;
+      try {
+        const response = await getLatestRequirementVersion(pId);
         // 만약 데이터가 있다면
         if (response.data && response.data.length > 0) {
           // 요구사항 목록 데이터 추출
@@ -204,7 +231,8 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
             approvalComment: req.approvalComment, // 요구사항 항목들의 승인 코멘트
             code: req.code, // 요구사항 항목들의 코드
             requirementName: req.requirementName, // 요구사항 항목들의 이름
-            manager: { // 이하는 담당자 관련
+            manager: {
+              // 이하는 담당자 관련
               name: req.manager.name, // 요구사항 담당자 이름 ex) "최지원"
               employeeId: req.manager.employeeId, // 요구사항 담당자 사번 ex) "SSAFY1001"
               department: req.manager.department, // 요구사항 담당자 부서 ex) "D109"
@@ -212,14 +240,13 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
               role: req.manager.role, // ex) admin 일경우 "ADMIN", 아닐경우 "USER"
               isApprovable: req.manager.isApprovable, // 요구사항 담당자의 승인 가능 여부 ex) "n"
               profileColor: req.manager.profileColor, // 요구사항 담당자 프로필 색상 ex) "#FF9933"
-            }
-          
+            },
           }));
           // 요구사항 목록 데이터 업데이트
-          console.log("requirementData1: ",requirementData);
+
           setRequirements(requirementData);
-          console.log("requirementData2: ",requirementData);
-        // 데이터가 없는 경우
+
+          // 데이터가 없는 경우
         } else {
           // 빈 배열로 요구사항 목록 데이터 설정
           setRequirements([]);
@@ -233,7 +260,9 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
     };
     fetchRequirements();
   }, [pId, pCode]);
-  console.log("requirements: ",requirements);
+
+  console.log('requirements: ', requirements);
+
   const handleRowClick = (requirement: Requirement) => {
     const { requirementId, code } = requirement;
     const rCode = code;
@@ -260,8 +289,16 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
         <div className='flex items-center px-5 py-5'>
           <Input
             placeholder='요구사항 이름을 입력해주세요.'
-            value={(table.getColumn('requirementName')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('requirementName')?.setFilterValue(event.target.value)}
+            value={
+              (table
+                .getColumn('requirementName')
+                ?.getFilterValue() as string) ?? ''
+            }
+            onChange={(event) =>
+              table
+                .getColumn('requirementName')
+                ?.setFilterValue(event.target.value)
+            }
             className='max-w-sm text-lg'
           />
           <div className='ml-auto'>
@@ -272,15 +309,21 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
-                {table.getAllColumns().filter((column) => column.getCanHide() && column.id !== 'actions').map((column) => (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                ))}
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) => column.getCanHide() && column.id !== 'actions',
+                  )
+                  .map((column) => (
+                    <DropdownMenuCheckboxItem
+                      key={column.id}
+                      checked={column.getIsVisible()}
+                      onCheckedChange={(value) =>
+                        column.toggleVisibility(!!value)
+                      }>
+                      {column.id}
+                    </DropdownMenuCheckboxItem>
+                  ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -290,8 +333,15 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className='text-center text-lg font-semibold'>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  <TableHead
+                    key={header.id}
+                    className='text-center text-lg font-semibold'>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -300,17 +350,27 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
           <TableBody className='text-base'>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} role='button' className='cursor-pointer hover:bg-gray-100'>
+                <TableRow
+                  key={row.id}
+                  role='button'
+                  className='cursor-pointer hover:bg-gray-100'>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} onClick={() => handleRowClick(row.original)}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <TableCell
+                      key={cell.id}
+                      onClick={() => handleRowClick(row.original)}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className='h-24 text-center'>
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'>
                   결과가 없습니다.
                 </TableCell>
               </TableRow>
@@ -319,15 +379,24 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
         </Table>
       </div>
       <div className='flex items-center justify-center space-x-2 py-4'>
-        <Button variant='outline' size='sm' onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+        <Button
+          variant='outline'
+          size='sm'
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}>
           이전 페이지
         </Button>
-        <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+        <Button
+          variant='outline'
+          size='sm'
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}>
           다음 페이지
         </Button>
       </div>
       <div className='flex-1 text-sm text-muted-foreground'>
-        {table.getFilteredRowModel().rows.length} 개 중 {table.getFilteredSelectedRowModel().rows.length} 개 선택됨.
+        {table.getFilteredRowModel().rows.length} 개 중{' '}
+        {table.getFilteredSelectedRowModel().rows.length} 개 선택됨.
       </div>
     </div>
   );
