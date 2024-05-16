@@ -56,3 +56,11 @@ export const setupFCMListener = () => {
     return subscribe;
   });
 };
+
+// 받은 알림 리스트 조회 함수
+export const getNotificationList = async (page: number, size: number) => {
+  const { data } = await privateApi.get('/notification/list', {
+    params: { page, size },
+  });
+  return data;
+};
