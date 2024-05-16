@@ -17,25 +17,24 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 // Requirement type 정의
 export type Requirement = {
-  description: string; // 요구사항의 설명
-  requirementId: number; // 요구사항의 아이디
-  orderIndex: number; // 요구사항의 순서
-  version: string; // 요구사항의 버전
-  isLock: 'u' | 'l'; // 요구사항의 잠금 여부
-  approval: 'u' | 'h' | 'a'; // 요구사항의 승인 여부
-  approvalComment: string; // 요구사항의 승인 코멘트
-  code: string; // 요구사항의 코드
-  requirementName: string; // 요구사항의 이름
-  detail: string; // 요구사항의 상세설명
+  requirementId: number | null; // 요구사항의 아이디
+  orderIndex: number | null; // 요구사항의 순서
+  version: string | null; // 요구사항의 버전
+  isLock: 'u' | 'l' | null; // 요구사항의 잠금 여부
+  approval: 'u' | 'h' | 'a' | null; // 요구사항의 승인 여부
+  approvalComment: string | null; // 요구사항의 승인 코멘트
+  code: string | null; // 요구사항의 코드
+  requirementName: string | null; // 요구사항의 이름
+  detail: string | null; // 요구사항의 상세설명
+  description: string | null; // 요구사항의 설명
   manager: {
-    userId: number; // 요구사항의 담당자의 아이디
-    name: string; // 요구사항의 담당자의 이름
-    employeeId: string; // 요구사항의 담당자의 사번
-    department: string; // 요구사항의 담당자의 부서
-    position: string; // 요구사항의 담당자의 직위
-    role: string; // 요구사항의 담당자의 역할
-    isApprovable: 'y' | 'n'; // 요구사항의 담당자의 승인 가능 여부
-    profileColor: string; // 요구사항의 담당자의 프로필 색상
+    name: string | null; // 요구사항의 담당자의 이름 ex) "최지원"    
+    employeeId: string | null; // 요구사항의 담당자의 사번 ex) "SSAFY1001"
+    department: string | null; // 요구사항의 담당자의 부서 ex) "D109"
+    position: string | null; // 요구사항의 담당자의 직위 ex) "총무"
+    role: string | null; // 요구사항의 담당자의 역할 ex) "ADMIN"
+    isApprovable: 'y' | 'n' | null; // 요구사항의 담당자의 승인 가능 여부 ex) "n"
+    profileColor: string | null; // 요구사항의 담당자의 프로필 색상 ex) "#FF9933"
   };
 };
 
@@ -73,13 +72,13 @@ export const columns: ColumnDef<Requirement>[] = [
   },
   // 승인여부 컬럼
   {
-    accessorKey: 'approvalStatus',
+    accessorKey: 'approval',
     header: '승인여부',
     cell: (info) => info.getValue(),
   },
   // 잠금여부 컬럼
   {
-    accessorKey: 'lockStatus',
+    accessorKey: 'isLock',
     header: '잠금여부',
     cell: (info) => info.getValue(),
   },
@@ -97,13 +96,13 @@ export const columns: ColumnDef<Requirement>[] = [
   },
   // 상세설명 컬럼
   {
-    accessorKey: 'description',
+    accessorKey: 'detail',
     header: '상세설명',
     cell: (info) => info.getValue(),
   },
   // 담당자 컬럼
   {
-    accessorKey: 'assignee',
+    accessorKey: 'manager.name',
     header: '담당자',
     cell: (info) => info.getValue(),
   },
@@ -115,7 +114,7 @@ export const columns: ColumnDef<Requirement>[] = [
   },
   // 현재버전 컬럼
   {
-    accessorKey: 'currentVersion',
+    accessorKey: 'version',
     header: '현재버전',
     cell: (info) => info.getValue(),
   },
@@ -197,18 +196,29 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
         if (response.data && response.data.length > 0) {
           // 요구사항 목록 데이터 추출
           const requirementData = response.data.map((req: Requirement) => ({
-            requirementId: req.requirementId,
-            orderIndex: req.orderIndex,
-            version: req.version,
-            isLock: req.isLock,
-            approval: req.approval,
-            approvalComment: req.approvalComment,
-            code: req.code,
-            requirementName: req.requirementName,
-            manager: req.manager,
+            requirementId: req.requirementId, // 요구사항 항목들의 pk
+            orderIndex: req.orderIndex, // 요구사항 항목들의 index
+            version: req.version, // 요구사항 항목들의 버전
+            isLock: req.isLock, // 요구사항 항목들의 잠금여부
+            approval: req.approval, // 요구사항 항목들의 승인여부
+            approvalComment: req.approvalComment, // 요구사항 항목들의 승인 코멘트
+            code: req.code, // 요구사항 항목들의 코드
+            requirementName: req.requirementName, // 요구사항 항목들의 이름
+            manager: { // 이하는 담당자 관련
+              name: req.manager.name, // 요구사항 담당자 이름 ex) "최지원"
+              employeeId: req.manager.employeeId, // 요구사항 담당자 사번 ex) "SSAFY1001"
+              department: req.manager.department, // 요구사항 담당자 부서 ex) "D109"
+              position: req.manager.position, // 요구사항 담당자 직위 ex) "총무"
+              role: req.manager.role, // ex) admin 일경우 "ADMIN", 아닐경우 "USER"
+              isApprovable: req.manager.isApprovable, // 요구사항 담당자의 승인 가능 여부 ex) "n"
+              profileColor: req.manager.profileColor, // 요구사항 담당자 프로필 색상 ex) "#FF9933"
+            }
+          
           }));
           // 요구사항 목록 데이터 업데이트
+          console.log("requirementData1: ",requirementData);
           setRequirements(requirementData);
+          console.log("requirementData2: ",requirementData);
         // 데이터가 없는 경우
         } else {
           // 빈 배열로 요구사항 목록 데이터 설정
@@ -223,7 +233,7 @@ const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
     };
     fetchRequirements();
   }, [pId, pCode]);
-
+  console.log("requirements: ",requirements);
   const handleRowClick = (requirement: Requirement) => {
     const { requirementId, code } = requirement;
     const rCode = code;
