@@ -35,15 +35,13 @@ public class ProjectRequirementController {
     @PostMapping("/{code}/history")
     public ResponseEntity<ResponseDto> getRequirementHistory(@RequestBody RequirementHistoryDto requirementHistoryDto, @PathVariable("code") String requirementCode) {
         Integer projectId = requirementHistoryDto.getProjectId();
-        System.out.println(requirementHistoryDto);
-        System.out.println(requirementCode);
-        System.out.println(projectId);
-        log.info("requirementHistoryDto:{}", requirementHistoryDto);
-        log.info("projectId:{}", projectId);
         List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, requirementCode);
 
         response = new ResponseDto(true, "코드에 해당하는 요구사항 항목 기록 반환", requirementSummaryDtos);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+
+
 
 }
