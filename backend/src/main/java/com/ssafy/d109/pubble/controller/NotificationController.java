@@ -7,7 +7,10 @@ import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NotificationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,9 +42,12 @@ public class NotificationController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<Page<NotificationMessageResponseDto>> getNotificationList(Pageable pageable) {
-        Page<NotificationMessageResponseDto> notifications = notificationService.getNotifications(pageable);
+    public ResponseEntity<Page<NotificationMessageResponseDto>> getNotificationList(@PageableDefault(size = 10) Pageable pageable) {
+        if (!pageable.getSort().isSorted()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
+        }
 
+        Page<NotificationMessageResponseDto> notifications = notificationService.getNotifications(pageable);
         return ResponseEntity.ok(notifications);
     }
 
