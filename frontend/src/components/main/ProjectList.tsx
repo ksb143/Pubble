@@ -6,6 +6,7 @@ import { getProject } from "@/apis/project";
 // 3. api 관련
 import  ProjectAddModal  from "@/components/main/ProjectAddModal"
 // 4. store 관련
+import usePageInfoStore from "@/stores/pageInfoStore";
 // 5. component 관련
 import { Cell, Header, HeaderGroup, Row, ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 // import { MoreHorizontal } from "lucide-react"
@@ -14,6 +15,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 // import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+
+// usePageInfoStore를 사용하기 위해 새롭게 정의
+const usePageStore = usePageInfoStore;
 // Project type 정의
 export type Project = {
   projectId: string // 프로젝트 pk
@@ -21,13 +25,14 @@ export type Project = {
   startAt: string // 프로젝트 시작일
   endAt: string // 프로젝트 종료일
   projectTitle: string // 프로젝트 이름
-  people: number // 프로젝트 참여자
-  progressRatio: number // 프로젝트 진행률
+  people: number // 프로젝트 참여자의 수(실수)
+  progressRatio: number // 프로젝트 진행률(실수)
   status: "in progress" | "complete" | "before start" // 프로젝트 상태
 }
 // column 정의
 export const columns: ColumnDef<Project>[] = [
   {
+    // 선택된 행의 체크박스
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -118,18 +123,16 @@ const ProjectList = () => {
   
   // useState를 통한 상태변화 관리 들어가기
   // 프로젝트의 목록
-  const [projects, setProjects] = useState<Project[]>([])
+  const [projects, setProjects] = useState<Project[]>([]);
   // 정렬 상태
-  const [sorting, setSorting] = useState<SortingState>([])
-  // 필터링 상태
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    [])
-  // 열 표시 상태
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({})
-  // 행 선택 상태
-  const [rowSelection, setRowSelection] = useState({})
-  // 테이블 상태
+  const [sorting, setSorting] = useState<SortingState>([]);
+  // column 필터링 상태
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  // column 보이기 상태
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  // row 선택 상태
+  const [rowSelection, setRowSelection] = useState({});
+  // table 상태
   const table = useReactTable({
     data: projects,
     columns,
@@ -148,30 +151,50 @@ const ProjectList = () => {
       rowSelection,
     },
   })
-  // useEffect를 활용한 사용자의 프로젝트 목록 보기.
+  // useEffect를 활용한... 사용자의 프로젝트 목록 화면 UI 갱신
   useEffect(() => {
-    // 사용자의 프로젝트 목록 불러오기.
-    const fetchProjects = async()=>{
-      // 사용자의 프로젝트 목록 불러오기.
-      const response = await getProject();
-      // 프로젝트 데이터 정의
-      console.log("1",response.data)
-      const projectData = response.data.map((pjt: Project) => ({
-        projectId: pjt.projectId, //프로젝트 pk
-        prdId: pjt.prdId, // 프로젝트 코드
-        startAt: pjt.startAt, //프로젝트 시작일
-        endAt: pjt.endAt, //프로젝트 종료일
-        projectTitle: pjt.projectTitle, //프로젝트 이름
-        people: pjt.people, //프로젝트 구성원 수
-        progressRatio: pjt.progressRatio, //프로젝트 진행률
-        status: pjt.status, //프로젝트 상태
-      }))
-      setProjects(projectData);
-      // 프로젝트 목록 상태 변경
-      console.log("2",projectData)
-    };
-    fetchProjects();
-  }, [])
+    // fetchProjects 함수 정의
+    const fetchProjects = async () => {
+      // 프로젝트 목록 조회 API 호출
+      try { const response = await getProject();
+      // 프로젝트 목록 데이터 추출
+      if (response.data && response.data.length > 0) {
+        const projectData = response.data.map((pjt: Project) => ({
+          projectId: pjt.projectId,
+          prdId: pjt.prdId,
+          startAt: pjt.startAt,
+          endAt: pjt.endAt,
+          projectTitle: pjt.projectTitle,
+          people: pjt.people,
+          progressRatio: pjt.progressRatio,
+          status: pjt.status,
+        }));
+        // 현재 컴포넌트에서 사용하는 '프로젝트 목록 배열'(=Project[])의 상태 업데이트 시행
+        setProjects(projectData);
+        // 정보를 받아 왔으므로, store에 프로젝트 정보 업데이트
+        usePageStore.setState({
+          projectId: projectData[0].projectId,
+          projectCode: projectData[0].prdId,
+          projectName: projectData[0].projectTitle,
+        });
+      // 데이터가 없는 경우
+      } else {
+        // 빈 배열로 프로젝트 목록 데이터 설정
+        setProjects([]);
+      }
+      // 에러 발생 시
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+      // 빈 배열로 프로젝트 목록 데이터 설정
+      setProjects([]);
+    }
+  };
+  // 프로젝트 목록 조회 API 호출
+  fetchProjects();
+  }, []); // 빈 배열로 설정하여 컴포넌트 처음 렌더링 시에만 실행
+  
+
+  // 새로운 프로젝트 생성 관련.
   // 사용자의 프로젝트 목록에 새로운 프로젝트 추가하기. // 프로젝트 생성 모달 true. 
   const handleAddProject = () => {
     // 프로젝트 생성 모달 true.
@@ -183,12 +206,18 @@ const ProjectList = () => {
     setIsModalOpen(false);
   };
 
-  // 특정 프로젝트 행 클릭시, 특정 프로젝트에 진입할 수 있도록 하는 함수.
+  // 특정 프로젝트 row 클릭시, 특정 프로젝트에 진입할 수 있도록 하는 함수.
   const handleRowClick = (row: Row<Project>) => {
     const { prdId, projectId, projectTitle } = row.original;
-    console.log("Clicked project ID:", prdId);
-    if (prdId && projectTitle) {
-      navigate(`/project/${prdId}`, { state: { prdId, projectId, projectTitle } });
+    const pId = projectId;
+    const pCode = prdId;
+    const pName = projectTitle;
+    // 프로젝트 상세 정보 페이지로 이동
+    console.log("Clicked project ID:", pId);
+    if (pCode && pName) {
+      // 프로젝트 상세 정보 페이지로 이동
+      // ps1.기존에는 state로 정보를 다음 페이지에 넘겼는데, 이제 모두 store 사용하므로 state 파라미터는 사용하지 않음
+      navigate(`/project/${pCode}`);
     } else {
       console.error("Missing prdId or projectTitle in the data");
     }

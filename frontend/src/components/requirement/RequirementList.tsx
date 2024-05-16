@@ -2,77 +2,56 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library 관련
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  SortingState,
-  getSortedRowModel,
-  ColumnFiltersState,
-  getFilteredRowModel,
-  VisibilityState,
-} from '@tanstack/react-table';
-import { MoreHorizontal } from 'lucide-react';
+import { FiMoreHorizontal } from 'react-icons/fi';
 // 3. api 관련
-import { getRequirement } from '@/apis/project.ts';
+import { getRequirement } from '@/apis/project';
 // 4. store 관련
-import usePageInfoStore from '@/stores/pageInfoStore.ts';
-// 5. components 관련
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  DropdownMenuLabel,
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuCheckboxItem,
-} from '@/components/ui/dropdown-menu';
+import usePageInfoStore from '@/stores/pageInfoStore';
+// 5. component 관련
+import { ColumnDef, flexRender, getCoreRowModel, useReactTable, getPaginationRowModel, SortingState, getSortedRowModel, ColumnFiltersState, getFilteredRowModel, VisibilityState } from '@tanstack/react-table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DropdownMenuLabel, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-// Requirement type 정의: 특정 프로젝트의 모든 요구사항 데이터를 아우르는 type
+
+// usePageInfoStore를 사용하기 위해 새롭게 정의
+const usePageStore = usePageInfoStore;
+// Requirement type 정의
 export type Requirement = {
-  description: string; // 개별 요구사항 상세설명
-  requirementId: number; // 개별 요구사항 pk
-  orderIndex: number; // 개별 요구사항 인덱스 번호
-  version: string; // 개별 요구사항의 버전
-  isLock: 'u' | 'l'; // 개별 요구사항 잠금 여부
-  approval: 'u' | 'h' | 'a'; // 개별 요구사항 승인 여부
-  approvalComment: string; // 개별 요구사항 승인 코멘트
-  code: string; // 개별 요구사항 코드
-  requirementName: string; // 개별 요구사항 이름
-  detail: string; // 개별 요구사항 상세설명
+  description: string; // 요구사항의 설명
+  requirementId: number; // 요구사항의 아이디
+  orderIndex: number; // 요구사항의 순서
+  version: string; // 요구사항의 버전
+  isLock: 'u' | 'l'; // 요구사항의 잠금 여부
+  approval: 'u' | 'h' | 'a'; // 요구사항의 승인 여부
+  approvalComment: string; // 요구사항의 승인 코멘트
+  code: string; // 요구사항의 코드
+  requirementName: string; // 요구사항의 이름
+  detail: string; // 요구사항의 상세설명
   manager: {
-    userId: number; // 개별 요구사항 담당자의 사용자 아이디
-    name: string; // 개별 요구사항 담당자의 이름
-    employeeId: string; // 개별 요구사항 담당자의 사번
-    department: string; // 개별 요구사항 담당자의 부서
-    position: string; // 개별 요구사항 담당자의 직위
-    role: string; // 개별 요구사항 담당자의 역할
-    isApprovable: 'y' | 'n'; // 개별 요구사항 담당자의 승인 가능 여부
-    profileColor: string; // 개별 요구사항 담당자의 프로필 색상
+    userId: number; // 요구사항의 담당자의 아이디
+    name: string; // 요구사항의 담당자의 이름
+    employeeId: string; // 요구사항의 담당자의 사번
+    department: string; // 요구사항의 담당자의 부서
+    position: string; // 요구사항의 담당자의 직위
+    role: string; // 요구사항의 담당자의 역할
+    isApprovable: 'y' | 'n'; // 요구사항의 담당자의 승인 가능 여부
+    profileColor: string; // 요구사항의 담당자의 프로필 색상
   };
 };
 
+// RequirementList component의 props 정의
 interface RequirementListProps {
-  projectId: string; // 프로젝트 pk
-  projectCode: string; // 프로젝트 코드
-  projectName: string; // 프로젝트 이름
+  pId: number;
+  pCode: string;
+  pName: string;
 }
-// cloumn 정의
-export const columns: ColumnDef<Requirement>[] = [
-  // useMemo는 계산 결과를 메모리에 저장(캐싱)하여, 컬럼 정의를 한번만 하게하고, 불필요한 리렌더링을 방지합니다.
 
+// RequirementList component의 columns 정의
+export const columns: ColumnDef<Requirement>[] = [
   {
+    // 선택된 행의 체크박스
     id: 'select',
     header: ({ table }) => (
       <Checkbox
@@ -80,9 +59,7 @@ export const columns: ColumnDef<Requirement>[] = [
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && 'indeterminate')
         }
-        onCheckedChange={(value: boolean) =>
-          table.toggleAllPageRowsSelected(!!value)
-        }
+        onCheckedChange={(value: boolean) => table.toggleAllPageRowsSelected(!!value)}
         aria-label='Select all'
       />
     ),
@@ -96,46 +73,55 @@ export const columns: ColumnDef<Requirement>[] = [
     enableSorting: false,
     enableHiding: false,
   },
+  // 승인여부 컬럼
   {
     accessorKey: 'approvalStatus',
     header: '승인여부',
     cell: (info) => info.getValue(),
   },
+  // 잠금여부 컬럼
   {
     accessorKey: 'lockStatus',
     header: '잠금여부',
     cell: (info) => info.getValue(),
   },
+  // 항목ID 컬럼
   {
     accessorKey: 'requirementId',
     header: '항목ID',
     cell: (info) => info.getValue(),
   },
+  // 요구사항이름 컬럼
   {
     accessorKey: 'requirementName',
     header: '요구사항이름',
     cell: (info) => info.getValue(),
   },
+  // 상세설명 컬럼
   {
     accessorKey: 'description',
     header: '상세설명',
     cell: (info) => info.getValue(),
   },
+  // 담당자 컬럼
   {
     accessorKey: 'assignee',
     header: '담당자',
     cell: (info) => info.getValue(),
   },
+  // 작성자 컬럼
   {
     accessorKey: 'author',
     header: '작성자',
     cell: (info) => info.getValue(),
   },
+  // 현재버전 컬럼
   {
     accessorKey: 'currentVersion',
     header: '현재버전',
     cell: (info) => info.getValue(),
   },
+  // 액션 컬럼
   {
     id: 'actions',
     cell: ({ row }) => {
@@ -145,7 +131,7 @@ export const columns: ColumnDef<Requirement>[] = [
           <DropdownMenuTrigger asChild>
             <Button variant='ghost' className='h-8 w-8 p-0'>
               <span className='sr-only'>Open menu</span>
-              <MoreHorizontal className='h-4 w-4' />
+              <FiMoreHorizontal className='h-4 w-4' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
@@ -169,31 +155,21 @@ export const columns: ColumnDef<Requirement>[] = [
   },
 ];
 
-// RequirementList: 특정 프로젝트의 요구사항을 개괄적으로 보는 컴포넌트
-const RequirementList = ({
-  projectId,
-  projectCode,
-  projectName,
-}: RequirementListProps) => {
-  // store에서 requirementId,requirementCode,requirementName를 업데이트 하는 함수를 가져옴
-  // const { setRequirementId, setRequirementCode, setRequirementName } =
-  //   usePageInfoStore();
-  // const { requirementId, requirementCode, requirementName } = usePageInfoStore.getState()
-  // // 스토어에 잘 저장되었는지 체크
-  // console.log('zustand 스토어에 잘 저장되었는지 체크')
-  // console.log("requirementId : ", requirementId)
-  // console.log("requirementCode : ", requirementCode)
-  // console.log("requirementName : ", requirementName)
 
-  // navigate
+const RequirementList = ({pId,pCode,pName}: RequirementListProps) => {
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
-  const [requirements, setRequirements] = useState<Requirement[]>([]); // 요구사항의 목록
-  const [sorting, setSorting] = useState<SortingState>([]); // 정렬 상태
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]); // 필터링 상태
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({}); // 열 표시 상태
-  const [rowSelection, setRowSelection] = useState({}); // 행 선택 상태
-  // 테이블 상태
+  // 요구사항의 목록
+  const [requirements, setRequirements] = useState<Requirement[]>([]);
+  // 정렬 상태
+  const [sorting, setSorting] = useState<SortingState>([]);
+  // column 필터링 상태
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  // column 보이기 상태
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  // row 선택 상태
+  const [rowSelection, setRowSelection] = useState({});
+  // table 상태
   const table = useReactTable({
     data: requirements,
     columns,
@@ -212,13 +188,16 @@ const RequirementList = ({
       rowSelection,
     },
   });
+// useEffect를 활용한... 사용자의 요구사항 목록 화면 UI 갱신
   useEffect(() => {
+    // fetchProjects 함수 정의
     const fetchRequirements = async () => {
-      try {
-        const response = await getRequirement(projectId, projectCode);
+      // 요구사항 목록 데이터 추출
+      try {const response = await getRequirement(pId, pCode);
+        // 만약 데이터가 있다면
         if (response.data && response.data.length > 0) {
+          // 요구사항 목록 데이터 추출
           const requirementData = response.data.map((req: Requirement) => ({
-            // 구조분해할당을 사용하여 직접 필드를 할당
             requirementId: req.requirementId,
             orderIndex: req.orderIndex,
             version: req.version,
@@ -227,97 +206,58 @@ const RequirementList = ({
             approvalComment: req.approvalComment,
             code: req.code,
             requirementName: req.requirementName,
-            manager: {
-              name: req.manager.name,
-              employeeId: req.manager.employeeId,
-              department: req.manager.department,
-              position: req.manager.position,
-              role: req.manager.role,
-              isApprovable: req.manager.isApprovable,
-              profileColor: req.manager.profileColor,
-            },
+            manager: req.manager,
           }));
-
-          // 첫번째 requirementId, requirementCode, requirementName를 가져와서 업데이트
-          // setRequirementId(response.data[0].requirementId);
-          // setRequirementCode(response.data[0].code);
-          // setRequirementName(response.data[0].requirementName);
-
+          // 요구사항 목록 데이터 설정
           setRequirements(requirementData);
+          usePageStore.setState({
+            requirementId: requirementData[0].requirementId,
+            requirementCode: requirementData[0].code,
+            requirementName: requirementData[0].requirementName,
+          });
+        // 데이터가 없는 경우
         } else {
-          setRequirements([]); // 데이터가 없는 경우 빈 배열 할당
+          // 빈 배열로 요구사항 목록 데이터 설정
+          setRequirements([]);
         }
+        // 에러 발생 시
       } catch (error) {
         console.error('Failed to fetch requirements:', error);
-        setRequirements([]); // 에러 처리
+        // 빈 배열로 요구사항 목록 데이터 설정
+        setRequirements([]);
       }
     };
-
     fetchRequirements();
-  }, [
-    projectId,
-    projectCode,
-    // setRequirementId,
-    // setRequirementCode,
-    // setRequirementName,
-    setRequirements,
-  ]);
+  }, [pId, pCode]);
 
   const handleRowClick = (requirement: Requirement) => {
     const { requirementId, code } = requirement;
+    const rCode = code;
+    // 요구사항코드가 존재 하지 않는 경우
     if (!requirementId) {
+      // 콘솔에 에러 메시지 반환
       console.error('Invalid requirement data');
-      return; // 유효하지 않은 데이터에 대해 처리 중단
+      return;
     }
-    // 스토어에서 setPageType 호출하여 상태 설정
-    usePageInfoStore.getState().setPageType('requirement', {
-      requirementId: requirementId,
-      requirementCode: code,
-      requirementName: requirement.requirementName
-  });
+    // 요구사항 코드가 존재하는 경우
+    // 요구사항 상세 정보 페이지로 이동
+    // 기존에는 state로 정보를 다음 페이지에 넘겼는데, 이제 모두 store 사용하므로 state 파라미터는 사용하지 않음
+    navigate(`/project/${pCode}/requirement/${rCode}`, 
+    {state: {requirementId}});
+  };
 
-  // 페이지 이동
-  navigate(`/project/${projectCode}/requirement/${code}`, {
-    state: { requirementId }
-  });
-};
-
-  // const handleAddRequirement = () => {
-  //   console.log('요구사항 항목의 추가');
-  // };
-  // const handleDeleteRequirement = () => {
-  //   console.log('요구사항 항목의 삭제');
-  // };
-  // const handleVersionCheck = () => {
-  //   console.log('요구사항 항목의 버전확인');
-  // };
   return (
     <div className='p-8 text-center'>
-      {/* 프로젝트 제목 및 기간 시작 */}
-      <p className='mb-4 text-2xl font-bold'>
-        {projectName || '예시 프로젝트 제목'}
-      </p>
+      <p className='mb-4 text-2xl font-bold'>{pName || '예시 프로젝트 제목'}</p>
       <p className='mb-8 text-lg'>프로젝트 기간</p>
-      {/* 프로젝트 제목 및 기간 끝 */}
-      <br />
-      {/* 테이블 시작 */}
       <div className='rounded-md border'>
         <div className='flex items-center px-5 py-5'>
           <Input
             placeholder='요구사항 이름을 입력해주세요.'
-            value={
-              (table
-                .getColumn('requirementName')
-                ?.getFilterValue() as string) ?? ''
-            }
-            onChange={(event) =>
-              table
-                .getColumn('requirementName')
-                ?.setFilterValue(event.target.value)
-            }
+            value={(table.getColumn('requirementName')?.getFilterValue() as string) ?? ''}
+            onChange={(event) => table.getColumn('requirementName')?.setFilterValue(event.target.value)}
             className='max-w-sm text-lg'
           />
-          {/* 테이블 시작 */}
           <div className='ml-auto'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -326,21 +266,15 @@ const RequirementList = ({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
-                {table
-                  .getAllColumns()
-                  .filter(
-                    (column) => column.getCanHide() && column.id !== 'actions',
-                  )
-                  .map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }>
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  ))}
+                {table.getAllColumns().filter((column) => column.getCanHide() && column.id !== 'actions').map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -350,15 +284,8 @@ const RequirementList = ({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className='text-center text-lg font-semibold'>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                  <TableHead key={header.id} className='text-center text-lg font-semibold'>
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -367,27 +294,17 @@ const RequirementList = ({
           <TableBody className='text-base'>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  role='button'
-                  className='cursor-pointer hover:bg-gray-100'>
+                <TableRow key={row.id} role='button' className='cursor-pointer hover:bg-gray-100'>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      onClick={() => handleRowClick(row.original)}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                    <TableCell key={cell.id} onClick={() => handleRowClick(row.original)}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'>
+                <TableCell colSpan={columns.length} className='h-24 text-center'>
                   결과가 없습니다.
                 </TableCell>
               </TableRow>
@@ -395,37 +312,16 @@ const RequirementList = ({
           </TableBody>
         </Table>
       </div>
-      <br />
-      <div className='flex justify-start'>
-        {/* <Button className='text-base' onClick={handleAddRequirementItem}>
-          항목 추가
-        </Button> */}
-      </div>
       <div className='flex items-center justify-center space-x-2 py-4'>
-        <Button
-          className='text-base'
-          variant='outline'
-          size='sm'
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}>
+        <Button variant='outline' size='sm' onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           이전 페이지
         </Button>
-        <div />
-        <div />
-        <div />
-        <Button
-          className='text-base'
-          variant='outline'
-          size='sm'
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}>
+        <Button variant='outline' size='sm' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
           다음 페이지
         </Button>
       </div>
-
       <div className='flex-1 text-sm text-muted-foreground'>
-        {table.getFilteredRowModel().rows.length} 개 중{' '}
-        {table.getFilteredSelectedRowModel().rows.length} 개 선택됨.
+        {table.getFilteredRowModel().rows.length} 개 중 {table.getFilteredSelectedRowModel().rows.length} 개 선택됨.
       </div>
     </div>
   );
