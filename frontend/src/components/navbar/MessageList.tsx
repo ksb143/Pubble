@@ -6,6 +6,7 @@ import { updateMessageStatus } from '@/apis/message';
 import { MessageInfo } from '@/types/messageTypes';
 import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
+import useNotificationStore from '@/stores/notificationStore';
 // 5. component
 import Profile from '@/components/layout/Profile';
 import Badge from '@/components/navbar/Badge';
@@ -18,6 +19,7 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({ data }) => {
+  const { isMessageChecked, setIsMessageChecked } = useNotificationStore();
   // 쪽지 읽었는지 여부 상태
   const [expandedMessageId, setExpandedMessageId] = useState<number | null>(
     null,
@@ -33,6 +35,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
     if (message.status !== 'r') {
       try {
         await updateMessageStatus(message.messageId, 'r');
+        setIsMessageChecked(!isMessageChecked);
       } catch (error) {
         console.log('쪽지 상태 업데이트 실패 :', error);
       }

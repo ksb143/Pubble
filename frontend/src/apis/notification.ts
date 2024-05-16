@@ -70,6 +70,7 @@ export const setupFCMListener = () => {
       if (payload.data?.type === 'message') {
         // 알림 타입이 쪽지인 경우
         useNotificationStore.setState({ hasNewMessage: true });
+        useNotificationStore.setState({ hasNewNotification: true });
       } else if (payload.data?.type !== 'message') {
         useNotificationStore.setState({ hasNewNotification: true });
       }

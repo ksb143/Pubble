@@ -21,10 +21,10 @@ export interface TypeData {
 // 서버에서 보내는 알림 정보
 export interface NotificationInfo {
   notificationId: number;
-  isChecked: boolean;
+  isChecked: boolean; // 읽음 여부
   content: string;
   senderInfo: SenderInfo;
   createdAt: string;
-  type: string;
-  typeData: TypeData;
+  type: string; // 알림 타입
+  typeData: TypeData; // 타입별 필요한 정보
 }

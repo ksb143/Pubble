@@ -30,7 +30,8 @@ const dialogStyle = css`
 `;
 
 const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
-  const { hasNewNotification } = useNotificationStore();
+  const { hasNewMessage, hasNewNotification, isNotificationChecked } =
+    useNotificationStore();
   const itemsPerPage = 10; // 한 페이지에 보여줄 알림 수
   const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
   const [totalPage, setTotalPage] = useState(0); // 전체 페이지 수
@@ -49,7 +50,7 @@ const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
         console.log('알림 조회 실패 : ', error);
       }
     })();
-  }, [currentPage, hasNewNotification]);
+  }, [currentPage, hasNewNotification, hasNewMessage, isNotificationChecked]);
 
   // 로티 기본 옵션
   const defaultOptions = {

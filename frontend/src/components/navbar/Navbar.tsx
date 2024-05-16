@@ -26,7 +26,12 @@ import Bell from '@/assets/icons/bell.svg?react';
 const Navbar = () => {
   const navigate = useNavigate();
   const { name, profileColor } = useUserStore();
-  const { hasNewNotification, setHasNewNotification } = useNotificationStore();
+  const {
+    hasNewMessage,
+    hasNewNotification,
+    setHasNewMessage,
+    setHasNewNotification,
+  } = useNotificationStore();
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -38,6 +43,7 @@ const Navbar = () => {
     setActiveMenu(activeMenu === menu ? null : menu);
   };
 
+  // firebase 초기 설정
   useEffect(() => {
     // 서비스 워커 등록
     registerServiceWorker();
@@ -47,8 +53,14 @@ const Navbar = () => {
     setupFCMListener();
   }, []);
 
-  // Bell 아이콘 클릭 시 알림 배지 숨김
-  const handleBellClick = () => {
+  // 쪽지 아이콘 클릭 시 알림 배지 숨김
+  const handleMessageClick = () => {
+    setHasNewMessage(false);
+    toggleMenu('message');
+  };
+
+  // 알림 아이콘 클릭 시 알림 배지 숨김
+  const handleNotificationClick = () => {
     setHasNewNotification(false);
     toggleMenu('notification');
   };
@@ -94,21 +106,22 @@ const Navbar = () => {
 
           {/* 쪽지 아이콘 */}
           <div
-            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
-            onClick={() => toggleMenu('message')}>
+            className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
+            onClick={handleMessageClick}>
             <Envelope
               className={`h-8 w-8 stroke-gray-900 ${activeMenu === 'message' ? 'stroke-[1.5]' : 'stroke-1'}`}
             />
+            {hasNewMessage && <Badge size='sm' position='right' />}
           </div>
 
           {/* 알림 아이콘 */}
           <div
-            className={`relative mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
-            onClick={handleBellClick}>
+            className={`relative mr-8 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
+            onClick={handleNotificationClick}>
             <Bell
               className={`h-8 w-8 fill-gray-900 stroke-gray-900 ${activeMenu === 'notification' ? 'stroke-[6]' : 'stroke-2'}`}
             />
-            {hasNewNotification && <Badge size='sm' position='right' />}
+            {hasNewNotification && <Badge size='sm' position='right-sm' />}
           </div>
 
           {/* 프로필 아이콘 */}
