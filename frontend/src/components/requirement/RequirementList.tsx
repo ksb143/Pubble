@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library 관련
-import { FiMoreHorizontal } from 'react-icons/fi';
+// import { FiMoreHorizontal } from 'react-icons/fi';
 // 3. api 관련
 import { getLatestRequirementVersion } from '@/apis/project';
 // 4. store 관련
@@ -29,11 +29,11 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  DropdownMenuLabel,
+  // DropdownMenuLabel,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
+  // DropdownMenuItem,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
@@ -42,25 +42,59 @@ import { Checkbox } from '@/components/ui/checkbox';
 
 // Requirement type 정의
 export type Requirement = {
-  requirementId: number | null; // 요구사항의 아이디
-  orderIndex: number | null; // 요구사항의 순서
-  version: string | null; // 요구사항의 버전
-  isLock: 'u' | 'l' | null; // 요구사항의 잠금 여부
-  approval: 'u' | 'h' | 'a' | null; // 요구사항의 승인 여부
-  approvalComment: string | null; // 요구사항의 승인 코멘트
-  code: string | null; // 요구사항의 코드
-  requirementName: string | null; // 요구사항의 이름
-  detail: string | null; // 요구사항의 상세설명
-  description: string | null; // 요구사항의 설명
-  manager: {
-    name: string | null; // 요구사항의 담당자의 이름 ex) "최지원"
-    employeeId: string | null; // 요구사항의 담당자의 사번 ex) "SSAFY1001"
-    department: string | null; // 요구사항의 담당자의 부서 ex) "D109"
-    position: string | null; // 요구사항의 담당자의 직위 ex) "총무"
-    role: string | null; // 요구사항의 담당자의 역할 ex) "ADMIN"
-    isApprovable: 'y' | 'n' | null; // 요구사항의 담당자의 승인 가능 여부 ex) "n"
-    profileColor: string | null; // 요구사항의 담당자의 프로필 색상 ex) "#FF9933"
-  };
+  // 프로젝트에 대한 내용
+  projectId: number | null; // 프로젝트의 아이디
+  projectTitle: string | null; // 프로젝트의 제목
+  startAt: string | null; // 프로젝트의 시작일
+  endAt: string | null; // 프로젝트의 종료일
+  status: string | null; // 프로젝트의 상태
+  code: string | null; // 프로젝트의 코드
+  // 프로젝트 참여자 정보
+  people: Array<{
+    name: string | null; // 프로젝트의 담당자의 이름 ex) "최지원"
+    employeeId: string | null; // 프로젝트의 담당자의 사번 ex) "SSAFY1001"
+    department: string | null; // 프로젝트의 담당자의 부서 ex) "D109"
+    position: string | null; // 프로젝트의 담당자의 직위 ex) "총무"
+    role: string | null; // 프로젝트의 담당자의 역할 ex) "ADMIN"
+    isApprovable: 'y' | 'n' | null; // 프로젝트의 담당자의 승인 가능 여부 ex) "n"
+    profileColor: string | null; // 프로젝트의 담당자의 프로필 색상 ex) "#FF9933"
+  }>;
+  // 요구사항들의 개요에 관한 내용
+  requirementSummaryDtos: Array<{
+    requirementId: number | null; // 요구사항의 아이디
+    orderIndex: number | null; // 요구사항의 순서
+    version: string | null; // 요구사항의 버전
+    isLock: 'u' | 'l' | null; // 요구사항의 잠금 여부
+    approval: 'u' | 'h' | 'a' | null; // 요구사항의 승인 여부
+    approvalComment: string | null; // 요구사항의 승인 코멘트
+    detail: Array<{
+      requirementDetailId: number | null; // 요구사항의 상세아이디
+      content: string | null; // 요구사항의 상세설명
+      status: 'u' | 'd' | null; // 요구사항의 상세설명의 상태
+    }>;
+    // 요구사항 담당자 관련
+    manager: Array<{
+      name: string | null; // 요구사항의 담당자의 이름 ex) "최지원"
+      employeeId: string | null; // 요구사항의 담당자의 사번 ex) "SSAFY1001"
+      department: string | null; // 요구사항의 담당자의 부서 ex) "D109"
+      position: string | null; // 요구사항의 담당자의 직위 ex) "총무"
+      role: string | null; // 요구사항의 담당자의 역할 ex) "ADMIN"
+      isApprovable: 'y' | 'n' | null; // 요구사항의 담당자의 승인 가능 여부 ex) "n"
+      profileColor: string | null; // 요구사항의 담당자의 프로필 색상 ex) "#FF9933"
+    }>;
+    targetUse: string | null; // 요구사항의 목적
+    createdAt: string | null; // 요구사항의 생성일
+    // 요구사항 작성자 관련
+    author: Array<{
+      name: string | null; // 요구사항의 작성자의 이름 ex) "최지원"
+      employeeId: string | null; // 요구사항의 작성자의 사번 ex) "SSAFY1001"
+      department: string | null; // 요구사항의 작성자의 부서 ex) "D109"
+      position: string | null; // 요구사항의 작성자의 직위 ex) "총무"
+      role: string | null; // 요구사항의 작성자의 역할 ex) "ADMIN"
+      isApprovable: 'y' | 'n' | null; // 요구사항의 작성자의 승인 가능 여부 ex) "n"
+      profileColor: string | null; // 요구사항의 작성자의 프로필 색상 ex) "#FF9933"
+    }>;
+  }>;
 };
 
 // RequirementList component의 props 정의
@@ -146,37 +180,37 @@ export const columns: ColumnDef<Requirement>[] = [
     cell: (info) => info.getValue(),
   },
   // 액션 컬럼
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const requirement = row.original;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant='ghost' className='h-8 w-8 p-0'>
-              <span className='sr-only'>Open menu</span>
-              <FiMoreHorizontal className='h-4 w-4' />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align='end'>
-            <DropdownMenuLabel></DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={
-                () => console.log(`Delete ${requirement.requirementId}`) // 함수 추가 후 콘솔 로그 삭제예정
-              }>
-              삭제하기
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={
-                () => console.log(`이전 버전확인 ${requirement.requirementId}`) // 함수 추가 후 콘솔 로그 삭제예정
-              }>
-              버전확인
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
+  // {
+  //   id: 'actions',
+  //   cell: ({ row }) => {
+  //     return (
+  //       <DropdownMenu>
+  //         <DropdownMenuTrigger asChild>
+  //           <Button variant='ghost' className='h-8 w-8 p-0'>
+  //             <span className='sr-only'>Open menu</span>
+  //             <FiMoreHorizontal className='h-4 w-4' />
+  //           </Button>
+  //         </DropdownMenuTrigger>
+  //         <DropdownMenuContent align='end'>
+  //           <DropdownMenuLabel></DropdownMenuLabel>
+  //           <DropdownMenuItem
+  //             onClick={
+  //               () => console.log(`Delete 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
+  //             }>
+  //             삭제하기
+  //           </DropdownMenuItem>
+  //           <DropdownMenuItem
+  //             onClick={
+  //               () =>
+  //                 console.log(`이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
+  //             }>
+  //             버전확인
+  //           </DropdownMenuItem>
+  //         </DropdownMenuContent>
+  //       </DropdownMenu>
+  //     );
+  //   },
+  // },
 ];
 
 const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
@@ -223,38 +257,40 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
         if (response.data && response.data.length > 0) {
           // 요구사항 목록 데이터 추출
           const requirementData = response.data.map((req: Requirement) => ({
-            requirementId: req.requirementId, // 요구사항 항목들의 pk
-            orderIndex: req.orderIndex, // 요구사항 항목들의 index
-            version: req.version, // 요구사항 항목들의 버전
-            isLock: req.isLock, // 요구사항 항목들의 잠금여부
-            approval: req.approval, // 요구사항 항목들의 승인여부
-            approvalComment: req.approvalComment, // 요구사항 항목들의 승인 코멘트
-            code: req.code, // 요구사항 항목들의 코드
-            requirementName: req.requirementName, // 요구사항 항목들의 이름
-            manager: {
-              // 이하는 담당자 관련
-              name: req.manager.name, // 요구사항 담당자 이름 ex) "최지원"
-              employeeId: req.manager.employeeId, // 요구사항 담당자 사번 ex) "SSAFY1001"
-              department: req.manager.department, // 요구사항 담당자 부서 ex) "D109"
-              position: req.manager.position, // 요구사항 담당자 직위 ex) "총무"
-              role: req.manager.role, // ex) admin 일경우 "ADMIN", 아닐경우 "USER"
-              isApprovable: req.manager.isApprovable, // 요구사항 담당자의 승인 가능 여부 ex) "n"
-              profileColor: req.manager.profileColor, // 요구사항 담당자 프로필 색상 ex) "#FF9933"
-            },
+            projectId: req.projectId,
+            projectTitle: req.projectTitle,
+            startAt: req.startAt,
+            endAt: req.endAt,
+            status: req.status,
+            code: req.code,
+            people: req.people,
+            requirementSummaryDtos: req.requirementSummaryDtos.map(
+              (summary) => ({
+                requirementId: summary.requirementId,
+                orderIndex: summary.orderIndex,
+                version: summary.version,
+                isLock: summary.isLock,
+                approval: summary.approval,
+                approvalComment: summary.approvalComment,
+                detail: summary.detail,
+                manager: summary.manager,
+                targetUse: summary.targetUse,
+                createdAt: summary.createdAt,
+                author: summary.author,
+              }),
+            ),
           }));
           // 요구사항 목록 데이터 업데이트
-
+          console.log('requirementData1: ', requirementData);
           setRequirements(requirementData);
-
-          // 데이터가 없는 경우
+          console.log('requirementData2: ', requirementData);
         } else {
-          // 빈 배열로 요구사항 목록 데이터 설정
+          // 데이터가 없는 경우, 빈 배열로 요구사항 목록 데이터 설정
           setRequirements([]);
         }
-        // 에러 발생 시
       } catch (error) {
         console.error('Failed to fetch requirements:', error);
-        // 빈 배열로 요구사항 목록 데이터 설정
+        // 에러 발생 시, 빈 배열로 요구사항 목록 데이터 설정
         setRequirements([]);
       }
     };
@@ -264,8 +300,9 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
   console.log('requirements: ', requirements);
 
   const handleRowClick = (requirement: Requirement) => {
-    const { requirementId, code } = requirement;
+    const { code } = requirement;
     const rCode = code;
+    const requirementId = requirement.requirementSummaryDtos[0]?.requirementId;
     // 요구사항코드가 존재 하지 않는 경우
     if (!requirementId) {
       // 콘솔에 에러 메시지 반환
