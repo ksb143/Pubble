@@ -44,11 +44,13 @@ const RequirementPage = () => {
     })();
   }, []);
 
+  console.log(requirementInfo);
+
   return (
     <div className='flex h-full w-full items-center justify-center py-3'>
       <div className='h-full w-1/3 rounded bg-white p-6 shadow'>
         <div className='flex flex-col'>
-          <p>
+          {/* <p>
             version : {requirementInfo?.version} // 버전 v.1.0, r는 restore
             복제버전, h는 hold 보류버전 ... 회색 태그(배지)로 표시
           </p>
@@ -78,7 +80,7 @@ const RequirementPage = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
         <button
           className='my-3 w-1/4 rounded bg-pubble py-3 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
