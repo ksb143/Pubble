@@ -39,6 +39,8 @@ const usePageInfoStore = create(
       // 입력받은 페이지 타입에 따라 상태 변경
       setPageType: (type, args = {}) => {
         switch (type) {
+          // 현재 페이지가 project 페이지일 때
+          // 나머지는 초기값, project 관련 변수 중 입력받은 값이 있으면 변경
           case 'project':
             set({
               ...initialState,
@@ -47,6 +49,9 @@ const usePageInfoStore = create(
               projectName: args.projectName ?? initialState.projectName,
             });
             break;
+          // 현재 페이지가 requirement 페이지일 때
+          // project 관련 변수는 유지
+          // requirement 관련 변수 중 입력받은 값이 있으면 변경, 나머지는 초기값
           case 'requirement':
             set((state) => ({
               ...state,
@@ -58,12 +63,15 @@ const usePageInfoStore = create(
               isRichPage: initialState.isRichPage,
             }));
             break;
+          // 현재 페이지가 rich 페이지일 때
+          // 나머지는 유지, rich 관련 변수 중 입력받은 값이 있으면 변경
           case 'rich':
             set((state) => ({
               ...state,
               isRichPage: args.isRichPage ?? initialState.isRichPage,
             }));
             break;
+          // 초기화
           case 'init':
             set(initialState);
             break;

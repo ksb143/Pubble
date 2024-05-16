@@ -48,7 +48,7 @@ const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
         console.log('쪽지 조회 실패 : ', error);
       }
     })();
-  }, [currentPage, messageList]);
+  }, [currentPage]);
 
   // 로티 기본 옵션
   const defaultOptions = {
