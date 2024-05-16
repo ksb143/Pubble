@@ -11,14 +11,12 @@ interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onInsert: (image: string) => void;
-  requirementId: number;
 }
 
 const ImageUploadModal = ({
   isOpen,
   onClose,
   onInsert,
-  requirementId,
 }: ImageUploadModalProps) => {
   const [tab, setTab] = useState('link');
   const [url, setUrl] = useState('');
@@ -40,7 +38,7 @@ const ImageUploadModal = ({
       onInsert(url);
     } else if (tab === 'upload' && file) {
       try {
-        const imageUrl = await getImageUrl(file, requirementId);
+        const imageUrl = await getImageUrl(file);
         onInsert(imageUrl);
       } catch (error) {
         console.error('Failed to upload image: ', error);

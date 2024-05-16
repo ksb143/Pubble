@@ -29,7 +29,6 @@ interface CodeEditorWithPreviewProps {
     css: string,
     javascript: string,
   ) => void;
-  requirementId: number;
   codePreview: CodePreview;
 }
 
@@ -37,7 +36,6 @@ const CodeEditorWithPreview = ({
   isOpen,
   onClose,
   applyCodeCapture,
-  requirementId,
   codePreview,
 }: CodeEditorWithPreviewProps) => {
   const { html, css, javascript } = codePreview;
@@ -122,7 +120,7 @@ const CodeEditorWithPreview = ({
       const blob = await response.blob();
       const imageFile = new File([blob], 'code-image.png', { type: blob.type });
 
-      const uploadedImageUrl = await getImageUrl(imageFile, requirementId);
+      const uploadedImageUrl = await getImageUrl(imageFile);
 
       applyCodeCapture(uploadedImageUrl, htmlValue, cssValue, jsValue);
       onClose();

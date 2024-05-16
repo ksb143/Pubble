@@ -22,6 +22,7 @@ import {
 // 5. component
 import Grid from '@/components/rich/Grid';
 // 6. image 등 assets
+import SearchIcon from '@/assets/icons/search.svg?react';
 import BoldIcon from '@/assets/icons/bold.svg?react';
 import ItalicIcon from '@/assets/icons/italic.svg?react';
 import UnderlineIcon from '@/assets/icons/underline.svg?react';
@@ -108,11 +109,19 @@ const MenuBar = ({
   };
 
   return (
-    <div className='flex w-full justify-around rounded-t-sm bg-pubble py-2 text-white'>
-      <div className='flex items-end gap-3'>
-        <h1 className='text-2xl font-normal'>ID {requirementCode}</h1>
-        <h1 className='text-2xl font-normal'>{requirementName}</h1>
-        <h2>{projectName}</h2>
+    <div className='relative flex w-full items-center justify-around rounded-t-sm bg-[#e5e6e6] py-2 text-black'>
+      <div className='flex gap-2'>
+        <span className='h-4 w-4 rounded-full bg-[#fd5a57]'></span>
+        <span className='h-4 w-4 rounded-full bg-[#fdbe3c]'></span>
+        <span className='h-4 w-4 rounded-full bg-[#13c43f]'></span>
+      </div>
+      <div className='flex items-center justify-between gap-5 rounded-lg bg-[#fefefe] px-4 py-1'>
+        <SearchIcon />
+        <div className='flex items-center gap-3'>
+          <h1 className='text-lg font-normal'>ID {requirementCode}</h1>
+          <h1 className='text-lg font-normal'>{requirementName}</h1>
+          <h2>{projectName}</h2>
+        </div>
       </div>
       <div className='flex'>
         <div className='flex gap-8'>
@@ -120,25 +129,25 @@ const MenuBar = ({
             <button
               onClick={() => editor.chain().focus().toggleBold().run()}
               disabled={!editor.can().chain().focus().toggleBold().run()}>
-              <BoldIcon className='h-6 w-6 fill-white' />
+              <BoldIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleItalic().run()}
               disabled={!editor.can().chain().focus().toggleItalic().run()}>
-              <ItalicIcon className='h-6 w-6 fill-white' />
+              <ItalicIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleUnderline().run()}
               disabled={!editor.can().chain().focus().toggleUnderline().run()}>
-              <UnderlineIcon className='h-6 w-6 fill-white' />
+              <UnderlineIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <button
               onClick={() => editor.chain().focus().toggleStrike().run()}
               disabled={!editor.can().chain().focus().toggleStrike().run()}>
-              <StrikeIcon className='h-6 w-6 fill-white' />
+              <StrikeIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <label className='flex w-8 cursor-pointer items-end'>
-              <PaletteIcon className='h-6 w-6 fill-white' />
+              <PaletteIcon className='h-6 w-6 fill-gray-800' />
               <ColorInput
                 type='color'
                 onInput={(event) => {
@@ -150,7 +159,7 @@ const MenuBar = ({
               />
             </label>
             <label className='flex w-8 cursor-pointer items-end'>
-              <MarkPenIcon className='h-6 w-6 fill-white' />
+              <MarkPenIcon className='h-6 w-6 fill-gray-800' />
               <HighlightInput
                 type='color'
                 onInput={(event) => {
@@ -168,22 +177,22 @@ const MenuBar = ({
           </div>
           <div className='flex items-center gap-3'>
             <button onClick={openImageModal}>
-              <ImageLineIcon className='h-6 w-6 fill-white' />
+              <ImageLineIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <button onClick={openFileModal}>
-              <FileLineIcon className='h-6 w-6 fill-white' />
+              <FileLineIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <button onClick={openLinkModal}>
-              <LinkIcon className='h-6 w-6 fill-white' />
+              <LinkIcon className='h-6 w-6 fill-gray-800' />
             </button>
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger>
-                <CodeBlockIcon className='h-6 w-6 fill-white' />
+                <CodeBlockIcon className='h-6 w-6 fill-gray-800' />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className='flex items-center'>
-                    <CodeVIewIcon className='h-5 w-5 fill-white' />
+                    <CodeVIewIcon className='h-5 w-5 fill-gray-800' />
                     <span className='ml-2'>언어 선택</span>
                   </DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
@@ -211,7 +220,7 @@ const MenuBar = ({
                 <DropdownMenuItem
                   onClick={openCodeEditorWithPreviewModal}
                   className='flex items-center'>
-                  <CodeVIewIcon className='h-5 w-5 fill-white' />
+                  <CodeVIewIcon className='h-5 w-5 fill-gray-800' />
                   <span className='ml-2'>HTML블럭</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -219,7 +228,7 @@ const MenuBar = ({
             <Popover>
               <PopoverTrigger asChild>
                 <button>
-                  <TableLIneIcon className='h-6 w-6 fill-white' />
+                  <TableLIneIcon className='h-6 w-6 fill-gray-800' />
                 </button>
               </PopoverTrigger>
               <PopoverContent>

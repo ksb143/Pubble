@@ -11,8 +11,8 @@ const VersionItem = ({ title, date, isActive, onClick }: VersionItemProps) => {
   return (
     <button
       onClick={onClick}
-      className={`flex shrink grow appearance-none bg-transparent text-left text-white hover:bg-pubble ${isActive && 'bg-pubble'}`}>
-      <span>{title || renderDate(date)}</span>
+      className={`mt-3 flex shrink grow appearance-none bg-transparent text-left text-black hover:bg-gray-200 ${isActive && 'bg-pubble'}`}>
+      <span className='mr-3'>{title || renderDate(date)}</span>
       {title ? <span>{renderDate(date)}</span> : null}
     </button>
   );

@@ -1,4 +1,46 @@
+/* Give a remote user a caret */
+.collaboration-cursor__caret {
+    border-left: 1px solid #0d0d0d;
+    border-right: 1px solid #0d0d0d;
+    margin-left: -1px;
+    margin-right: -1px;
+    pointer-events: none;
+    position: relative;
+    word-break: normal;
+    width: 3px; /* Adjust the width as needed */
+}
+
+/* Render the username above the caret */
+.collaboration-cursor__label {
+    border-radius: 3px 3px 3px 0;
+    color: #0d0d0d;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    left: -1px;
+    line-height: normal;
+    padding: 0.1rem 0.3rem;
+    position: absolute;
+    top: -1.4em;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.tableWrapper {
+    padding: 1rem 0;
+    overflow-x: auto;
+}
+
+.resize-cursor {
+    cursor: ew-resize;
+    cursor: col-resize;
+}
+
 .tiptap {
+    > * + * {
+        margin-top: 0.75em;
+    }
+
     table {
         border-collapse: collapse;
         margin: 0;
@@ -27,7 +69,7 @@
         }
 
         .selectedCell:after {
-            background: rgba(200, 200, 255, 0.4);
+            background: #c8c8ff;
             content: "";
             left: 0;
             right: 0;
@@ -39,7 +81,7 @@
         }
 
         .column-resize-handle {
-            background-color: #adf;
+            background-color: #aaddff;
             bottom: -2px;
             position: absolute;
             right: -2px;
@@ -53,26 +95,4 @@
         }
     }
 
-    table:hover .addRowButton, table:hover .addColumnButton {
-        visibility: visible;
-    }
-}
-
-.tableWrapper {
-    padding: 1rem 0;
-    overflow-x: auto;
-}
-
-.resize-cursor {
-    cursor: ew-resize;
-    cursor: col-resize;
-}
-
-.addRowButton, .addColumnButton {
-    visibility: hidden;
-    position: absolute;
-    right: 0;
-    background-color: blue;
-    color: white;
-    cursor: pointer;
 }

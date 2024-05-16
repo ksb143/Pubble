@@ -13,14 +13,12 @@ interface LinkUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onInsert: (link: string, linkType: string) => void;
-  requirementId: number;
 }
 
 const LinkUploadModal = ({
   isOpen,
   onClose,
   onInsert,
-  requirementId,
 }: LinkUploadModalProps) => {
   const [linkType, setLinkType] = useState('link');
   const [url, setUrl] = useState('');
@@ -48,7 +46,7 @@ const LinkUploadModal = ({
       const blob = await response.blob();
       const fileName = `screenshot-${new Date().getTime()}.gif`;
       const file = new File([blob], fileName, { type: blob.type });
-      const imageUrl = await getImageUrl(file, requirementId);
+      const imageUrl = await getImageUrl(file);
       return imageUrl;
     } catch (error) {
       console.error('Failed to upload image: ', error);

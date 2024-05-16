@@ -12,14 +12,12 @@ interface FileUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onInsert: (fileUrl: string, fileName: string) => void;
-  requireUniqueId: number;
 }
 
 const FileUploadModal = ({
   isOpen,
   onClose,
   onInsert,
-  requireUniqueId,
 }: FileUploadModalProps) => {
   const [file, setFile] = useState<File | null>(null);
 
@@ -40,7 +38,7 @@ const FileUploadModal = ({
         alert('파일을 선택해주세요.');
         return;
       }
-      const fileUrl = await getFileUrl(file, requireUniqueId);
+      const fileUrl = await getFileUrl(file);
       onInsert(fileUrl, file.name);
       setFile(null);
       onClose();

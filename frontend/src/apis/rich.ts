@@ -1,9 +1,8 @@
 import { privateApi } from '@/utils/http-commons.ts';
 
-export const getImageUrl = async (imageFile: File, requirementId: number) => {
+export const getImageUrl = async (imageFile: File) => {
   const formData = new FormData();
   formData.append('upload', imageFile);
-  formData.append('requirementId', requirementId.toString());
 
   try {
     const response = await privateApi.post('/uploads/image', formData, {
@@ -19,10 +18,9 @@ export const getImageUrl = async (imageFile: File, requirementId: number) => {
   }
 };
 
-export const getFileUrl = async (file: File, requirementId: number) => {
+export const getFileUrl = async (file: File) => {
   const formData = new FormData();
   formData.append('upload', file);
-  formData.append('requirementId', requirementId.toString());
 
   try {
     const response = await privateApi.post('/uploads/file', formData, {
