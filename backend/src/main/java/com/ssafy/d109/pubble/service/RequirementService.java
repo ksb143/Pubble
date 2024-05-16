@@ -404,4 +404,13 @@ public class RequirementService {
             detailRepository.save(detail);
         }
     }
-}
+
+
+    /* getRequirementSpecific : 특정 버전의 요구사항을 반환해주는 메서드
+     * @params : Integer projectId 가 포함된 request DTO
+     * @return : 요구사항 NB-001 의 특정 버전 정보
+     * */
+    public RequirementSummaryDto getRequirementSpecific(Integer projectId, String requirementCode, String requirementVersion) {
+        requirementRepository.findRequirementByCodeAndVersion(requirementCode, requirementVersion).orElseThrow(RequirementNotFoundException::new);
+
+    }

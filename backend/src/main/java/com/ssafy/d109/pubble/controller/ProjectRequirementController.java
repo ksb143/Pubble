@@ -48,23 +48,47 @@ public class ProjectRequirementController {
     }
 
 
-    /* getRequirementCurrent : 최신 버전의 요구사항만 반환해주는 메서드
-    * @params : Integer projectId 가 포함된 request DTO
-    * @return : 요구사항 NB-001 의 최신 버전 정보
-    * */
-    @Operation(summary = "최신 버전의 요구사항만 반환")
-    @PostMapping("/{code}/current")
-    public ResponseEntity<ResponseDto> getRequirementCurrent(@RequestBody RequirementHistoryDto requirementHistoryDto, @PathVariable("code") String requirementCode) {
-        Integer projectId = requirementHistoryDto.getProjectId();
+//    /* getRequirementCurrent : 최신 버전의 요구사항만 반환해주는 메서드
+//    * @params : Integer projectId 가 포함된 request DTO
+//    * @return : 요구사항 NB-001 의 최신 버전 정보
+//    * */
+//    @Operation(summary = "최신 버전의 요구사항만 반환")
+//    @PostMapping("/{code}/current")
+//    public ResponseEntity<ResponseDto> getRequirementCurrent(@RequestBody RequirementHistoryDto requirementHistoryDto, @PathVariable("code") String requirementCode) {
+//        Integer projectId = requirementHistoryDto.getProjectId();
+//        try {
+//            ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
+//            response = new ResponseDto(true, "최신 버전의 요구사항만 조회 성공", projectRequirementsDto);
+//            return ResponseEntity.status(HttpStatus.OK).body(response);
+//        } catch (Exception e) {
+//            log.error(e.getMessage());
+//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
+
+    /* getRequirementSpecific : 특정 버전의 요구사항을 반환해주는 메서드
+     * @params : Integer projectId 가 포함된 request DTO
+     * @return : 요구사항 NB-001 의 특정 버전 정보
+     * */
+    @Operation(summary = "특정 버전의 요구사항을 반환")
+    @PostMapping("/{code}/{version}")
+    public ResponseEntity<ResponseDto> getRequirementSpecific(@RequestBody RequirementHistoryDto requirementHistoryDto,
+                                                              @PathVariable("code") String requirementCode,
+                                                              @PathVariable("version") String requirementVersion) {
         try {
-            ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
-            response = new ResponseDto(true, "최신 버전의 요구사항만 조회 성공", projectRequirementsDto);
+            Integer projectId = requirementHistoryDto.getProjectId();
+            RequirementSummaryDto requirementSummaryDto = requirementService.getRequirementSpecific(projectId, requirementCode, requirementVersion);
+
+            response = new ResponseDto(true, "요구사항 항목 조회", requirementSummaryDto);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
+
+
 
 
 
