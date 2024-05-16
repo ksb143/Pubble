@@ -51,7 +51,7 @@ public class NotificationService {
                 .orElse(Notification.builder().token(token).build());
         notification.setToken(token);
         notification.setUser(currentUser);
-        currentUser.setNotification(notification);
+//        currentUser.setNotification(notification);
 
         userRepository.save(currentUser);
         notificationRepository.save(notification);
@@ -114,7 +114,7 @@ public class NotificationService {
                 .orElseThrow(NotificationNotFoundException::new);
         User user = notification.getUser();
         if (user != null) {
-            user.setNotification(null);
+//            user.setNotification(null);
             userRepository.saveAndFlush(user);  // User 엔티티 업데이트
         }
         notificationRepository.delete(notification);
