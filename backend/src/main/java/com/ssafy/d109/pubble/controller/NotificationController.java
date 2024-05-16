@@ -23,7 +23,7 @@ public class NotificationController {
         this.commonUtil = commonUtil;
     }
 
-    @PostMapping("/token")
+    @PostMapping("/fcm-token")
     public void registerToken(@RequestBody FCMTokenRequestDto tokenDto) {
 
         User currentUser = commonUtil.getUser();
