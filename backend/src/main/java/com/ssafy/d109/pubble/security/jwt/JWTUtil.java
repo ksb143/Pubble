@@ -88,7 +88,7 @@ public class JWTUtil {
         }
 
 
-        /*
+
 
 
         List<EditableProjectsResponseDto> editables =  projectService.getEditableProjects(user.getUserId());
@@ -101,7 +101,7 @@ public class JWTUtil {
             uneditableProjects.add(ue.getProjectId() + "/" + ue.getProjectCode() + "/" + ue.getRequirementId() + "/" + ue.getRequirementCode() + "/*");
         }
 
-         */
+
 
 
 
@@ -114,8 +114,8 @@ public class JWTUtil {
                 .claim("department", department)
                 .claim("position", position)
                 .claim("allowedDocumentNames", reponseDto)
-//                .claim("editable", editableProjects)
-//                .claim("uneditable", uneditableProjects)
+                .claim("editable", editableProjects)
+                .claim("uneditable", uneditableProjects)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)
