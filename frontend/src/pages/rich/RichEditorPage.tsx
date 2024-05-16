@@ -8,7 +8,6 @@ import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import CollaborationHistory from '@tiptap-pro/extension-collaboration-history';
 import { CollabHistoryVersion } from '@tiptap-pro/extension-collaboration-history';
-import { SignJWT } from 'jose';
 import * as Y from 'yjs';
 import { Switch } from '@/components/ui/switch';
 // 3. api
@@ -23,20 +22,23 @@ import ImageUploadModal from '@/components/rich/ImageUploadModal.tsx';
 import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
 import LinkUploadModal from '@/components/rich/LinkUploadModal.tsx';
 // 6. image 등 assets
-const { VITE_TIPTAP_APP_ID, VITE_TIPTAP_APP_SECRET } = import.meta.env;
 import { renderDate } from '@/utils/tiptap.ts';
+import './RichEditorPage.css';
 
-const RichEditorPage = () => {
+interface RichEditorPageProps {
+  provider: (docName: string) => TiptapCollabProvider;
+  ydoc: Y.Doc;
+}
+
+const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
   const { name, profileColor } = useUserStore();
   const {
-    projectId,
+    projectCode,
     projectName,
-    requirementId,
     requirementCode,
     requirementName,
+    setPageType,
   } = usePageInfoStore();
-  const [loading, setLoading] = useState(true);
-  const [tiptapToken, setTiptapToken] = useState('');
   const [status, setStatus] = useState('connecting');
   const [currentVersion, setCurrentVersion] = useState(0);
   const [latestVersion, setLatestVersion] = useState(0);
@@ -54,38 +56,57 @@ const RichEditorPage = () => {
   const [imageUploadModalOpen, setImageUploadModalOpen] = useState(false);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
 
-  // 공동편집 기능 사용
+  // 공동편집 기능 및 리치에디터 전역변수 설정
   useEffect(() => {
-    const generateJwt = async () => {
-      try {
-        const userId = await localStorage.getItem('userId');
-        const newToken = await new SignJWT({ userId: userId })
-          .setProtectedHeader({ alg: 'HS256' })
-          .setExpirationTime('2h')
-          .sign(new TextEncoder().encode(VITE_TIPTAP_APP_SECRET));
-        setTiptapToken(newToken);
-      } catch (error) {
-        console.error('JWT 생성 오류:', error);
-      }
-    };
-    generateJwt();
+    setPageType('rich', {
+      isRichPage: true,
+    });
   }, []);
 
-  // 웹소켓 프로바이더 설정
-  const ydoc = new Y.Doc();
-  const websocketProvider = new TiptapCollabProvider({
-    appId: VITE_TIPTAP_APP_ID,
-    name: `test-page`,
-    document: ydoc,
-    token: tiptapToken,
-    onAuthenticationFailed(reason) {
-      console.log('인증 실패: ', reason);
-    },
-  });
-  websocketProvider.setAwarenessField('user', {
-    name: name,
-    color: profileColor,
-  });
+  // provider 설정
+  const collabProvider = provider(`${projectCode}-${requirementCode}`);
+
+  // 현재 사용자 정보 설정
+  useEffect(() => {
+    collabProvider.setAwarenessField('user', {
+      name: name,
+      color: profileColor,
+    });
+  }, [collabProvider, name, profileColor]);
+
+  // 공급자 이벤트 리스너 설정
+  useEffect(() => {
+    collabProvider.on('connect', () => {
+      setStatus('connected');
+    });
+    collabProvider.on('disconnect', () => {
+      console.log('Disconnected');
+    });
+    collabProvider.on('synced', () => {
+      console.log('Synced');
+    });
+    collabProvider.on(
+      'authenticationFailed',
+      ({ reason }: { reason: string }) => {
+        console.error('Authentication failed:', reason);
+      },
+    );
+    collabProvider.on('awarenessChange', ({ states }: { states: string }) => {
+      console.log('states: ', states);
+    });
+    collabProvider.on('status', ({ status }: { status: string }) => {
+      console.log('status: ', status);
+      setStatus(status);
+    });
+    return () => {
+      collabProvider.off('connect');
+      collabProvider.off('disconnect');
+      collabProvider.off('synced');
+      collabProvider.off('authenticationFailed');
+      collabProvider.off('awarenessChange');
+      collabProvider.off('status');
+    };
+  }, [collabProvider]);
 
   const editor = useEditor({
     editorProps: {
@@ -94,92 +115,57 @@ const RichEditorPage = () => {
           'm-2 p-4 w-full border border-gray-200 rounded-lg focus:outline-none overflow-y-auto overflow-x-hidden',
       },
     },
-    extensions: [
-      ...Extensions,
-      Collaboration.configure({
-        document: ydoc,
-      }),
-      CollaborationCursor.configure({
-        provider: websocketProvider,
-        user: {
-          name: name,
-          color: profileColor,
-        },
-      }),
-      CollaborationHistory.configure({
-        provider: websocketProvider,
-        onUpdate: (data) => {
-          setVersions(data.versions);
-          setCurrentVersion(data.currentVersion);
-          setLatestVersion(data.version);
-          setIsAutoVersioning(data.versioningEnabled);
-        },
-      }),
-    ],
+    extensions: collabProvider
+      ? [
+          ...Extensions,
+          Collaboration.configure({
+            document: ydoc,
+          }),
+          CollaborationCursor.configure({
+            provider: collabProvider,
+            user: {
+              name: name,
+              color: profileColor,
+            },
+          }),
+          CollaborationHistory.configure({
+            provider: collabProvider,
+            onUpdate: (data) => {
+              setVersions(data.versions);
+              setCurrentVersion(data.currentVersion);
+              setLatestVersion(data.version);
+              setIsAutoVersioning(data.versioningEnabled);
+            },
+          }),
+        ]
+      : [...Extensions],
   });
 
   // 버전 복구
   const handleRevert = useCallback(
     (version: number, versionData?: CollabHistoryVersion) => {
-      if (versionData) {
-        const versionTitle =
-          versionData.name || renderDate(new Date(versionData.date));
-        editor?.commands.revertToVersion(
-          version,
-          `Revert to ${versionTitle}`,
-          `Unsaved changes before revert to ${versionTitle}`,
-        );
-      } else {
-        const defaultTitle = `Version ${version}`;
-        editor?.commands.revertToVersion(
-          version,
-          `Revert to ${defaultTitle}`,
-          `Unsaved changes before revert to ${defaultTitle}`,
-        );
-      }
+      const versionTitle = versionData
+        ? versionData.name || renderDate(new Date(versionData.date))
+        : version;
+      editor?.commands.revertToVersion(
+        version,
+        `Revert to ${versionTitle}`,
+        `Unsaved changes before revert to ${versionTitle}`,
+      );
     },
     [editor],
   );
 
-  // 현재 접속 유저 판단
-  const currentUser = loading ? null : { name: name, color: profileColor };
-
-  // 스토어 값 감지
-  useEffect(() => {
-    if (
-      name &&
-      profileColor &&
-      projectId &&
-      requirementId &&
-      requirementCode &&
-      requirementName
-    ) {
-      setLoading(false);
-    }
-  }, [
-    name,
-    profileColor,
-    projectId,
-    requirementId,
-    requirementCode,
-    requirementName,
-  ]);
-
-  // 상태값 감지
-  useEffect(() => {
-    if (websocketProvider) {
-      websocketProvider.on('status', (event: { status: string }) => {
-        setStatus(event.status);
-      });
-    }
-  }, [websocketProvider]);
-
   // 현재 접속 유저 감지
   useEffect(() => {
-    if (editor && currentUser) {
-      editor.chain().focus().updateUser(currentUser).run();
+    if (editor && name && profileColor) {
+      editor
+        .chain()
+        .focus()
+        .updateUser({ name: name, color: profileColor })
+        .run();
     }
-  }, [editor, currentUser, websocketProvider]);
+  }, [editor, name, profileColor]);
 
   // 버전 관리 모달
   const showVersioningModal = useCallback(() => {
@@ -279,15 +265,17 @@ const RichEditorPage = () => {
 
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
-      <VersioningModal
-        versions={versions}
-        isOpen={versioningModalOpen}
-        onClose={handleVersioningClose}
-        onRevert={handleRevert}
-        currentVersion={currentVersion}
-        latestVersion={latestVersion}
-        provider={websocketProvider}
-      />
+      {collabProvider && (
+        <VersioningModal
+          versions={versions}
+          isOpen={versioningModalOpen}
+          onClose={handleVersioningClose}
+          onRevert={handleRevert}
+          currentVersion={currentVersion}
+          latestVersion={latestVersion}
+          provider={collabProvider}
+        />
+      )}
       <CodeEditorWithPreview
         codePreview={codePreview}
         isOpen={codeEditorWithPreviewOpen}
@@ -331,8 +319,7 @@ const RichEditorPage = () => {
             className={`mr-4 h-2 w-2 rounded-full ${status === 'connected' ? 'bg-pubble' : 'bg-gray-400'}`}></div>
           <div>
             {status === 'connected'
-              ? `${editor?.storage.collaborationCursor.users.length} 명의 유저가 이
-            문서에 있습니다.`
+              ? `${editor?.storage.collaborationCursor.users.length} 명의 유저가 이 문서에 있습니다.`
               : '오프라인'}
           </div>
         </div>

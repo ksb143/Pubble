@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import ProjectPage from '@/pages/project/ProjectPage';
 import RequirementPage from '@/pages/requirement/RequirementPage';
 import RichEditorPage from '@/pages/rich/RichEditorPage.tsx';
+import { provider, ydoc } from '@/utils/tiptap';
 
 const Project = () => {
   return (
@@ -13,7 +14,7 @@ const Project = () => {
       />
       <Route
         path='/:projectCode/requirement/:requirementCode/detail'
-        element={<RichEditorPage />}
+        element={<RichEditorPage provider={provider} ydoc={ydoc} />}
       />
     </Routes>
   );
