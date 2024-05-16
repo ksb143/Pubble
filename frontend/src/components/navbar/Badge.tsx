@@ -25,7 +25,7 @@ const Badge: React.FC<BadgeProps> = ({ size, position }) => {
   return (
     <div className={`absolute ${positionClass}`}>
       <span className={`relative flex ${sizeClass}`}>
-        <span className='absolute inline-flex h-full w-full animate-ping3 rounded-full bg-red-400 opacity-75'></span>
+        <span className='animate-badgeping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75'></span>
         <span
           className={`relative inline-flex rounded-full bg-red-500  ${sizeClass}`}></span>
       </span>
