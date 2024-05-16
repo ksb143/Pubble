@@ -14,12 +14,14 @@ type UserStore = {
   position: string;
   profileColor: string;
   textColor: string;
+  allowedDocumentNames: string[];
   setName: (name: string) => void;
   setEmployeeId: (employeeId: string) => void;
   setDepartment: (department: string) => void;
   setPosition: (position: string) => void;
   setProfileColor: (color: string) => void;
   setTextColor: (color: string) => void;
+  setAllowedDocumentNames: (names: string[]) => void;
 };
 
 const useUserStore = create<UserStore>((set) => ({
@@ -29,6 +31,7 @@ const useUserStore = create<UserStore>((set) => ({
   department: '',
   employeeId: '',
   position: '',
+  allowedDocumentNames: [],
   setName: (name: string) => set({ name }),
   setEmployeeId: (employeeId: string) => set({ employeeId }),
   setDepartment: (department: string) => set({ department }),
@@ -39,6 +42,8 @@ const useUserStore = create<UserStore>((set) => ({
     set({ profileColor: color, textColor });
   },
   setTextColor: (color: string) => set({ textColor: color }),
+  setAllowedDocumentNames: (names: string[]) =>
+    set({ allowedDocumentNames: names }),
 }));
 
 export default useUserStore;
