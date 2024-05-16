@@ -363,8 +363,8 @@ public class RequirementService {
         }
     }
 
-    public List<RequirementSummaryDto> getRequirementsByCode(Integer projectId, String code) {
-        List<Requirement> requirements = requirementRepository.findByProject_ProjectIdAndCode(projectId, code);
+    public List<RequirementSummaryDto> getRequirementsByCode(Integer projectId, String requirementCode) {
+        List<Requirement> requirements = requirementRepository.findByProject_ProjectIdAndCode(projectId, requirementCode);
         List<RequirementSummaryDto> requirementSummaryDtos = new ArrayList<>();
 
         for(Requirement requirement : requirements) {

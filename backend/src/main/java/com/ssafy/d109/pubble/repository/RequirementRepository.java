@@ -39,4 +39,6 @@ public interface RequirementRepository extends JpaRepository<Requirement, Intege
 
     Optional<Requirement> findRequirementByRequirementId(Integer requirementId);
 
+
+
 }
