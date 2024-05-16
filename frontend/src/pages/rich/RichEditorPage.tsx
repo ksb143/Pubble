@@ -82,9 +82,6 @@ const RichEditorPage = () => {
     onAuthenticationFailed(reason) {
       console.log('인증 실패: ', reason);
     },
-    onSynced(isSynced) {
-      console.log('문서 동기화 상태:', isSynced);
-    },
   });
   websocketProvider.setAwarenessField('user', {
     name: name,
@@ -279,7 +276,7 @@ const RichEditorPage = () => {
     if (editor && currentUser) {
       editor.chain().focus().updateUser(currentUser).run();
     }
-  }, [editor, currentUser]);
+  }, [editor, currentUser, websocketProvider]);
 
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
@@ -297,25 +294,21 @@ const RichEditorPage = () => {
         isOpen={codeEditorWithPreviewOpen}
         onClose={handleCodeEditorWithPreviewClose}
         applyCodeCapture={applyCodeCapture}
-        requirementId={requirementId}
       />
       <FileUploadModal
         isOpen={fileUploadModalOpen}
         onClose={handleFileUploadModalClose}
         onInsert={handleFileInsert}
-        requireUniqueId={requirementId}
       />
       <ImageUploadModal
         isOpen={imageUploadModalOpen}
         onClose={handleImageUploadModalClose}
         onInsert={handleImageInsert}
-        requirementId={requirementId}
       />
       <LinkUploadModal
         isOpen={linkModalOpen}
         onClose={handleLinkModalClose}
         onInsert={handleLinkInsert}
-        requirementId={requirementId}
       />
       {editor && (
         <MenuBar
