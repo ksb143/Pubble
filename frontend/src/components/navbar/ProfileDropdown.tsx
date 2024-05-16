@@ -25,6 +25,7 @@ const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isOpen }) => {
     try {
       await logout();
       localStorage.clear(); // 로컬스토리지 초기화
+      sessionStorage.clear(); // 세션스토리지 초기화
       navigate('/'); // 로그인 페이지로 이동
     } catch (error) {
       console.log(error);
