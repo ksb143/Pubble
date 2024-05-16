@@ -15,8 +15,6 @@ const ProjectPage = () => {
   const pName = usePageInfoStore.getState().projectName;
   // setPageType의 type과 argument를 업데이트한다. useEffect를 사용하여.
 
-
-
   return (
     <div>
       <RequirementList
