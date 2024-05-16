@@ -126,7 +126,8 @@ const RichEditorPage = () => {
   const handleRevert = useCallback(
     (version: number, versionData?: CollabHistoryVersion) => {
       if (versionData) {
-        const versionTitle = versionData.name || renderDate(versionData.date);
+        const versionTitle =
+          versionData.name || renderDate(new Date(versionData.date));
         editor?.commands.revertToVersion(
           version,
           `Revert to ${versionTitle}`,

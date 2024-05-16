@@ -2,7 +2,7 @@ import { renderDate } from '@/utils/tiptap.ts';
 
 interface VersionItemProps {
   title?: string;
-  date: number;
+  date: Date;
   isActive: boolean;
   onClick: () => void;
 }
