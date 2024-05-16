@@ -18,7 +18,7 @@ import { MoreHorizontal } from 'lucide-react';
 // 3. api 관련
 import { getRequirement } from '@/apis/project.ts';
 // 4. store 관련
-// import usePageInfoStore from '@/stores/pageInfoStore.ts';
+import usePageInfoStore from '@/stores/pageInfoStore.ts';
 // 5. components 관련
 import {
   Table,
@@ -269,14 +269,18 @@ const RequirementList = ({
       console.error('Invalid requirement data');
       return; // 유효하지 않은 데이터에 대해 처리 중단
     }
-    // console.log("requirementId : ", requirementId)
-    // console.log("requirementCode : ", code)
-    // const setPageType = usePageInfoStore.getState;
+    // 스토어에서 setPageType 호출하여 상태 설정
+    usePageInfoStore.getState().setPageType('requirement', {
+      requirementId: requirementId,
+      requirementCode: code,
+      requirementName: requirement.requirementName
+  });
 
-    navigate(`/project/${projectCode}/requirement/${code}`, {
-      state: { requirementId },
-    });
-  };
+  // 페이지 이동
+  navigate(`/project/${projectCode}/requirement/${code}`, {
+    state: { requirementId }
+  });
+};
 
   // const handleAddRequirement = () => {
   //   console.log('요구사항 항목의 추가');
