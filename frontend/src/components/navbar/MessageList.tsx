@@ -7,10 +7,10 @@ import { MessageInfo } from '@/types/messageTypes';
 import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
 // 5. component
-// 6. assets
-import Down from '@/assets/icons/chevron-down.svg?react';
 import Profile from '@/components/layout/Profile';
 import Badge from '@/components/navbar/Badge';
+// 6. assets
+import Down from '@/assets/icons/chevron-down.svg?react';
 
 // api로 받아온 쪽지 리스트 타입 설정
 interface MessageListProps {
@@ -65,7 +65,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
               </p>
             </div>
           </div>
-          <div className='flex flex-col items-end'>
+          <div className='flex shrink-0 flex-col items-end'>
             <p>{extractDate(message.createdAt)}</p>
             <p>{extractTime(message.createdAt)}</p>
           </div>

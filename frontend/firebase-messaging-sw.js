@@ -6,13 +6,14 @@ importScripts(
 );
 
 self.addEventListener('install', function (e) {
-  self.skipWaiting();
+  self.skipWaiting(); // 이벤트가 발생하면 즉시 활성화
 });
 
 self.addEventListener('activate', function (e) {
   console.log('FCM service worker가 실행되었습니다.');
 });
 
+// Firebase 설정 값
 const firebaseConfig = {
   apiKey: 'AIzaSyA-jlbMvTl34uffdBao_ToX8cxDwqSiA4k',
   authDomain: 'pubble-push.firebaseapp.com',
@@ -23,15 +24,16 @@ const firebaseConfig = {
   measurementId: 'G-RDDYCM82CV',
 };
 
+// Firebase SDK 초기화
 firebase.initializeApp(firebaseConfig);
-
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  const notificationTitle = payload.title;
-  const notificationOptions = {
-    body: payload.body,
-    // icon: payload.icon
-  };
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
+// 백그라운드 상태에서 수신된 알림 표시
+// messaging.onBackgroundMessage((payload) => {
+//   const notificationTitle = payload.title;
+//   const notificationOptions = {
+//     body: payload.body,
+//     // icon: payload.icon
+//   };
+//   self.registration.showNotification(notificationTitle, notificationOptions);
+// });

@@ -5,6 +5,7 @@ export const ExtendedImageExtension = Node.create({
   group: 'block',
   inline: false,
   draggable: true,
+
   addAttributes() {
     return {
       src: {},
@@ -13,6 +14,7 @@ export const ExtendedImageExtension = Node.create({
       javascript: { default: null },
     };
   },
+
   parseHTML() {
     return [
       {
@@ -26,6 +28,7 @@ export const ExtendedImageExtension = Node.create({
       },
     ];
   },
+
   renderHTML({ HTMLAttributes }) {
     return ['img', HTMLAttributes];
   },

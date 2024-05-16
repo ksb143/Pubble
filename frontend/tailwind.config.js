@@ -25,14 +25,14 @@ const oldConfig = {
         custom: '0px 0px 8px rgba(0, 0, 0, 0.12)',
       },
       keyframes: {
-        badgeping: {
+        'badge-ping': {
           '0%, 20%': { transform: 'scale(1)', opacity: 1 },
           '40%': { transform: 'scale(2)', opacity: 0 },
           '100%': { transform: 'scale(1)', opacity: 0 },
         },
       },
       animation: {
-        badgeping: 'badgeping 5s cubic-bezier(0, 0, 0.2, 1) infinite',
+        'badge-ping': 'badge-ping 5s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
     },
   },

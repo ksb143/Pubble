@@ -2,7 +2,6 @@
 import { Outlet } from 'react-router-dom';
 // 2. library
 // 3. api
-
 // 4. store
 // 5. component
 import Navbar from '@/components/navbar/Navbar';
