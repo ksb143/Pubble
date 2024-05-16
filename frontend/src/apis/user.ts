@@ -11,7 +11,17 @@ export const login = async (employeeId: string, password: string) => {
 
 // 로그아웃 함수
 export const logout = async () => {
-  const { data } = await privateApi.post('/users/logout');
-  console.log('로그아웃 api : ', data);
+  await privateApi.post('/users/logout');
+};
+
+// 전체 유저 리스트를 불러오는 함수
+export const getUser = async () => {
+  const { data } = await privateApi.get('/users/userinfo/all');
+  return data;
+};
+
+// 프로젝트에 소속된 유저 리스트를 불러오는 함수
+export const getUserByProject = async (projectId: number) => {
+  const { data } = await privateApi.get(`/users/userinfo/${projectId}`);
   return data;
 };

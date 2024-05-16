@@ -8,6 +8,7 @@ import useUserStore from '@/stores/userStore.ts';
 // 5. component
 import User from '@/routers/User';
 import Project from '@/routers/Project';
+import Admin from '@/routers/Admin';
 import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
 // 6. image 등 assets
@@ -63,6 +64,8 @@ function App() {
           <Route path='/main' element={<MainPage />} />
           {/* 프로젝트 페이지들*/}
           <Route path='/project/*' element={<Project />} />
+          {/* 관리자 페이지 */}
+          <Route path='/admin/*' element={<Admin />} />
         </Route>
       </Routes>
     </Router>

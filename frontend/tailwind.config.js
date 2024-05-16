@@ -24,6 +24,14 @@ const oldConfig = {
       boxShadow: {
         custom: '0px 0px 8px rgba(0, 0, 0, 0.12)',
       },
+      keyframes: {
+        ping3: {
+          '75%, 100%': { transform: 'scale(2)', opacity: 0 },
+        },
+      },
+      animation: {
+        ping3: 'ping3 1s cubic-bezier(0, 0, 0.2, 1) 3',
+      },
     },
   },
   plugins: [],
