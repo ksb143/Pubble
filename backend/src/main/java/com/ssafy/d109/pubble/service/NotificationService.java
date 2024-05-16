@@ -66,10 +66,10 @@ public class NotificationService {
             String token = getNotificationToken(receiverId);
             Message message = Message.builder()
                     .setWebpushConfig(WebpushConfig.builder()
+                            .putData("type", reqDto.getType())
                             .setNotification(WebpushNotification.builder()
                                     .setTitle(reqDto.getTitle())
                                     .setBody(reqDto.getMessage())
-                                    .putCustomData("type", reqDto.getType())
                                     .build())
                             .build())
                     .setToken(token)
