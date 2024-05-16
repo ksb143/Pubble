@@ -32,7 +32,7 @@ export const addProject = async (
 // 특정한 project의 상황을 확인하는 대시보드 보기 - GET
 // 참고: 보안상 pjtId(백엔드 table pk)를 header에 넣어서 보내는게 더 낫지만 일단 params에 붙여서 보냄.
 export const getProjectStatus = async (pjtId: number) => {
-  const { data } = await privateApi.get(`/projects/${pjtId}/dashboards`, {});
+  const { data } = await privateApi.get(`/projects/${pjtId}/dashboards`);
   return data;
 };
 
