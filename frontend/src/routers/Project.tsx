@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import ProjectPage from '@/pages/project/ProjectPage';
 import RequirementPage from '@/pages/requirement/RequirementPage';
-import RichPage from '@/pages/rich/RichPage';
+import RichEditorPage from '@/pages/rich/RichEditorPage.tsx';
 
 const Project = () => {
   return (
@@ -13,7 +13,7 @@ const Project = () => {
       />
       <Route
         path='/:projectCode/requirement/:requirementCode/detail'
-        element={<RichPage />}
+        element={<RichEditorPage />}
       />
     </Routes>
   );
