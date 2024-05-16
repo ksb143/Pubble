@@ -101,7 +101,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         long oneMonthMillis = 30L * 24 * 60 * 60 * 1000;
         String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, oneMonthMillis);
+        log.info("이거 보임?");
         String refreshToken = jwtUtil.createJwt("refresh", employeeId, role, 86400000L);
+        log.info("이건 보임?");
         String profileColor = jwtUtil.getProfileColor(accessToken);
         String name = jwtUtil.getName(accessToken);
         String department = jwtUtil.getDepartment(accessToken);
