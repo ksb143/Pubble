@@ -63,13 +63,13 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
-//    @GetMapping("/{project-id}/requirements")
-//    public ResponseEntity<ResponseDto> getRequirementsByCode(@PathVariable("project-id") Integer projectId, @RequestParam("code") String code) {
-//        List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, code);
-//
-//        response = new ResponseDto(true, "코드에 해당하는 요구사항 항목 기록 반환", requirementSummaryDtos);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
+    @GetMapping("/{project-id}/requirements")
+    public ResponseEntity<ResponseDto> getRequirementsByCode(@PathVariable("project-id") Integer projectId, @RequestParam("code") String code) {
+        List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, code);
+
+        response = new ResponseDto(true, "코드에 해당하는 요구사항 항목 기록 반환", requirementSummaryDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @GetMapping("/{project-id}/requirements/recent")
     public ResponseEntity<ResponseDto> getProjectRequirements(@PathVariable("project-id") Integer projectId) {
