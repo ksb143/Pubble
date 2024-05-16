@@ -4,7 +4,7 @@ import useNotificationStore from '@/stores/notificationStore';
 
 // FCM 토큰 전송 함수
 export const sendFCMToken = async (token: string) => {
-  await privateApi.post(`notification/token`, { token });
+  await privateApi.post(`/notification/fcm-token`, { token });
 };
 
 // FCM 토큰 요청 함수
@@ -22,6 +22,7 @@ export const getFCMToken = async () => {
       // FCM 토큰을 받은 경우
       if (currentToken) {
         // 서버로 토큰 전송
+        console.log('FCM 토큰 : ', currentToken);
         sendFCMToken(currentToken);
       } else {
         alert('알림 권한을 허용해주세요!');
@@ -62,5 +63,13 @@ export const getNotificationList = async (page: number, size: number) => {
   const { data } = await privateApi.get('/notification/list', {
     params: { page, size },
   });
+  return data;
+};
+
+// 알림을 읽었을 때 상태를 변경하는 함수
+export const updateNotificationStatus = async (notificationId: number) => {
+  const { data } = await privateApi.put(
+    `/notification/${notificationId}/check`,
+  );
   return data;
 };

@@ -1,10 +1,11 @@
 /** @jsxImportSource @emotion/react */
 // 1. react
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 // 2. library
 import { css } from '@emotion/react';
 import Lottie from 'react-lottie';
 // 3. api
+import { getNotificationList } from '@/apis/notification';
 // 4. store
 // 5. component
 import NotificationList from '@/components/navbar/NotificationList';
@@ -25,7 +26,24 @@ const dialogStyle = css`
 `;
 
 const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
+  const itemsPerPage = 10; // 한 페이지에 보여줄 알림 수
+  const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
+  const [totalPage, setTotalPage] = useState(0); // 전체 페이지 수
   const [notificationList, setNotificationList] = useState([]); // 알림 리스트
+
+  // 현재 페이지의 알림 리스트 조회
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await getNotificationList(currentPage, itemsPerPage);
+        console.log('알림 조회 : ', response);
+        setNotificationList(response.content);
+        setTotalPage(response.totalPages);
+      } catch (error) {
+        console.log('알림 조회 실패 : ', error);
+      }
+    })();
+  }, [currentPage]);
 
   // 로티 기본 옵션
   const defaultOptions = {

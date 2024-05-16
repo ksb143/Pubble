@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import { setupFCMListener } from '@/apis/notification';
+import { getFCMToken, setupFCMListener } from '@/apis/notification';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
@@ -34,8 +34,10 @@ const Navbar = () => {
     setActiveMenu(activeMenu === menu ? null : menu);
   };
 
-  // FCM 리스너 등록
   useEffect(() => {
+    // FCM 토큰 요청
+    getFCMToken();
+    // FCM 리스너 등록
     setupFCMListener();
   }, []);
 

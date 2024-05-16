@@ -6,11 +6,12 @@
 import Profile from '@/components/layout/Profile';
 // 6. assets
 
-interface NotificationListProps {
-  data: NotificationInfo[];
-}
+// interface NotificationListProps {
+//   data: NotificationInfo[];
+// }
 
 const NotificationList: React.FC<NotificationListProps> = ({ data }) => {
+  console.log('props 받은 알림 : ', data);
   return (
     <>
       {data.map((notification) => (
@@ -18,12 +19,12 @@ const NotificationList: React.FC<NotificationListProps> = ({ data }) => {
           key={notification.messageId}
           className='flex items-center justify-between border-b px-2 py-6 last-of-type:border-none'>
           <div className='flex flex-grow items-center'>
-            <Profile
+            {/* <Profile
               width='3rem'
               height='3rem'
               name={notification.name}
               profileColor={notification.profileColor}
-            />
+            /> */}
             <p className='flex-grow px-2'>{notification.text}</p>
           </div>
           <div className='flex flex-col items-end'>
