@@ -1,7 +1,7 @@
 package com.ssafy.d109.pubble.controller;
 
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
-import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationInfo;
+import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationRequestDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.UserLocationService;
@@ -27,38 +27,31 @@ public class StompController {
     private final UserLocationService userLocationService;
     private final SimpMessageSendingOperations sendingOperations;
 
-    @MessageMapping("/project/{projectId}/enter")
-    public void enter(@DestinationVariable Integer projectId, UserLocationRequestDto dto) {
+    @MessageMapping("/project/{projectId}")
+    public void enter(@DestinationVariable Integer projectId, UserLocationRequestDto requestDto) {
         User user = commonUtil.getUser();
-        UserLocationInfo enterUserInfo = userLocationService.enter(user, projectId, dto);
-        sendingOperations.convertAndSend("/sub/project/" + projectId + "/enter", enterUserInfo);
-    }
-
-    @MessageMapping("/project/{projectId}/move")
-    public void move(@DestinationVariable Integer projectId, UserLocationRequestDto dto) {
-        User user = commonUtil.getUser();
-        UserLocationInfo moveUserInfo = userLocationService.move(user, projectId, dto);
-        sendingOperations.convertAndSend("/sub/project/" + projectId + "/move", moveUserInfo);
-    }
-
-    @MessageMapping("/project/{projectId}/leave")
-    public void leave(@DestinationVariable Integer projectId) {
-        User user = commonUtil.getUser();
-        String leavedUserEID = userLocationService.leave(user, projectId);
-        sendingOperations.convertAndSend("/sub/project/" + projectId + "/leave", leavedUserEID);
+        // 권한검사 해줄지
+        switch (requestDto.getOperation()) {
+            case "e" -> {
+                UserLocationDto enterUserDto = userLocationService.enter(user, projectId, requestDto);
+                sendingOperations.convertAndSend("/sub/project/" + projectId, enterUserDto);
+            }
+            case "m" -> {
+                UserLocationDto moveUserDto = userLocationService.move(user, projectId, requestDto);
+                sendingOperations.convertAndSend("/sub/project/" + projectId, moveUserDto);
+            }
+            case "l" -> {
+                UserLocationDto leaveUserDto = userLocationService.leave(user, projectId);
+                sendingOperations.convertAndSend("/sub/project/" + projectId, leaveUserDto);
+            }
+        }
     }
 
     @GetMapping("/project/{projectId}/current-user")
     public ResponseEntity<ResponseDto> getCurrentUserLocations(@PathVariable Integer projectId) {
-        List<UserLocationInfo> currentUserLocations = userLocationService.getCurrentUserLocations(projectId);
+        List<UserLocationDto> currentUserLocations = userLocationService.getCurrentUserLocations(projectId);
 
         response = new ResponseDto(true, "현재 프로젝트에 접속중인 유저들의 정보", currentUserLocations);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
-
-
-/*
-세션(방) 생성 또는 가입
-userinfo 사용
- */

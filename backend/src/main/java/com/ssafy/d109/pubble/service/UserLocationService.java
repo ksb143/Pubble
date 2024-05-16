@@ -1,7 +1,7 @@
 package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.UserInfoDto;
-import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationInfo;
+import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationRequestDto;
 import com.ssafy.d109.pubble.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -15,51 +15,57 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class UserLocationService {
 
-    private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, UserLocationInfo>> projectUserLocations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, UserLocationDto>> projectUserLocations = new ConcurrentHashMap<>();
 
-    public UserLocationInfo enter(User user, Integer projectId, UserLocationRequestDto dto) {
-        UserLocationInfo userLocationInfo = UserLocationInfo.builder()
+    public UserLocationDto enter(User user, Integer projectId, UserLocationRequestDto dto) {
+        UserLocationDto userLocationDto = UserLocationDto.builder()
                 .userInfoDto(UserInfoDto.createUserInfo(user))
                 .locationName(dto.getLocationName())
                 .locationUrl(dto.getLocationUrl())
                 .build();
 
-        projectUserLocations.computeIfAbsent(projectId, k -> new ConcurrentHashMap<>()).put(user.getEmployeeId(), userLocationInfo);
-        return userLocationInfo;
+        projectUserLocations.computeIfAbsent(projectId, k -> new ConcurrentHashMap<>()).put(user.getEmployeeId(), userLocationDto);
+
+        userLocationDto.setOperation("e");
+        return userLocationDto;
     }
 
-    public UserLocationInfo move(User user, Integer projectId, UserLocationRequestDto dto) {
-        ConcurrentHashMap<String, UserLocationInfo> userLocations = projectUserLocations.get(projectId);
+    public UserLocationDto move(User user, Integer projectId, UserLocationRequestDto dto) {
+        ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
         if (userLocations != null) {
-            UserLocationInfo userLocationInfo = userLocations.get(user.getEmployeeId());
-            if (userLocationInfo != null) {
-                userLocationInfo.setLocationName(dto.getLocationName());
-                userLocationInfo.setLocationUrl(dto.getLocationUrl());
+            UserLocationDto userLocationDto = userLocations.get(user.getEmployeeId());
+            if (userLocationDto != null) {
+                userLocationDto.setLocationName(dto.getLocationName());
+                userLocationDto.setLocationUrl(dto.getLocationUrl());
             }
         }
 
-        return UserLocationInfo.builder()
+        return UserLocationDto.builder()
+                .operation("m")
                 .userInfoDto(UserInfoDto.createUserInfo(user))
                 .locationName(dto.getLocationName())
                 .locationUrl(dto.getLocationUrl())
                 .build();
     }
 
-    public String leave(User user, Integer projectId) {
-        ConcurrentHashMap<String, UserLocationInfo> userLocations = projectUserLocations.get(projectId);
+    public UserLocationDto leave(User user, Integer projectId) {
+        ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
         if (userLocations != null) {
             userLocations.remove(user.getEmployeeId());
         }
-        return user.getEmployeeId();
+        return UserLocationDto.builder()
+                .operation("l")
+                .employeeId(user.getEmployeeId())
+                .build();
     }
 
-    public List<UserLocationInfo> getCurrentUserLocations(Integer projectId) {
-        ConcurrentHashMap<String, UserLocationInfo> userLocations = projectUserLocations.get(projectId);
-        List<UserLocationInfo> userLocationInfos = new ArrayList<>();
+    public List<UserLocationDto> getCurrentUserLocations(Integer projectId) {
+        ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
+        List<UserLocationDto> userLocationDtos = new ArrayList<>();
         if (userLocations == null) {
-            return userLocationInfos;
+            return userLocationDtos;
         }
-        userLocationInfos.addAll(userLocations.values());
-        return userLocationInfos;
+        userLocationDtos.addAll(userLocations.values());
+        return userLocationDtos;
     }
 }

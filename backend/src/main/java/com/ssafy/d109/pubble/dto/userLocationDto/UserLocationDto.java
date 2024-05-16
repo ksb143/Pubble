@@ -8,10 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class UserLocationInfo {
+public class UserLocationDto {
 
+    private String operation;
+
+    private String employeeId; // 유저 정보 내에 존재하지만 편의를 위해
     private UserInfoDto userInfoDto; // 유저 정보
 
-    private String locationName; // 프론트에서 이름을 정해주는건?
-    private String locationUrl; // 이것도 프론트에서 보내줘야 할 듯
+    private String locationName;
+    private String locationUrl;
 }
