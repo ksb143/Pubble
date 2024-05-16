@@ -7,6 +7,7 @@ import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.NoticeService;
 import com.ssafy.d109.pubble.util.CommonUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class NoticeController {
     private final NoticeService noticeService;
     private final CommonUtil commonUtil;
 
+    @Operation(summary = "삭제되지 않은 공지사항 리스트 조회")
     @GetMapping()
     public ResponseEntity<ResponseDto> getNoticeList() {
         List<NoticeSummaryDto> noticeList = noticeService.getNoticeList();
@@ -32,6 +34,7 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "해당 공지사항 조회")
     @GetMapping("/{notice-id}")
     public ResponseEntity<ResponseDto> getNotice(@PathVariable("notice-id") Integer noticeId) {
         NoticeResponseDto notice = noticeService.getNotice(noticeId);
@@ -40,6 +43,7 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "공지사항 작성")
     @PostMapping()
     public ResponseEntity<ResponseDto> createNotice(@RequestBody NoticeCreateDto noticeCreateDto) {
         User user = commonUtil.getUser();
@@ -57,6 +61,7 @@ public class NoticeController {
         }
     }
 
+    @Operation(summary = "공지사항 삭제(d) 처리")
     @PutMapping("/{notice-id}/delete")
     public ResponseEntity<ResponseDto> deleteNotice(@PathVariable("notice-id") Integer noticeId) {
         User user = commonUtil.getUser();

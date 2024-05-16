@@ -321,8 +321,8 @@ public class RequirementService {
                 .approval("u")
                 .build());
 
-        // 기존 requirement 상태 갱ㅅ니
-        requirement.setVersion(command);
+        // 기존 requirement 상태 갱신
+        requirement.setApproval(command);
 
         List<RequirementDetail> details = detailRepository.findAllByRequirement_requirementId(requirementId);
         for (RequirementDetail detail : details) {

@@ -8,6 +8,7 @@ import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.service.ProjectService;
 import com.ssafy.d109.pubble.service.RequirementService;
 import com.ssafy.d109.pubble.util.CommonUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class ProjectController {
     private final ProjectService projectService;
     private final RequirementService requirementService;
 
+    @Operation(summary = "사용자가 참여중인 모든 프로젝트들의 리스트/대시보드")
     @GetMapping()
     public ResponseEntity<ResponseDto> getProjectList() {
         Integer userId = commonUtil.getUser().getUserId();
@@ -36,6 +38,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "새 프로젝트 생성")
     @PostMapping() // Project_Init_001
     public ResponseEntity<ResponseDto> createProject(@RequestBody ProjectCreateDto projectCreateDto) {
         User user = commonUtil.getUser();
@@ -47,6 +50,7 @@ public class ProjectController {
 
     // 전반적으로 프로젝트 참여 여부 확인이 필요
 
+    @Operation(summary = "해당 프로젝트의 대시보드")
     @GetMapping("/{project-id}/dashboards")
     public ResponseEntity<ResponseDto> getProjectDashboard(@PathVariable("project-id") Integer projectId) {
         ProjectDashboardDto projectDashboardDto = projectService.getProjectDashboard(projectId);
@@ -55,6 +59,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "프로젝트 상태 변경")
     @PutMapping("/{project-id}")
     public ResponseEntity<ResponseDto> changeProjectStatus(@PathVariable("project-id") Integer projectId, @RequestBody String status) {
         projectService.changeProjectStatus(projectId, status);
@@ -63,6 +68,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
+    @Operation(summary = "코드에 해당하는 요구사항 항목 기록(다른 버전들) 반환")
     @GetMapping("/{project-id}/requirements")
     public ResponseEntity<ResponseDto> getRequirementsByCode(@PathVariable("project-id") Integer projectId, @RequestParam("code") String code) {
         List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, code);
@@ -71,6 +77,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "해당 프로젝트의 요구사항 항목들 - 코드 별 최신")
     @GetMapping("/{project-id}/requirements/recent")
     public ResponseEntity<ResponseDto> getProjectRequirements(@PathVariable("project-id") Integer projectId) {
         ProjectRequirementsDto projectRequirementsDto = projectService.getProjectRequirements(projectId);
@@ -79,6 +86,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "요구사항 항목 생성")
     @PostMapping("/{project-id}/requirements")
     public ResponseEntity<ResponseDto> createRequirement(@PathVariable("project-id") Integer projectId, @RequestBody RequirementCreateDto requirementCreateDto) {
         requirementService.createRequirement(projectId, requirementCreateDto);
@@ -87,6 +95,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "요구사항 항목 조회")
     @GetMapping("/{project-id}/requirements/{requirement-id}")
     public ResponseEntity<ResponseDto> getRequirement(@PathVariable("requirement-id") Integer requirementId) {
         RequirementSummaryDto requirementSummaryDto = requirementService.getRequirement(requirementId);
@@ -95,6 +104,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @Operation(summary = "요구사항 항목 수정")
     @PatchMapping("/{project-id}/requirements/{requirement-id}")
     public ResponseEntity<ResponseDto> updateRequirement(@PathVariable("requirement-id") Integer requirementId, @RequestBody RequirementUpdateDto requirementUpdateDto) {
         requirementService.updateRequirement(requirementId, requirementUpdateDto);
@@ -104,6 +114,7 @@ public class ProjectController {
     }
 
     // update version by command(h:hold / r:restore)
+    @Operation(summary = "요구사항 항목의 새 버전 생성")
     @PostMapping("/{project-id}/requirements/{requirement-id}/version")
     public ResponseEntity<ResponseDto> createNewVersion(@PathVariable("requirement-id") Integer requirementId, @RequestBody String command) {
         requirementService.updateVersion(requirementId, command);
@@ -113,6 +124,7 @@ public class ProjectController {
     }
 
     // 일단 인자 받아서 잠금 풀기도 가능은 하게 해놓음
+    @Operation(summary = "해당 요구사항 항목의 잠금 상태 변경")
     @PutMapping("/{project-id}/requirements/{requirement-id}/lock")
     public ResponseEntity<ResponseDto> updateRequirementLock(@PathVariable("requirement-id") Integer requirementId, @RequestBody String lock) {
         requirementService.updateRequirementLock(requirementId, lock);
@@ -121,6 +133,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
 
+    @Operation(summary = "해당 요구사항 항목의 승인 상태 변경")
     @PutMapping("/{project-id}/requirements/{requirement-id}/approval")
     public ResponseEntity<ResponseDto> updateRequirementApproval(@PathVariable("requirement-id") Integer requirementId, @RequestBody ApprovalDto approvalDto) {
         requirementService.updateRequirementApproval(requirementId, approvalDto);
@@ -131,6 +144,7 @@ public class ProjectController {
 
     // 위의 안쓰는 url 부분들 줄여버릴지
     // 세부사항 항목 추가
+    @Operation(summary = "세부사항 항목 추가")
     @PostMapping("/reuqirements/{requirement-id}")
     public ResponseEntity<ResponseDto> addRequirementDetail(@PathVariable("requirement-id") Integer requirementId, @RequestBody String content) {
         try {
@@ -145,6 +159,7 @@ public class ProjectController {
     }
 
     // 세부사항 상태 변경
+    @Operation(summary = "세부사항 상태 변경")
     @PutMapping("/reuqirements/{requirementId}/details/{detailId}/status")
     public ResponseEntity<ResponseDto> updateDetailStatus(@PathVariable Integer requirementId, @PathVariable Integer detailId, @RequestBody String command) {
         Integer userId = commonUtil.getUser().getUserId();

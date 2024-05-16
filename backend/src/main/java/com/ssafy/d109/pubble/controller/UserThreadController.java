@@ -13,6 +13,7 @@ import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.repository.UserThreadRepository;
 import com.ssafy.d109.pubble.service.UserThreadService;
 import com.ssafy.d109.pubble.util.CommonUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ public class UserThreadController {
         this.userThreadRepository = userThreadRepository;
     }
 
+    @Operation(summary = "모든 스레드 조회")
     @GetMapping("/{detailId}/threads")
     public ResponseEntity<UserThreadResponseDto> getAllThreads(@PathVariable Integer detailId) {
 
@@ -64,6 +66,7 @@ public class UserThreadController {
 
     }
 
+    @Operation(summary = "스레드 잠금")
     @PutMapping("/threads/{userThreadId}/lock")
     public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer userThreadId) {
 
@@ -77,6 +80,7 @@ public class UserThreadController {
 
 
     // 스레드 생성
+    @Operation(summary = "새 스레드 생성")
     @PostMapping("/{detailId}/threads")
     public ResponseEntity<ResponseDto> createUserThread(@PathVariable Integer detailId) {
         User user = commonUtil.getUser();
@@ -87,6 +91,7 @@ public class UserThreadController {
     }
 
     // 코멘트 작성
+    @Operation(summary = "새 댓글 생성")
     @PostMapping("/threads/{threadId}/comments")
     public ResponseEntity<ResponseDto> createComment(@PathVariable Integer threadId, @RequestBody CommentCreateDto commentCreateDto) {
         User user = commonUtil.getUser();

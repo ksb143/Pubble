@@ -8,6 +8,7 @@ import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.service.MessageService;
 import com.ssafy.d109.pubble.util.CommonUtil;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,7 @@ public class MessageController {
     private final UserRepository userRepository;
 
     // 수신한 메세지 페이지 확인
+    @Operation(summary = "수신한 메세지 확인")
     @GetMapping("/received")
     public ResponseEntity<ResponseDto> getReceivedMessageList(
             @RequestParam int page,
@@ -44,6 +46,7 @@ public class MessageController {
 //    @GetMapping("/sent")
 
     // 하나의 메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨
+    @Operation(summary = "메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨")
     @PutMapping("/{messageId}")
     public ResponseEntity<ResponseDto> updateMessage(@PathVariable("messageId")Integer messageId, @RequestBody MessageStatusDto dto) {
         String status = dto.getStatus();
@@ -68,6 +71,7 @@ public class MessageController {
     }
 
     // 해당 사번 유저에게 메세지 보내기
+    @Operation(summary = "해당 사번 유저에게 메세지 보내기")
     @PostMapping("/{employeeId}")
     public ResponseEntity<ResponseDto> sendMessage(@PathVariable("employeeId") String employeeId, @RequestBody MessageSendDto messageSendDto) {
         Optional<User> optionalReceiver = userRepository.findByEmployeeId(employeeId);
