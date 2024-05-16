@@ -145,6 +145,43 @@ const RichEditorPage = () => {
   // 현재 접속 유저 판단
   const currentUser = loading ? null : { name: name, color: profileColor };
 
+  // 스토어 값 감지
+  useEffect(() => {
+    if (
+      name &&
+      profileColor &&
+      projectId &&
+      requirementId &&
+      requirementCode &&
+      requirementName
+    ) {
+      setLoading(false);
+    }
+  }, [
+    name,
+    profileColor,
+    projectId,
+    requirementId,
+    requirementCode,
+    requirementName,
+  ]);
+
+  // 상태값 감지
+  useEffect(() => {
+    if (websocketProvider) {
+      websocketProvider.on('status', (event: { status: string }) => {
+        setStatus(event.status);
+      });
+    }
+  }, [websocketProvider]);
+
+  // 현재 접속 유저 감지
+  useEffect(() => {
+    if (editor && currentUser) {
+      editor.chain().focus().updateUser(currentUser).run();
+    }
+  }, [editor, currentUser, websocketProvider]);
+
   // 버전 관리 모달
   const showVersioningModal = useCallback(() => {
     setVersioningModalOpen(true);
@@ -240,43 +277,6 @@ const RichEditorPage = () => {
   const handleImageInsert = (image: string) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
   };
-
-  // 스토어 값 감지
-  useEffect(() => {
-    if (
-      name &&
-      profileColor &&
-      projectId &&
-      requirementId &&
-      requirementCode &&
-      requirementName
-    ) {
-      setLoading(false);
-    }
-  }, [
-    name,
-    profileColor,
-    projectId,
-    requirementId,
-    requirementCode,
-    requirementName,
-  ]);
-
-  // 상태값 감지
-  useEffect(() => {
-    if (websocketProvider) {
-      websocketProvider.on('status', (event: { status: string }) => {
-        setStatus(event.status);
-      });
-    }
-  }, [websocketProvider]);
-
-  // 현재 접속 유저 감지
-  useEffect(() => {
-    if (editor && currentUser) {
-      editor.chain().focus().updateUser(currentUser).run();
-    }
-  }, [editor, currentUser, websocketProvider]);
 
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
