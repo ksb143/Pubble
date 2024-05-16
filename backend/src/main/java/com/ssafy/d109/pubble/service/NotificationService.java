@@ -188,6 +188,7 @@ public class NotificationService {
         }
 
         NotificationMessageResponseDto dto = NotificationMessageResponseDto.builder()
+                .notificationId(notificationMsg.getNotificationMessageId())
                 .isChecked(notificationMsg.getIsChecked())
                 .content(notificationMsg.getContent())
                 .createdAt(notificationMsg.getCreatedAt())
