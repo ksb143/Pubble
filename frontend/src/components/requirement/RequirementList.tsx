@@ -234,6 +234,8 @@ const RequirementList = ({projectId, projectCode, projectName}: RequirementListP
     }
     // console.log("requirementId : ", requirementId)
     // console.log("requirementCode : ", code)
+    // const setPageType = usePageInfoStore.getState;
+
     navigate(`/project/${projectCode}/requirement/${code}`, {
       state: { requirementId }
     });

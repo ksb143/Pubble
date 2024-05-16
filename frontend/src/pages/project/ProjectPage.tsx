@@ -2,9 +2,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 // 2. library
-import { useLocation } from "react-router-dom";
 // 3. api
-// import { getRequirement } from '@/apis/project';
 // 4. store
 import usePageInfoStore from "@/stores/pageInfoStore.ts";
 // 5. components
