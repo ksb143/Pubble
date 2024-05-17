@@ -17,24 +17,24 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
-interface ProjectAddModalProps {
+interface RequirementAddModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
+const RequirementAddModal = ({ isOpen, onClose }: RequirementAddModalProps) => {
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
   const [participant, setParticipant] = useState('');
   const [startAt, setStartAt] = useState('');
   const [endAt, setEndAt] = useState('');
 
-  const handleAddProject = async () => {
+  const handleAddRequirement = async () => {
     const participantsArray = participant.split(',').map((part) => part.trim());
     console.log('api 호출시작');
     try {
       await addProject(title, code, participantsArray, startAt, endAt);
       console.log('api 호출 성공');
-      onClose(); // 프로젝트 생성 후 모달 닫기
+      onClose(); // 요구사항 생성 후 모달 닫기
     } catch (error) {
       console.error('api 호출 실패', error);
     }
@@ -45,7 +45,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>프로젝트 생성</DialogTitle>
+          <DialogTitle>요구사항 생성</DialogTitle>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
           <div className='grid grid-cols-4 items-center gap-4'>
@@ -109,7 +109,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             />
           </div>
           <DialogFooter>
-            <Button onClick={handleAddProject}>생성</Button>
+            <Button onClick={handleAddRequirement}>생성</Button>
             <Button onClick={onClose}>취소</Button>
           </DialogFooter>
         </div>
@@ -118,4 +118,4 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
   );
 };
 
-export default ProjectAddModal;
+export default RequirementAddModal;

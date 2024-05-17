@@ -105,8 +105,12 @@
     "react-lottie": "^1.2.4",
     "react-query": "^3.39.3",
     "react-resizable-panels": "^2.0.19",
+<<<<<<< HEAD
     "react-router-dom": "^6.23.0",
     "react-table": "^7.8.0",
+=======
+    "react-router-dom": "^6.23.1",
+>>>>>>> 8ea6f60f254f88239fe21770d220fbcfe87573d8
     "shadcn-ui": "^0.8.0",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.3.0",
