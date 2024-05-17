@@ -1,7 +1,7 @@
 // 1. react 관련
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 // 2. library
-import { EditorContent, useEditor } from '@tiptap/react';
+import { EditorContent, useEditor, BubbleMenu } from '@tiptap/react';
 import { Extensions } from '@/extensions/Extensions.ts';
 import { TiptapCollabProvider } from '@hocuspocus/provider';
 import Collaboration from '@tiptap/extension-collaboration';
@@ -9,7 +9,7 @@ import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import CollaborationHistory from '@tiptap-pro/extension-collaboration-history';
 import { CollabHistoryVersion } from '@tiptap-pro/extension-collaboration-history';
 import * as Y from 'yjs';
-import { Switch } from '@/components/ui/switch';
+import styled from '@emotion/styled';
 // 3. api
 // 4. store
 import useUserStore from '@/stores/userStore.ts';
@@ -21,16 +21,55 @@ import CodeEditorWithPreview from '@/components/rich/CodeEditorWithPreview.tsx';
 import ImageUploadModal from '@/components/rich/ImageUploadModal.tsx';
 import FileUploadModal from '@/components/rich/FileUploadModal.tsx';
 import LinkUploadModal from '@/components/rich/LinkUploadModal.tsx';
+import { Switch } from '@/components/ui/switch';
 // 6. image 등 assets
 import { renderDate } from '@/utils/tiptap.ts';
 import './RichEditorPage.css';
+import BoldIcon from '@/assets/icons/bold.svg?react';
+import ItalicIcon from '@/assets/icons/italic.svg?react';
+import UnderlineIcon from '@/assets/icons/underline.svg?react';
+import StrikeIcon from '@/assets/icons/strikethrough.svg?react';
+import PaletteIcon from '@/assets/icons/palette-line.svg?react';
+import MarkPenIcon from '@/assets/icons/mark-pen-line.svg?react';
+const { VITE_TIPTAP_APP_ID } = import.meta.env;
+
+// 컬러팔레트 커스텀
+const ColorInput = styled.input`
+  width: 10px; // 너비 설정
+  height: 14px; // 높이 설정
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+
+  &::-webkit-color-swatch {
+    border-radius: 50%;
+    border: none;
+  }
+`;
+
+// 하이라이트 커스텀
+const HighlightInput = styled.input`
+  width: 10px; // 너비 설정
+  height: 14px; // 높이 설정
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent;
+  border: none;
+
+  &::-webkit-color-swatch {
+    border-radius: 50%;
+    border: none;
+  }
+`;
 
 interface RichEditorPageProps {
-  provider: (docName: string) => TiptapCollabProvider;
-  ydoc: Y.Doc;
+  tiptapToken: string;
 }
 
-const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
+const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
   const { name, profileColor } = useUserStore();
   const {
     projectCode,
@@ -63,51 +102,59 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
     });
   }, []);
 
-  // provider 설정
-  const collabProvider = provider(`${projectCode}-${requirementCode}`);
+  const ydoc = new Y.Doc();
+
+  const provider = useMemo(
+    () =>
+      new TiptapCollabProvider({
+        appId: VITE_TIPTAP_APP_ID,
+        name: `${projectCode}-${requirementCode}`,
+        document: ydoc,
+        token: tiptapToken,
+        onConnect() {
+          console.log('연결됨');
+        },
+        onDisconnect() {
+          console.log('연결 끊김');
+        },
+        onSynced() {
+          console.log('동기화 완료');
+        },
+        onAuthenticationFailed({ reason }: { reason: string }) {
+          console.error('인증 실패: ', reason);
+        },
+      }),
+    [tiptapToken, ydoc],
+  );
+
+  // 공급자 이벤트 리스너 파괴 설정
+  useEffect(() => {
+    return () => {
+      provider.destroy();
+    };
+  }, []);
 
   // 현재 사용자 정보 설정
   useEffect(() => {
-    collabProvider.setAwarenessField('user', {
+    provider.setAwarenessField('user', {
       name: name,
       color: profileColor,
     });
-  }, [collabProvider, name, profileColor]);
+  }, [provider, name, profileColor]);
 
-  // 공급자 이벤트 리스너 설정
+  // 접속 상태 확인
   useEffect(() => {
-    collabProvider.on('connect', () => {
-      setStatus('connected');
-    });
-    collabProvider.on('disconnect', () => {
-      console.log('Disconnected');
-    });
-    collabProvider.on('synced', () => {
-      console.log('Synced');
-    });
-    collabProvider.on(
-      'authenticationFailed',
-      ({ reason }: { reason: string }) => {
-        console.error('Authentication failed:', reason);
-      },
-    );
-    collabProvider.on('awarenessChange', ({ states }: { states: string }) => {
-      console.log('states: ', states);
-    });
-    collabProvider.on('status', ({ status }: { status: string }) => {
-      console.log('status: ', status);
-      setStatus(status);
-    });
-    return () => {
-      collabProvider.off('connect');
-      collabProvider.off('disconnect');
-      collabProvider.off('synced');
-      collabProvider.off('authenticationFailed');
-      collabProvider.off('awarenessChange');
-      collabProvider.off('status');
+    const statusListener = (event: { status: string }) => {
+      console.log('status', event.status);
+      setStatus(event.status);
     };
-  }, [collabProvider]);
+    provider.on('status', statusListener);
+    return () => {
+      provider.off('status', statusListener);
+    };
+  }, [provider]);
 
+  // 에디터 설정
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -115,21 +162,21 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
           'm-2 p-4 w-full border border-gray-200 rounded-lg focus:outline-none overflow-y-auto overflow-x-hidden',
       },
     },
-    extensions: collabProvider
+    extensions: provider
       ? [
           ...Extensions,
           Collaboration.configure({
             document: ydoc,
           }),
           CollaborationCursor.configure({
-            provider: collabProvider,
+            provider: provider,
             user: {
               name: name,
               color: profileColor,
             },
           }),
           CollaborationHistory.configure({
-            provider: collabProvider,
+            provider: provider,
             onUpdate: (data) => {
               setVersions(data.versions);
               setCurrentVersion(data.currentVersion);
@@ -265,7 +312,7 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
 
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
-      {collabProvider && (
+      {provider && (
         <VersioningModal
           versions={versions}
           isOpen={versioningModalOpen}
@@ -273,7 +320,7 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
           onRevert={handleRevert}
           currentVersion={currentVersion}
           latestVersion={latestVersion}
-          provider={collabProvider}
+          provider={provider}
         />
       )}
       <CodeEditorWithPreview
@@ -308,6 +355,54 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
           openFileModal={showFileUploadModal}
           openImageModal={showImageUploadModal}
         />
+      )}
+      {editor && (
+        <BubbleMenu
+          className='z-10 flex gap-2 rounded border border-gray-200 bg-white px-4 py-1 shadow-custom'
+          editor={editor}
+          tippyOptions={{ duration: 100 }}>
+          <button onClick={() => editor.chain().focus().toggleBold().run()}>
+            <BoldIcon className='h-5 w-5' />
+          </button>
+          <button onClick={() => editor.chain().focus().toggleItalic().run()}>
+            <ItalicIcon className='h-5 w-5' />
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleUnderline().run()}>
+            <UnderlineIcon className='h-5 w-5' />
+          </button>
+          <button onClick={() => editor.chain().focus().toggleStrike().run()}>
+            <StrikeIcon className='h-5 w-5' />
+          </button>
+          <label className='flex w-7 cursor-pointer items-end'>
+            <PaletteIcon className='h-5 w-5 fill-gray-800' />
+            <ColorInput
+              type='color'
+              onInput={(event) => {
+                const target = event.target as HTMLInputElement; // 타입 단언 추가
+                editor.chain().focus().setColor(target.value).run();
+              }}
+              value={editor.getAttributes('textStyle').color}
+              data-testid='setColor'
+            />
+          </label>
+          <label className='flex w-7 cursor-pointer items-end'>
+            <MarkPenIcon className='h-5 w-5 fill-gray-800' />
+            <HighlightInput
+              type='color'
+              onInput={(event) => {
+                const target = event.target as HTMLInputElement; // 타입 단언 추가
+                editor
+                  .chain()
+                  .focus()
+                  .toggleHighlight({ color: target.value })
+                  .run();
+              }}
+              value={editor.getAttributes('textStyle').highlight}
+              data-testid='setColor'
+            />
+          </label>
+        </BubbleMenu>
       )}
       <EditorContent
         className='flex shrink grow overflow-y-auto overflow-x-hidden px-5 py-4'

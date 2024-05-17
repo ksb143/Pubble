@@ -1,10 +1,22 @@
+import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ProjectPage from '@/pages/project/ProjectPage';
 import RequirementPage from '@/pages/requirement/RequirementPage';
 import RichEditorPage from '@/pages/rich/RichEditorPage.tsx';
-import { provider, ydoc } from '@/utils/tiptap';
+import { generateJwt } from '@/utils/tiptap';
 
 const Project = () => {
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const jwt = await generateJwt();
+      setToken(jwt);
+    };
+
+    fetchToken();
+  }, []);
+
   return (
     <Routes>
       <Route path='/:projectCode' element={<ProjectPage />} />
@@ -14,7 +26,7 @@ const Project = () => {
       />
       <Route
         path='/:projectCode/requirement/:requirementCode/detail'
-        element={<RichEditorPage provider={provider} ydoc={ydoc} />}
+        element={<RichEditorPage tiptapToken={token} />}
       />
     </Routes>
   );

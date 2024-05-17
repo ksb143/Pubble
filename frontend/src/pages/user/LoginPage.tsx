@@ -28,6 +28,7 @@ const LoginPage = () => {
     setDepartment,
     setPosition,
     setAllowedDocumentNames,
+    setUserId,
   } = useUserStore();
 
   // 로티 기본 옵션
@@ -78,6 +79,7 @@ const LoginPage = () => {
       setPosition(decodeToken.position);
       setProfileColor(decodeToken.profileColor);
       setAllowedDocumentNames(decodeToken.allowedDocumentNames);
+      setUserId(decodeToken.userId);
 
       // 성공 후 페이지 리다이렉션
       navigate('/main');
