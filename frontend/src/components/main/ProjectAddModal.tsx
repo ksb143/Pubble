@@ -21,6 +21,7 @@ interface ProjectAddModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
 const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
@@ -79,7 +80,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             <Input
               id='projectParticipant'
               placeholder='ex) SSAFY1001, SSAFY1002'
-              type='ty'
+              type='text'
               value={participant}
               onChange={(e) => setParticipant(e.target.value)}
               className='col-span-3'

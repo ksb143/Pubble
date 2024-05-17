@@ -8,6 +8,7 @@ import { getLatestRequirementVersion } from '@/apis/project';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
+
 import {
   ColumnDef,
   flexRender,
@@ -299,6 +300,7 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
         {requirements.length > 0 &&
           `${new Date(requirements[0].startAt).toLocaleDateString('ko-KR')} ~ ${new Date(requirements[0].endAt).toLocaleDateString('ko-KR')}`}
       </p>
+
       <div className='rounded-md border'>
         <div className='flex items-center px-5 py-5'>
           <Input
