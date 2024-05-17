@@ -79,6 +79,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             <Input
               id='projectParticipant'
               placeholder='ex) SSAFY1001, SSAFY1002'
+              type='checkbox'
               value={participant}
               onChange={(e) => setParticipant(e.target.value)}
               className='col-span-3'

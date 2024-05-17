@@ -278,7 +278,6 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
     fetchRequirements();
   }, [pId, pCode]);
 
-
   const handleRowClick = (summary: Summary) => {
     const { code } = summary;
     const rCode = code;
