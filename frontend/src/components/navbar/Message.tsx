@@ -8,6 +8,7 @@ import Lottie from 'react-lottie';
 import { getMessageList } from '@/apis/message';
 import { MessageInfo } from '@/types/messageTypes';
 // 4. store
+import useNotificationStore from '@/stores/notificationStore';
 // 5. component
 import MessageSendModal from '@/components/navbar/MessageSendModal';
 import MessageList from '@/components/navbar/MessageList';
@@ -31,6 +32,7 @@ const dialogStyle = css`
 `;
 
 const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
+  const { hasNewMessage, isMessageChecked } = useNotificationStore();
   const [isMessageSendModalOpen, setIsMessageSendModalOpen] = useState(false); // 쪽지 쓰기 모달 상태
   const itemsPerPage = 10; // 한 페이지에 보여줄 쪽지 수
   const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
@@ -48,7 +50,7 @@ const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
         console.log('쪽지 조회 실패 : ', error);
       }
     })();
-  }, [currentPage]);
+  }, [currentPage, hasNewMessage, isMessageChecked]);
 
   // 로티 기본 옵션
   const defaultOptions = {

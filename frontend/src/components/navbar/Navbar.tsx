@@ -1,16 +1,23 @@
 // 1. react
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
+import {
+  registerServiceWorker,
+  getFCMToken,
+  setupFCMListener,
+} from '@/apis/notification';
 // 4. store
 import useUserStore from '@/stores/userStore';
+import useNotificationStore from '@/stores/notificationStore';
 // 5. component
 import Message from '@/components/navbar/Message';
 import Notification from '@/components/navbar/Notification';
 import Profile from '@/components/layout/Profile';
 import ProfileDropdown from '@/components/navbar/ProfileDropdown';
 import Breadcrumb from '@/components/navbar/Breadcrumb';
+import Badge from '@/components/navbar/Badge';
 // 6. assets
 import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
@@ -19,6 +26,12 @@ import Bell from '@/assets/icons/bell.svg?react';
 const Navbar = () => {
   const navigate = useNavigate();
   const { name, profileColor } = useUserStore();
+  const {
+    hasNewMessage,
+    hasNewNotification,
+    setHasNewMessage,
+    setHasNewNotification,
+  } = useNotificationStore();
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -28,6 +41,28 @@ const Navbar = () => {
   // 메뉴 토글 함수
   const toggleMenu = (menu: 'message' | 'notification' | 'profile') => {
     setActiveMenu(activeMenu === menu ? null : menu);
+  };
+
+  // firebase 초기 설정
+  useEffect(() => {
+    // 서비스 워커 등록
+    registerServiceWorker();
+    // FCM 토큰 요청
+    getFCMToken();
+    // FCM 리스너 등록
+    setupFCMListener();
+  }, []);
+
+  // 쪽지 아이콘 클릭 시 알림 배지 숨김
+  const handleMessageClick = () => {
+    setHasNewMessage(false);
+    toggleMenu('message');
+  };
+
+  // 알림 아이콘 클릭 시 알림 배지 숨김
+  const handleNotificationClick = () => {
+    setHasNewNotification(false);
+    toggleMenu('notification');
   };
 
   return (
@@ -71,20 +106,22 @@ const Navbar = () => {
 
           {/* 쪽지 아이콘 */}
           <div
-            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
-            onClick={() => toggleMenu('message')}>
+            className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
+            onClick={handleMessageClick}>
             <Envelope
               className={`h-8 w-8 stroke-gray-900 ${activeMenu === 'message' ? 'stroke-[1.5]' : 'stroke-1'}`}
             />
+            {hasNewMessage && <Badge size='sm' position='right' />}
           </div>
 
           {/* 알림 아이콘 */}
           <div
-            className={`mr-8 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
-            onClick={() => toggleMenu('notification')}>
+            className={`relative mr-8 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
+            onClick={handleNotificationClick}>
             <Bell
               className={`h-8 w-8 fill-gray-900 stroke-gray-900 ${activeMenu === 'notification' ? 'stroke-[6]' : 'stroke-2'}`}
             />
+            {hasNewNotification && <Badge size='sm' position='right-sm' />}
           </div>
 
           {/* 프로필 아이콘 */}

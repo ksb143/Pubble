@@ -6,8 +6,8 @@ export interface SenderInfo {
   employeeId: string;
   department: string;
   position: string;
-  role: string;
-  isApprovable: 'y' | 'n';
+  role: string; // 관리자 여부
+  isApprovable: 'y' | 'n'; // 결재자 여부
   profileColor: string;
 }
 

@@ -4,13 +4,14 @@ import { useState } from 'react';
 // 3. api
 import { updateMessageStatus } from '@/apis/message';
 import { MessageInfo } from '@/types/messageTypes';
-import { extractDate, extractTime } from '@/utils/time-format';
+import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
+import useNotificationStore from '@/stores/notificationStore';
 // 5. component
-// 6. assets
-import Down from '@/assets/icons/chevron-down.svg?react';
 import Profile from '@/components/layout/Profile';
 import Badge from '@/components/navbar/Badge';
+// 6. assets
+import Down from '@/assets/icons/chevron-down.svg?react';
 
 // api로 받아온 쪽지 리스트 타입 설정
 interface MessageListProps {
@@ -18,6 +19,7 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({ data }) => {
+  const { isMessageChecked, setIsMessageChecked } = useNotificationStore();
   // 쪽지 읽었는지 여부 상태
   const [expandedMessageId, setExpandedMessageId] = useState<number | null>(
     null,
@@ -33,6 +35,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
     if (message.status !== 'r') {
       try {
         await updateMessageStatus(message.messageId, 'r');
+        setIsMessageChecked(!isMessageChecked);
       } catch (error) {
         console.log('쪽지 상태 업데이트 실패 :', error);
       }
@@ -65,7 +68,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
               </p>
             </div>
           </div>
-          <div className='flex flex-col items-end'>
+          <div className='flex shrink-0 flex-col items-end'>
             <p>{extractDate(message.createdAt)}</p>
             <p>{extractTime(message.createdAt)}</p>
           </div>
@@ -75,7 +78,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
               handleToggleExpand(message.messageId);
             }}
           />
-          {message.status !== 'r' && <Badge size='sm' />}
+          {message.status !== 'r' && <Badge size='sm' position='left' />}
         </li>
       ))}
     </>
