@@ -20,8 +20,8 @@ export const addProject = async (
 ) => {
   const { data } = await privateApi.post('/projects', {
     projectTitle: pjtTitle,
-    startAt: pjtStartDate,
-    endAt: pjtEndDate,
+    startAt: pjtStartDate + 'T00:00:00',
+    endAt: pjtEndDate + 'T23:59:59',
     code: pjtCode,
     participantsEID: pjtParticipants,
     status: 'before start',
@@ -46,6 +46,7 @@ export const getLatestRequirementVersion = async (pjtId: number) => {
 };
 
 // 특정 프로젝트의 모든 요구사항 목록 보기 - GET
+// 버전에 무관하게 모두 조회 하는 것이므로, 실제로 중복되는 요구사항 항목이 있을 수 있음.
 export const getRequirement = async (pjtId: number, pjtCode: string) => {
   const { data } = await privateApi.get(
     `/projects/${pjtId}/requirements?code=${pjtCode}`,
