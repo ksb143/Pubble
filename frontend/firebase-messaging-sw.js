@@ -29,11 +29,11 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 // 백그라운드 상태에서 수신된 알림 표시
-// messaging.onBackgroundMessage((payload) => {
-//   const notificationTitle = payload.title;
-//   const notificationOptions = {
-//     body: payload.body,
-//     // icon: payload.icon
-//   };
-//   self.registration.showNotification(notificationTitle, notificationOptions);
-// });
+messaging.onBackgroundMessage((payload) => {
+  const notificationTitle = payload.title;
+  const notificationOptions = {
+    body: payload.body,
+    // icon: payload.icon
+  };
+  self.registration.showNotification(notificationTitle, notificationOptions);
+});
