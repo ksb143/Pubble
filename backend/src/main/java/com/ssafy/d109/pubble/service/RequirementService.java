@@ -197,18 +197,18 @@ public class RequirementService {
             // 양방향 -> 단방향으로 수정
             createDetailWhenCreateRequirement(requirement.getRequirementId(), requirementCreateDto.getDetailContents());
             requirementRepository.save(requirement);
-            sendNotificationsToProjectParticipants(requirement);
+            sendNotificationsToProjectParticipants(requirement, author);
 
         }
     }
 
 
-    private void sendNotificationsToProjectParticipants(Requirement requirement) {
+    private void sendNotificationsToProjectParticipants(Requirement requirement, User author) {
         // 푸시 알림 전송
         List<ProjectAssignment> assignments = projectAssignmentRepository.findAllByProject_projectId(requirement.getProject().getProjectId());
         for (ProjectAssignment assignment : assignments) {
 
-            User user = assignment.getUser();
+            User user = assignment.getUser();           // sender? receiver ?
             Notification notification = notificationRepository.findNotificationByUser(user).orElseThrow(NotificationNotFoundException::new);
 
             if (notification.getToken() != null) {
@@ -221,7 +221,8 @@ public class RequirementService {
                     notificationService.sendNotification(dto, user.getEmployeeId());
                     notificationService.saveNotificationMessage(dto.getMessage(),
                             NotificationType.NEW_REQUIREMENT,
-                            null, user.getUserId(),
+                            user.getUserId(),
+                            author.getUserId(),       // sender 수정 필
                             assignment.getProject(),
                             requirement,
                             null
