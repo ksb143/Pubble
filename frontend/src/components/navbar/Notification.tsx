@@ -9,6 +9,7 @@ import { getNotificationList } from '@/apis/notification';
 import { NotificationInfo } from '@/types/notificationTypes';
 // 4. store
 import useNotificationStore from '@/stores/notificationStore';
+import useUserStore from '@/stores/userStore';
 // 5. component
 import NotificationList from '@/components/navbar/NotificationList';
 // 6. assets
@@ -32,6 +33,7 @@ const dialogStyle = css`
 const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
   const { hasNewMessage, hasNewNotification, isNotificationChecked } =
     useNotificationStore();
+  const { userId } = useUserStore();
   const itemsPerPage = 10; // 한 페이지에 보여줄 알림 수
   const [currentPage, setCurrentPage] = useState(0); // 현재 페이지
   const [totalPage, setTotalPage] = useState(0); // 전체 페이지 수
@@ -43,14 +45,25 @@ const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
   useEffect(() => {
     (async () => {
       try {
-        const response = await getNotificationList(currentPage, itemsPerPage);
+        const response = await getNotificationList(
+          currentPage,
+          itemsPerPage,
+          userId,
+        );
         setNotificationList(response.content);
         setTotalPage(response.totalPages);
+        console.log('알림 조회 성공 : ', response);
       } catch (error) {
         console.log('알림 조회 실패 : ', error);
       }
     })();
-  }, [currentPage, hasNewNotification, hasNewMessage, isNotificationChecked]);
+  }, [
+    currentPage,
+    hasNewNotification,
+    hasNewMessage,
+    isNotificationChecked,
+    userId,
+  ]);
 
   // 로티 기본 옵션
   const defaultOptions = {
@@ -106,13 +119,13 @@ const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
           </button>
           <span className='mx-4 text-center text-lg'>{currentPage + 1}</span>
           <button
-            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage - 1 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
+            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
             onClick={() => {
               setCurrentPage(currentPage + 1);
             }}
-            disabled={currentPage === totalPage - 1}>
+            disabled={currentPage === totalPage}>
             <Right
-              className={`h-6 w-6 ${currentPage === totalPage - 1 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
+              className={`h-6 w-6 ${currentPage === totalPage ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
             />
           </button>
         </div>

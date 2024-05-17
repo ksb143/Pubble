@@ -10,7 +10,7 @@ import useNotificationStore from '@/stores/notificationStore';
 import Profile from '@/components/layout/Profile';
 import Badge from '@/components/navbar/Badge';
 // 6. asset
-import ArrowRight from '@/assets/icons/arrow-right.svg?react';
+import ArrowRight from '@/assets/icons/arrow-right-circle.svg?react';
 
 // api로 받아온 알림 리스트 타입 설정
 interface NotificationListProps {
@@ -33,6 +33,34 @@ const NotificationList: React.FC<NotificationListProps> = ({ data }) => {
     }
   };
 
+  // 알림 타입에 따라 화면에 출력되는 텍스트
+  const notificationMessages: { [key: string]: JSX.Element } = {
+    message: (
+      <div>
+        <p>새 쪽지가 있습니다.</p>
+        <p>쪽지함을 확인해 주세요.</p>
+      </div>
+    ),
+    project: (
+      <div>
+        <p>새 프로젝트 알림이 있습니다.</p>
+        <p>프로젝트 페이지를 확인해 주세요.</p>
+      </div>
+    ),
+    new_requirement: (
+      <div>
+        <p>새 요구사항이 있습니다.</p>
+        <p>요구사항 페이지를 확인해 주세요.</p>
+      </div>
+    ),
+    mention: (
+      <div>
+        <p>멘션이 있습니다.</p>
+        <p>멘션 알림을 확인해 주세요.</p>
+      </div>
+    ),
+  };
+
   return (
     <>
       {data.map((notification) => (
@@ -43,16 +71,17 @@ const NotificationList: React.FC<NotificationListProps> = ({ data }) => {
             className='flex flex-grow items-center'
             onClick={() => handleReadNotification(notification)}>
             {/* 이미지 부분 */}
-            {notification.senderInfo.name && (
-              <Profile
-                width='3rem'
-                height='3rem'
-                name={notification.senderInfo.name}
-                profileColor={notification.senderInfo.profileColor}
-              />
-            )}
+            <Profile
+              width='3rem'
+              height='3rem'
+              name={notification.senderInfo.name}
+              profileColor={notification.senderInfo.profileColor}
+            />
             {/* 내용 부분 */}
-            <p className='flex-grow px-2'>{notification.content}</p>
+            <p>{notification.content}</p>
+            <div className='flex-grow px-2'>
+              {notificationMessages[notification.type]}
+            </div>
           </div>
           <div className='flex shrink-0 flex-col items-end'>
             <p>{extractDate(notification.createdAt)}</p>
