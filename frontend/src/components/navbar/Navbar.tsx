@@ -75,6 +75,7 @@ const Navbar = () => {
       <Notification
         isOpen={activeMenu === 'notification'}
         closeMenu={() => setActiveMenu(null)}
+        setActiveMenu={setActiveMenu}
       />
 
       {/* 상단바 전체 */}
