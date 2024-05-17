@@ -47,7 +47,7 @@ const VersioningModal = memo(
     );
     const isCurrentVersion =
       versions && versions.length > 0
-        ? currentVersionId === versions[versions.length - 1].version
+        ? currentVersionId === versions.at(-1)?.version
         : false;
 
     const editor = useEditor({
@@ -85,7 +85,7 @@ const VersioningModal = memo(
 
     useEffect(() => {
       if (isOpen && currentVersionId === null && versions.length > 0) {
-        const initialVersion = versions[versions.length - 1].version;
+        const initialVersion = versions.at(-1)?.version ?? null;
 
         setCurrentVersionId(initialVersion);
 
@@ -108,7 +108,6 @@ const VersioningModal = memo(
             }
           },
         );
-
         return () => {
           unbindContentWatcher();
         };
@@ -166,7 +165,7 @@ const VersioningModal = memo(
                   <hr />
                   <div className='mt-4 flex h-1/4 flex-col gap-3'>
                     <button
-                      className={`bg-pubble py-2 ${versionData && !isCurrentVersion ? 'hover:bg-dpubble' : ''} rounded text-white`}
+                      className={`bg-pubble py-2 disabled:bg-plblue ${versionData && !isCurrentVersion ? 'hover:bg-dpubble' : ''} rounded text-white`}
                       type='button'
                       disabled={!versionData || isCurrentVersion}
                       onClick={handleRevert}>
