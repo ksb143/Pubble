@@ -59,7 +59,6 @@ const Notification: React.FC<NotificationProps> = ({
         );
         setNotificationList(response.content);
         setTotalPage(response.totalPages);
-        console.log('알림 조회 성공 : ', response);
       } catch (error) {
         console.log('알림 조회 실패 : ', error);
       }
