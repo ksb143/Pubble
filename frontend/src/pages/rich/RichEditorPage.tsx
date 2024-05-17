@@ -169,7 +169,6 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
           CollaborationHistory.configure({
             provider: provider,
             onUpdate: (payload) => {
-              console.log('협력 이력 데이터: ', payload);
               setVersions(payload.versions);
               setCurrentVersion(payload.currentVersion);
               setLatestVersion(payload.version);
@@ -403,9 +402,10 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       <div className='flex max-h-12 shrink grow flex-wrap items-center justify-between whitespace-nowrap border-t-2 border-gray-200 bg-white px-4'>
         <div className='flex items-center gap-2'>
           <div
-            className={`mr-4 h-2 w-2 rounded-full ${status === 'connecting' || status === 'connected' ? 'bg-pubble' : 'bg-gray-400'}`}></div>
+            className={`mr-4 h-2 w-2 rounded-full ${status === 'connected' || (editor?.storage?.collaborationCursor?.users?.length > 0 ?? false) ? 'bg-pubble' : 'bg-gray-400'}`}></div>
           <div>
-            {status === 'connecting' || status === 'connected'
+            {status === 'connected' ||
+            (editor?.storage?.collaborationCursor?.users?.length > 0 ?? false)
               ? `${editor?.storage.collaborationCursor.users.length} 명의 유저가 이 문서에 있습니다.`
               : '오프라인'}
           </div>
