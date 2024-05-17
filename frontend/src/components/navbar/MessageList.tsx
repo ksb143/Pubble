@@ -47,7 +47,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
       {data.map((message) => (
         <li
           key={message.messageId}
-          className='relative flex justify-between border-b py-6 pl-2 last-of-type:border-none'>
+          className='relative flex justify-between border-b px-2 py-6 last-of-type:border-none'>
           <div
             className='flex flex-1'
             onClick={() => handleReadMessage(message)}>
@@ -57,7 +57,7 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
               name={message.senderInfo.name}
               profileColor={message.senderInfo.profileColor}
             />
-            <div className='flex w-0 flex-1 flex-col px-2'>
+            <div className='flex w-0 flex-1 flex-col px-4'>
               <p
                 className={`font-normal ${expandedMessageId === message.messageId ? '' : 'truncate'}`}>
                 {message.title}
@@ -68,12 +68,12 @@ const MessageList: React.FC<MessageListProps> = ({ data }) => {
               </p>
             </div>
           </div>
-          <div className='flex shrink-0 flex-col items-end'>
+          <div className='flex shrink-0 flex-col items-end text-sm'>
             <p>{extractDate(message.createdAt)}</p>
             <p>{extractTime(message.createdAt)}</p>
           </div>
           <Down
-            className={`ml-3 mt-3 h-4 w-4 cursor-pointer stroke-gray-400 transition duration-300 ${expandedMessageId === message.messageId ? 'rotate-180' : ''}`}
+            className={`ml-5 mt-3 h-4 w-4 cursor-pointer stroke-gray-400 transition duration-300 ${expandedMessageId === message.messageId ? 'rotate-180' : ''}`}
             onClick={() => {
               handleToggleExpand(message.messageId);
             }}

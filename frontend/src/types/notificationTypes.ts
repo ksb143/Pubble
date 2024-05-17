@@ -11,9 +11,9 @@ export interface SenderInfo {
 
 // 알림 타입 정보
 export interface TypeData {
-  projectId: string | null;
+  projectId: number | undefined;
   projectCode: string | null;
-  requirementId: string | null;
+  requirementId: number | undefined;
   requirementCode: string | null;
   threadId: string | null;
 }
@@ -22,6 +22,7 @@ export interface TypeData {
 export interface NotificationInfo {
   notificationId: number;
   isChecked: boolean; // 읽음 여부
+  title: string;
   content: string;
   senderInfo: SenderInfo;
   createdAt: string;

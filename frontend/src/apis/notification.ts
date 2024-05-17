@@ -47,11 +47,11 @@ export const setupFCMListener = () => {
         new Notification(notificationTitle, notificationOptions);
       }
 
-      if (payload.data?.type === 'message') {
+      if (payload.data?.type === 'MESSAGE') {
         // 알림 타입이 쪽지인 경우
         useNotificationStore.setState({ hasNewMessage: true });
         useNotificationStore.setState({ hasNewNotification: true });
-      } else if (payload.data?.type !== 'message') {
+      } else if (payload.data?.type !== 'MESSAGE') {
         useNotificationStore.setState({ hasNewNotification: true });
       }
     } else {

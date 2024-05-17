@@ -88,7 +88,6 @@ type Requirement = {
 interface RequirementListProps {
   pId: number;
   pCode: string;
-  pName: string;
 }
 
 // RequirementList component의 columns 정의
@@ -170,7 +169,7 @@ export const columns: ColumnDef<Summary>[] = [
 //   },
 // },
 
-const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
+const RequirementList = ({ pId, pCode }: RequirementListProps) => {
   const { setPageType } = usePageInfoStore();
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
@@ -294,7 +293,9 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
 
   return (
     <div className='p-8 text-center'>
-      <p className='mb-4 text-2xl font-bold'>{pName || '예시 프로젝트 제목'}</p>
+      <p className='mb-4 text-2xl font-bold'>
+        {requirements[0]?.projectTitle || '예시 프로젝트 제목'}
+      </p>
       <p className='mb-8 text-lg'>
         {requirements.length > 0 &&
           `${new Date(requirements[0].startAt).toLocaleDateString('ko-KR')} ~ ${new Date(requirements[0].endAt).toLocaleDateString('ko-KR')}`}

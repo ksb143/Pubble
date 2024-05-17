@@ -23,6 +23,9 @@ import NoData from '@/assets/lotties/no-data.json';
 interface NotificationProps {
   isOpen: boolean;
   closeMenu: () => void;
+  setActiveMenu: React.Dispatch<
+    React.SetStateAction<null | 'message' | 'notification' | 'profile'>
+  >;
 }
 
 // 상단바 높이를 제외한 화면 높이
@@ -30,7 +33,11 @@ const dialogStyle = css`
   height: calc(100vh - 64px);
 `;
 
-const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
+const Notification: React.FC<NotificationProps> = ({
+  isOpen,
+  closeMenu,
+  setActiveMenu,
+}) => {
   const { hasNewMessage, hasNewNotification, isNotificationChecked } =
     useNotificationStore();
   const { userId } = useUserStore();
@@ -101,34 +108,40 @@ const Notification: React.FC<NotificationProps> = ({ isOpen, closeMenu }) => {
           )}
           {notificationList.length > 0 && (
             <>
-              <NotificationList data={notificationList} />
+              <NotificationList
+                data={notificationList}
+                closeMenu={closeMenu}
+                setActiveMenu={setActiveMenu}
+              />
             </>
           )}
         </ul>
         {/* 페이지네이션 */}
-        <div className='mt-4 flex items-center justify-center'>
-          <button
-            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
-            onClick={() => {
-              setCurrentPage(currentPage - 1);
-            }}
-            disabled={currentPage === 0}>
-            <Left
-              className={`h-6 w-6 ${currentPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
-            />
-          </button>
-          <span className='mx-4 text-center text-lg'>{currentPage + 1}</span>
-          <button
-            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage - 1 || totalPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
-            onClick={() => {
-              setCurrentPage(currentPage + 1);
-            }}
-            disabled={currentPage === totalPage - 1 || totalPage === 0}>
-            <Right
-              className={`h-6 w-6 ${currentPage === totalPage - 1 || totalPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
-            />
-          </button>
-        </div>
+        {notificationList.length > 0 && (
+          <div className='mt-4 flex items-center justify-center'>
+            <button
+              className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
+              onClick={() => {
+                setCurrentPage(currentPage - 1);
+              }}
+              disabled={currentPage === 0}>
+              <Left
+                className={`h-6 w-6 ${currentPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
+              />
+            </button>
+            <span className='mx-4 text-center text-lg'>{currentPage + 1}</span>
+            <button
+              className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage - 1 || totalPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
+              onClick={() => {
+                setCurrentPage(currentPage + 1);
+              }}
+              disabled={currentPage === totalPage - 1 || totalPage === 0}>
+              <Right
+                className={`h-6 w-6 ${currentPage === totalPage - 1 || totalPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
+              />
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
