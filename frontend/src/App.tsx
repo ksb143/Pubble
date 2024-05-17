@@ -30,7 +30,6 @@ function App() {
       const { name, employeeId, department, position, profileColor, userId } =
         parseJwt(token);
       console.log(parseJwt(token));
-      console.log('유저 아이디2 : ', userId);
       setName(name);
       setEmployeeId(employeeId);
       setDepartment(department);

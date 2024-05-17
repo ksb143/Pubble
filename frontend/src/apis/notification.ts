@@ -67,7 +67,6 @@ export const getNotificationList = async (
   size: number,
   userId: number,
 ) => {
-  console.log('유저 아이디 1', userId);
   const { data } = await privateApi.get(`/notification/${userId}/list`, {
     params: { page, size },
   });

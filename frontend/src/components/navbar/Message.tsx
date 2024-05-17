@@ -123,13 +123,13 @@ const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
           </button>
           <span className='mx-4 text-center text-lg'>{currentPage + 1}</span>
           <button
-            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
+            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage - 1 || totalPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
             onClick={() => {
               setCurrentPage(currentPage + 1);
             }}
-            disabled={currentPage === totalPage}>
+            disabled={currentPage === totalPage - 1 || totalPage === 0}>
             <Right
-              className={`h-6 w-6 ${currentPage === totalPage ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
+              className={`h-6 w-6 ${currentPage === totalPage - 1 || totalPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
             />
           </button>
         </div>
