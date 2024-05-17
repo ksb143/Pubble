@@ -111,14 +111,8 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
         name: `${projectCode}-${requirementCode}`,
         document: ydoc,
         token: tiptapToken,
-        onConnect() {
-          console.log('연결됨');
-        },
         onDisconnect() {
           console.log('연결 끊김');
-        },
-        onSynced() {
-          console.log('동기화 완료');
         },
         onAuthenticationFailed({ reason }: { reason: string }) {
           console.error('인증 실패: ', reason);
@@ -127,32 +121,33 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     [tiptapToken, ydoc],
   );
 
-  // 공급자 이벤트 리스너 파괴 설정
-  useEffect(() => {
-    return () => {
-      provider.destroy();
-    };
-  }, []);
-
   // 현재 사용자 정보 설정
   useEffect(() => {
     provider.setAwarenessField('user', {
       name: name,
       color: profileColor,
     });
-  }, [provider, name, profileColor]);
+  }, [name, profileColor]);
 
   // 접속 상태 확인
   useEffect(() => {
-    const statusListener = (event: { status: string }) => {
-      console.log('status', event.status);
-      setStatus(event.status);
+    const statusHandler = ({ status }: { status: string }) => {
+      setStatus(status);
     };
-    provider.on('status', statusListener);
+    provider.on('status', statusHandler);
     return () => {
-      provider.off('status', statusListener);
+      provider.off('status', statusHandler);
     };
-  }, [provider]);
+  }, []);
+
+  // 공급자 이벤트 리스너 파괴 설정
+  useEffect(() => {
+    return () => {
+      provider.off('disconnect');
+      provider.off('authentication-failed');
+      provider.destroy();
+    };
+  }, []);
 
   // 에디터 설정
   const editor = useEditor({
@@ -170,18 +165,15 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
           }),
           CollaborationCursor.configure({
             provider: provider,
-            user: {
-              name: name,
-              color: profileColor,
-            },
           }),
           CollaborationHistory.configure({
             provider: provider,
-            onUpdate: (data) => {
-              setVersions(data.versions);
-              setCurrentVersion(data.currentVersion);
-              setLatestVersion(data.version);
-              setIsAutoVersioning(data.versioningEnabled);
+            onUpdate: (payload) => {
+              console.log('협력 이력 데이터: ', payload);
+              setVersions(payload.versions);
+              setCurrentVersion(payload.currentVersion);
+              setLatestVersion(payload.version);
+              setIsAutoVersioning(payload.versioningEnabled);
             },
           }),
         ]
@@ -411,9 +403,9 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       <div className='flex max-h-12 shrink grow flex-wrap items-center justify-between whitespace-nowrap border-t-2 border-gray-200 bg-white px-4'>
         <div className='flex items-center gap-2'>
           <div
-            className={`mr-4 h-2 w-2 rounded-full ${status === 'connected' ? 'bg-pubble' : 'bg-gray-400'}`}></div>
+            className={`mr-4 h-2 w-2 rounded-full ${status === 'connecting' || status === 'connected' ? 'bg-pubble' : 'bg-gray-400'}`}></div>
           <div>
-            {status === 'connected'
+            {status === 'connecting' || status === 'connected'
               ? `${editor?.storage.collaborationCursor.users.length} 명의 유저가 이 문서에 있습니다.`
               : '오프라인'}
           </div>
