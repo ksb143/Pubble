@@ -3,11 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import {
-  // registerServiceWorker,
-  getFCMToken,
-  setupFCMListener,
-} from '@/apis/notification';
+import { getFCMToken, setupFCMListener } from '@/apis/notification';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
@@ -45,8 +41,6 @@ const Navbar = () => {
 
   // firebase 초기 설정
   useEffect(() => {
-    // 서비스 워커 등록
-    // registerServiceWorker();
     // FCM 토큰 요청
     getFCMToken();
     // FCM 리스너 등록
