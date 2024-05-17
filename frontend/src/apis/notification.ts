@@ -62,8 +62,12 @@ export const setupFCMListener = () => {
 };
 
 // 받은 알림 리스트 조회 함수
-export const getNotificationList = async (page: number, size: number) => {
-  const { data } = await privateApi.get('/notification/list', {
+export const getNotificationList = async (
+  page: number,
+  size: number,
+  userId: number,
+) => {
+  const { data } = await privateApi.get(`/notification/${userId}/list`, {
     params: { page, size },
   });
   return data;
