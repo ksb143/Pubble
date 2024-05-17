@@ -175,7 +175,7 @@ public class NotificationService {
 
 
     private NotificationMessageResponseDto convertToDto(NotificationMessage notificationMsg) {
-        User sender = userRepository.findByUserId(notificationMsg.getSenderId()).orElseThrow(UserNotFoundException::new);
+        User sender = userRepository.findByUserId(notificationMsg.getReceiverId()).orElseThrow(UserNotFoundException::new);
 
         TypeDataDto typeData = new TypeDataDto();
         switch (notificationMsg.getType()) {
