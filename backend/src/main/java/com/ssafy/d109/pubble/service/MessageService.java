@@ -70,7 +70,7 @@ public class MessageService {
             notificationService.sendNotification(dto, receiver.getEmployeeId());
             notificationService.saveNotificationMessage(dto.getMessage(),
                                                         NotificationType.MESSAGE,
-                                                        null,
+                                                        receiver.getUserId(),
                                                         message.getSender().getUserId(),
                                                         null, null, null);
         } catch (Exception e) {
