@@ -147,7 +147,7 @@ public class UserThreadService {
                 .type("MENTION")
                 .build();
         notificationService.sendNotification(notificationDto, receiverInfo.getReceiverId());
-        notificationService.saveNotificationMessage(content,
+        notificationService.saveNotificationMessage("MENTION", content,
                 NotificationType.MENTION,
                 receiver.getUserId(),
                 sender.getUserId(),

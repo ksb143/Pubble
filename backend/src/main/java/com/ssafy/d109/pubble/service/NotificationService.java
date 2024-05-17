@@ -144,6 +144,7 @@ public class NotificationService {
 
     @Transactional
     public NotificationMessage saveNotificationMessage(
+            String title,
             String content,
             NotificationType type,
             Integer receiverId,
@@ -208,6 +209,7 @@ public class NotificationService {
         NotificationMessageResponseDto dto = NotificationMessageResponseDto.builder()
                 .notificationId(notificationMsg.getNotificationMessageId())
                 .isChecked(notificationMsg.getIsChecked())
+                .title(notificationMsg.getTitle())
                 .content(notificationMsg.getContent())
                 .createdAt(notificationMsg.getCreatedAt())
                 .type(notificationMsg.getType())

@@ -26,6 +26,9 @@ public class NotificationMessage {
     @Column(name = "isChecked")
     private Boolean isChecked;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "content")
     private String content;
 

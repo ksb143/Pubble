@@ -16,6 +16,7 @@ public class NotificationMessageResponseDto {
 
     private Integer notificationId;
     private Boolean isChecked;
+    private String title;
     private String content;
     private SenderInfoDto senderInfo;
     private LocalDateTime createdAt;

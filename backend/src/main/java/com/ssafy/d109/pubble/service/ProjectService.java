@@ -117,7 +117,7 @@ public class ProjectService {
 
                 try {
                     notificationService.sendNotification(reqDto, user1.getEmployeeId());
-                    notificationService.saveNotificationMessage(reqDto.getMessage(), PROJECT, user1.getUserId(), user.getUserId(), project, null, null);
+                    notificationService.saveNotificationMessage(reqDto.getTitle(), reqDto.getMessage(), PROJECT, user1.getUserId(), user.getUserId(), project, null, null);
                 } catch (Exception e) {
                     log.error("Failed to send notification", e);
                     throw new NotificationSendingFailedException();

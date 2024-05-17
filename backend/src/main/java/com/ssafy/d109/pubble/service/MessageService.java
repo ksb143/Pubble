@@ -68,7 +68,8 @@ public class MessageService {
         try {
             // 푸시 알림 비동기 전송
             notificationService.sendNotification(dto, receiver.getEmployeeId());
-            notificationService.saveNotificationMessage(dto.getMessage(),
+            notificationService.saveNotificationMessage(dto.getTitle(),
+                                                        dto.getMessage(),
                                                         NotificationType.MESSAGE,
                                                         receiver.getUserId(),
                                                         message.getSender().getUserId(),

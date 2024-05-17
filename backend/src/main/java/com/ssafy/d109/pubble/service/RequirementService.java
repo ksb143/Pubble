@@ -219,7 +219,7 @@ public class RequirementService {
                         .build();
                 try {
                     notificationService.sendNotification(dto, user.getEmployeeId());
-                    notificationService.saveNotificationMessage(dto.getMessage(),
+                    notificationService.saveNotificationMessage(requirement.getProject().getProjectTitle(), dto.getMessage(),
                             NotificationType.NEW_REQUIREMENT,
                             user.getUserId(),
                             author.getUserId(),       // sender 수정 필
