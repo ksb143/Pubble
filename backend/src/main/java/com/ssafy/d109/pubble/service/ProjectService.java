@@ -102,6 +102,7 @@ public class ProjectService {
                         .message(user1.getName() + " " + user1.getPosition() + "님, '" + project.getProjectTitle() + "' 프로젝트에 참여하게 되었습니다.")
                         .type("PROJECT")
                         .build();
+                /*
                 CompletableFuture.runAsync(() -> {
                     try {
                         notificationService.sendNotification(reqDto, user1.getEmployeeId());
@@ -111,6 +112,16 @@ public class ProjectService {
                         throw new NotificationSendingFailedException();
                     }
                 });
+
+                 */
+
+                try {
+                    notificationService.sendNotification(reqDto, user1.getEmployeeId());
+                    notificationService.saveNotificationMessage(reqDto.getMessage(), PROJECT, user1.getUserId(), null, project, null, null);
+                } catch (Exception e) {
+                    log.error("Failed to send notification", e);
+                    throw new NotificationSendingFailedException();
+                }
             }
         }
     }
