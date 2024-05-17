@@ -154,6 +154,7 @@ public class NotificationService {
             UserThread userThread
             ) {
         NotificationMessage notificationMessage = NotificationMessage.builder()
+                .title(title)
                 .createdAt(LocalDateTime.now())
                 .isChecked(false)
                 .content(content)
