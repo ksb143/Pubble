@@ -25,11 +25,20 @@ export const provider = (docName: string) =>
     name: docName,
     document: ydoc,
     token: generateJwt,
-    onDisconnect: () => {
+    onConnect() {
+      console.log('연결 성공');
+    },
+    onDisconnect() {
       console.log('연결 끊김');
     },
-    onAuthenticationFailed: (reason) => {
+    onSynced() {
+      console.log('동기화 완료');
+    },
+    onAuthenticationFailed(reason) {
       console.log('인증 실패: ', reason);
+    },
+    onMessage() {
+      console.log('메시지 수신');
     },
   });
 
