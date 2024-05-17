@@ -62,7 +62,7 @@ public class MessageService {
                 .title(messageSendDto.getTitle())
                 .message(messageSendDto.getContent())
                 .token(receiver.getNotification().getToken())
-                .type("message")
+                .type("MESSAGE")
                 .build();
 
         try {
