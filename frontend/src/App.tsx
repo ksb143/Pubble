@@ -29,7 +29,6 @@ function App() {
     if (token) {
       const { name, employeeId, department, position, profileColor, userId } =
         parseJwt(token);
-      console.log(parseJwt(token));
       setName(name);
       setEmployeeId(employeeId);
       setDepartment(department);
