@@ -278,13 +278,6 @@ const RequirementList = ({ pId, pCode, pName }: RequirementListProps) => {
     fetchRequirements();
   }, [pId, pCode]);
 
-  useEffect(() => {
-    if (requirements.length > 0) {
-      console.log('프로젝트 시작기간: ', requirements[0]?.startAt);
-      console.log('프로젝트 종료기간: ', requirements[0]?.endAt);
-    }
-  }, [requirements]);
-
   const handleRowClick = (summary: Summary) => {
     const { code } = summary;
     const rCode = code;
