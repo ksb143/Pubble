@@ -60,6 +60,7 @@ export const setupFCMListener = () => {
       const notificationTitle = payload.notification.title || '알림';
       const notificationOptions = {
         body: payload.notification.body || '알림 내용',
+        icon: payload.notification.icon || '/favicon.ico',
       };
 
       // 브라우저 알림 권한이 허용되었으면
