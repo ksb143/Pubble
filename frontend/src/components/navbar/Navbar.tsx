@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
 import {
-  registerServiceWorker,
+  // registerServiceWorker,
   getFCMToken,
   setupFCMListener,
 } from '@/apis/notification';
