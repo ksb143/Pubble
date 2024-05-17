@@ -168,9 +168,10 @@ public class NotificationService {
     }
 
 
-    public Page<NotificationMessageResponseDto> getNotifications(Pageable pageable) {
+    public Page<NotificationMessageResponseDto> getNotifications(Integer userId, Pageable pageable) {
 
-        return notificationMessageRepository.findAll(pageable).map(this::convertToDto);
+//        return notificationMessageRepository.findAll(pageable).map(this::convertToDto);
+        return notificationMessageRepository.findAllByReceiverId(userId, pageable).map(this::convertToDto);
     }
 
 

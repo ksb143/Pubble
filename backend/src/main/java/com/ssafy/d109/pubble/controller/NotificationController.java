@@ -41,13 +41,13 @@ public class NotificationController {
         notificationService.deleteNotification(notificationId);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<Page<NotificationMessageResponseDto>> getNotificationList(@PageableDefault(size = 10) Pageable pageable) {
+    @GetMapping("/{receiverId}/list")
+    public ResponseEntity<Page<NotificationMessageResponseDto>> getNotificationList(@PathVariable Integer receiverId, @PageableDefault(size = 10) Pageable pageable) {
         if (!pageable.getSort().isSorted()) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdAt").descending());
         }
 
-        Page<NotificationMessageResponseDto> notifications = notificationService.getNotifications(pageable);
+        Page<NotificationMessageResponseDto> notifications = notificationService.getNotifications(receiverId, pageable);
         return ResponseEntity.ok(notifications);
     }
 

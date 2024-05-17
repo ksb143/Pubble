@@ -105,6 +105,7 @@ public class JWTUtil {
 
         return Jwts.builder()
                 .claim("category", category)
+                .claim("userId", user.getUserId())
                 .claim("employeeId", employeeId)
                 .claim("role", r)
                 .claim("profileColor", profileColor)
