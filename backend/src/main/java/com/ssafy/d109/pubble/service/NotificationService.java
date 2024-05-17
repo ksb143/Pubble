@@ -47,6 +47,7 @@ public class NotificationService {
     @Transactional
     public String registerToken(String token, User currentUser) {
 
+        /*
         Notification notification = notificationRepository.findNotificationByUser(currentUser)
                 .orElse(Notification.builder().token(token).build());
         notification.setToken(token);
@@ -57,6 +58,16 @@ public class NotificationService {
         notificationRepository.save(notification);
 
         return "TSS: Token Saved Successfully 라는 뜻ㅋ";
+
+         */
+
+        Notification notification = notificationRepository.findNotificationByUser(currentUser)
+                .orElse(Notification.builder().token(token).build());
+        notification.setToken(token);
+        notification.setUser(currentUser);
+        userRepository.save(currentUser);
+        notificationRepository.save(notification);
+        return "Token Saved Successfully";
     }
 
 
