@@ -177,7 +177,10 @@ public class NotificationService {
 
     private NotificationMessageResponseDto convertToDto(NotificationMessage notificationMsg) {
         User receiver = userRepository.findByUserId(notificationMsg.getReceiverId()).orElseThrow(UserNotFoundException::new);
-        User sender = userRepository.findByUserId(notificationMsg.getSenderId()).orElseThrow(UserNotFoundException::new);
+        User sender = null;
+        if (notificationMsg.getSenderId() != null) {
+            sender = userRepository.findByUserId(notificationMsg.getSenderId()).orElseThrow(UserNotFoundException::new);
+        }
 
 
         TypeDataDto typeData = new TypeDataDto();
@@ -217,6 +220,11 @@ public class NotificationService {
                         .profileColor(sender.getProfileColor())
                         .build())
                 .build();
+
+        log.info(dto.getNotificationId());
+        log.info(dto.getType());
+        log.info(dto.getContent());
+
 
         return dto;
     }
