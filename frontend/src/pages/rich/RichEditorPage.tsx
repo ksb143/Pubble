@@ -31,11 +31,8 @@ import UnderlineIcon from '@/assets/icons/underline.svg?react';
 import StrikeIcon from '@/assets/icons/strikethrough.svg?react';
 import PaletteIcon from '@/assets/icons/palette-line.svg?react';
 import MarkPenIcon from '@/assets/icons/mark-pen-line.svg?react';
+const { VITE_TIPTAP_APP_ID } = import.meta.env;
 
-interface RichEditorPageProps {
-  provider: (docName: string) => TiptapCollabProvider;
-  ydoc: Y.Doc;
-}
 // 컬러팔레트 커스텀
 const ColorInput = styled.input`
   width: 10px; // 너비 설정
@@ -68,7 +65,11 @@ const HighlightInput = styled.input`
   }
 `;
 
-const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
+interface RichEditorPageProps {
+  tiptapToken: string;
+}
+
+const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
   const { name, profileColor } = useUserStore();
   const {
     projectCode,
@@ -101,54 +102,59 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
     });
   }, []);
 
-  // provider 설정
-  const collabProvider = useMemo(() => {
-    const newProvider = provider(`${projectCode}-${requirementCode}`);
-    return newProvider;
-  }, [projectCode, requirementCode, provider]);
+  const ydoc = new Y.Doc();
+
+  const provider = useMemo(
+    () =>
+      new TiptapCollabProvider({
+        appId: VITE_TIPTAP_APP_ID,
+        name: `${projectCode}-${requirementCode}`,
+        document: ydoc,
+        token: tiptapToken,
+        onConnect() {
+          console.log('연결됨');
+        },
+        onDisconnect() {
+          console.log('연결 끊김');
+        },
+        onSynced() {
+          console.log('동기화 완료');
+        },
+        onAuthenticationFailed({ reason }: { reason: string }) {
+          console.error('인증 실패: ', reason);
+        },
+      }),
+    [tiptapToken, ydoc],
+  );
+
+  // 공급자 이벤트 리스너 파괴 설정
+  useEffect(() => {
+    return () => {
+      provider.destroy();
+    };
+  }, []);
 
   // 현재 사용자 정보 설정
   useEffect(() => {
-    collabProvider.setAwarenessField('user', {
+    provider.setAwarenessField('user', {
       name: name,
       color: profileColor,
     });
-  }, [collabProvider, name, profileColor]);
-
-  // 공급자 이벤트 리스너 설정
-  useEffect(() => {
-    collabProvider.on('connect', () => {
-      console.log('문서 내 연결');
-    });
-    collabProvider.on('disconnect', () => {
-      console.log('문서 내 연결 끊김');
-    });
-    collabProvider.on('synced', () => {
-      console.log('문서 내 동기화 완료');
-    });
-    collabProvider.on(
-      'authenticationFailed',
-      ({ reason }: { reason: string }) => {
-        console.error('문서 내 인증 실패: ', reason);
-      },
-    );
-
-    return () => {
-      collabProvider.destroy();
-    };
-  }, [collabProvider]);
+  }, [provider, name, profileColor]);
 
   // 접속 상태 확인
   useEffect(() => {
     const statusListener = (event: { status: string }) => {
+      console.log('status', event.status);
       setStatus(event.status);
     };
-    collabProvider.on('status', statusListener);
+    provider.on('status', statusListener);
     return () => {
-      collabProvider.off('status', statusListener);
+      provider.off('status', statusListener);
     };
-  }, []);
+  }, [provider]);
 
+  // 에디터 설정
   const editor = useEditor({
     editorProps: {
       attributes: {
@@ -156,21 +162,21 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
           'm-2 p-4 w-full border border-gray-200 rounded-lg focus:outline-none overflow-y-auto overflow-x-hidden',
       },
     },
-    extensions: collabProvider
+    extensions: provider
       ? [
           ...Extensions,
           Collaboration.configure({
             document: ydoc,
           }),
           CollaborationCursor.configure({
-            provider: collabProvider,
+            provider: provider,
             user: {
               name: name,
               color: profileColor,
             },
           }),
           CollaborationHistory.configure({
-            provider: collabProvider,
+            provider: provider,
             onUpdate: (data) => {
               setVersions(data.versions);
               setCurrentVersion(data.currentVersion);
@@ -306,7 +312,7 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
 
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
-      {collabProvider && (
+      {provider && (
         <VersioningModal
           versions={versions}
           isOpen={versioningModalOpen}
@@ -314,7 +320,7 @@ const RichEditorPage = ({ provider, ydoc }: RichEditorPageProps) => {
           onRevert={handleRevert}
           currentVersion={currentVersion}
           latestVersion={latestVersion}
-          provider={collabProvider}
+          provider={provider}
         />
       )}
       <CodeEditorWithPreview

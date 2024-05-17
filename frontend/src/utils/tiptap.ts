@@ -1,9 +1,7 @@
-import * as Y from 'yjs';
-import { TiptapCollabProvider } from '@hocuspocus/provider';
-const { VITE_TIPTAP_APP_ID, VITE_TIPTAP_APP_SECRET } = import.meta.env;
+const { VITE_TIPTAP_APP_SECRET } = import.meta.env;
 import { SignJWT } from 'jose';
 
-const generateJwt = async () => {
+export const generateJwt = async () => {
   try {
     const userId = await localStorage.getItem('userId');
     const newToken = await new SignJWT({ userId: userId })
@@ -16,31 +14,6 @@ const generateJwt = async () => {
     return '';
   }
 };
-
-export const ydoc = new Y.Doc();
-
-export const provider = (docName: string) =>
-  new TiptapCollabProvider({
-    appId: VITE_TIPTAP_APP_ID,
-    name: docName,
-    document: ydoc,
-    token: generateJwt,
-    onConnect() {
-      console.log('연결 성공');
-    },
-    onDisconnect() {
-      console.log('연결 끊김');
-    },
-    onSynced() {
-      console.log('동기화 완료');
-    },
-    onAuthenticationFailed(reason) {
-      console.log('인증 실패: ', reason);
-    },
-    onMessage() {
-      console.log('메시지 수신');
-    },
-  });
 
 export const renderDate = (date: Date) => {
   const d = new Date(date);
