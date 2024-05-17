@@ -98,7 +98,7 @@ public class ProjectService {
 
                 // 알림 메시지 생성 및 발송
                 NotificationRequestDto reqDto = NotificationRequestDto.builder()
-                        .title("새로운 프로젝트 참여 알림")
+                        .title(projectCreateDto.getProjectTitle())
                         .message(user1.getName() + " " + user1.getPosition() + "님, '" + project.getProjectTitle() + "' 프로젝트에 참여하게 되었습니다.")
                         .type("PROJECT")
                         .build();
