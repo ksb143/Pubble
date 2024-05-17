@@ -1,17 +1,17 @@
-// 1. react 관련
+// 1. react
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // 2. library
 // 3. api
 // 4. store
-import useUserStore from '@/stores/userStore.ts';
+import useUserStore from '@/stores/userStore';
 // 5. component
 import User from '@/routers/User';
 import Project from '@/routers/Project';
 import Admin from '@/routers/Admin';
 import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
-// 6. image 등 assets
+// 6. assets
 
 function App() {
   const {

@@ -1,9 +1,16 @@
+// 1. react
 import { useEffect } from 'react';
+// 2. library
+// 3. api
+// 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
+// 5. component
+// 6. assets
 
 const AdminPage = () => {
   const { setPageType } = usePageInfoStore();
 
+  // 위치 정보 초기화
   useEffect(() => {
     setPageType('init');
   }, []);

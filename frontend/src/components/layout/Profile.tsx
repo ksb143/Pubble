@@ -29,6 +29,7 @@ const Profile = ({ width, height, name, profileColor }: ProfileProps) => {
     border-radius: 9999px;
     background-color: ${profileColor};
     color: ${textColor};
+    flex-shrink: 0;
   `;
 
   return (
