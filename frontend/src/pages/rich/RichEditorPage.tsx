@@ -1,5 +1,12 @@
 // 1. react 관련
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  ChangeEvent,
+  FormEvent,
+} from 'react';
 // 2. library
 import { EditorContent, useEditor, BubbleMenu } from '@tiptap/react';
 import { Extensions } from '@/extensions/Extensions.ts';
@@ -94,6 +101,8 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
   const [fileUploadModalOpen, setFileUploadModalOpen] = useState(false);
   const [imageUploadModalOpen, setImageUploadModalOpen] = useState(false);
   const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [commitDescription, setCommitDescription] = useState('');
 
   // 공동편집 기능 및 리치에디터 전역변수 설정
   useEffect(() => {
@@ -139,6 +148,22 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       provider.off('status', statusHandler);
     };
   }, []);
+
+  // 버전 변경사항 상태 확인
+  useEffect(() => {
+    const onUpdate = () => {
+      setHasChanges(true);
+    };
+    const onSynced = () => {
+      ydoc.on('update', onUpdate);
+    };
+    provider.on('synced', onSynced);
+
+    return () => {
+      provider.off('synced', onSynced);
+      ydoc.off('update', onUpdate);
+    };
+  }, [ydoc]);
 
   // 공급자 이벤트 리스너 파괴 설정
   useEffect(() => {
@@ -212,6 +237,26 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
   const handleVersioningClose = useCallback(() => {
     setVersioningModalOpen(false);
   }, []);
+  const handleCommitDescriptionChange = (
+    event: ChangeEvent<HTMLInputElement>,
+  ) => {
+    setCommitDescription(event.target.value);
+  };
+  const handleNewVersion = useCallback(
+    (event: FormEvent<HTMLElement>) => {
+      event.preventDefault();
+      if (!commitDescription) {
+        return;
+      }
+      editor?.commands.saveVersion(commitDescription);
+      setCommitDescription('');
+      alert(
+        `버전 ${commitDescription}이 생성되었습니다. 버전 히스토리 모달을 확인해주세요!`,
+      );
+      setHasChanges(false);
+    },
+    [editor, commitDescription],
+  );
 
   // 코드 프리뷰 모달
   const showCodeEditorWithPreview = useCallback(() => {
@@ -402,22 +447,45 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       <div className='flex max-h-12 shrink grow flex-wrap items-center justify-between whitespace-nowrap border-t-2 border-gray-200 bg-white px-4'>
         <div className='flex items-center gap-2'>
           <div
-            className={`mr-4 h-2 w-2 rounded-full ${status === 'connected' || (editor?.storage?.collaborationCursor?.users?.length > 0 ?? false) ? 'bg-pubble' : 'bg-gray-400'}`}></div>
+            className={`mr-4 h-2 w-2 rounded-full ${status === 'connected' ? 'bg-pubble' : status === 'connecting' ? 'bg-plblue' : 'bg-gray-400'}`}></div>
           <div>
-            {status === 'connected' ||
-            (editor?.storage?.collaborationCursor?.users?.length > 0 ?? false)
-              ? `${editor?.storage.collaborationCursor.users.length} 명의 유저가 이 문서에 있습니다.`
-              : '오프라인'}
+            {status === 'connected'
+              ? `${editor?.storage?.collaborationCursor?.users?.length ?? 0} 명의 유저가 이 문서에 있습니다.`
+              : status === 'connecting'
+                ? '연결 중...'
+                : '오프라인'}
           </div>
         </div>
+        <div></div>
         <div className='flex items-center gap-4'>
+          {!isAutoVersioning && (
+            <div>
+              <form className='commit-panel'>
+                <input
+                  className='px-4 py-1'
+                  disabled={!hasChanges}
+                  type='text'
+                  placeholder='버전 이름 설정'
+                  value={commitDescription}
+                  onChange={handleCommitDescriptionChange}
+                />
+                <button
+                  disabled={!hasChanges || commitDescription.length === 0}
+                  className='rounded bg-plblue px-4 py-1 text-white hover:bg-pubble disabled:bg-plblue'
+                  type='submit'
+                  onClick={handleNewVersion}>
+                  Create
+                </button>
+              </form>
+            </div>
+          )}
           <Switch
             checked={isAutoVersioning}
             onCheckedChange={() => editor?.commands.toggleVersioning()}
           />
-          <div>{isAutoVersioning ? 'ON' : 'OFF'}</div>
+          <div>Auto Save {isAutoVersioning ? 'ON' : 'OFF'}</div>
           <button
-            className='rounded bg-plblue p-2 text-xs text-gray-800 hover:bg-pubble hover:text-white'
+            className='p-2 text-sm text-gray-800 hover:text-pubble hover:text-white'
             onClick={showVersioningModal}>
             버전 히스토리 확인
           </button>
