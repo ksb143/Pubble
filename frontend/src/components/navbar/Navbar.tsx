@@ -46,7 +46,7 @@ const Navbar = () => {
   // firebase 초기 설정
   useEffect(() => {
     // 서비스 워커 등록
-    registerServiceWorker();
+    // registerServiceWorker();
     // FCM 토큰 요청
     getFCMToken();
     // FCM 리스너 등록
