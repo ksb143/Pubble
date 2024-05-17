@@ -43,6 +43,7 @@ export const getFCMToken = async () => {
       // FCM 토큰을 받은 경우
       if (currentToken) {
         // 서버로 토큰 전송
+        console.log('FCM 토큰 : ', currentToken);
         sendFCMToken(currentToken);
       } else {
         alert('알림 권한을 허용해주세요!');
