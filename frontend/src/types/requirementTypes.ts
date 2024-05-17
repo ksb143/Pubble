@@ -13,7 +13,7 @@ export interface Person {
   employeeId: string;
   department: string;
   position: string;
-  role: 'USER' | 'ADMIN'; // 추가적인 역할 구분이 필요하다면 여기에 추가 가능
+  role: 'USER' | 'ADMIN';
   isApprovable: 'y' | 'n';
   profileColor: string;
 }
@@ -26,15 +26,15 @@ export type Author = Person;
 export interface RequirementInfo {
   requirementId: number;
   orderIndex: number;
-  version: string;
-  isLock: 'l' | 'u'; // 'l'은 locked, 'u'는 unlocked 상태를 나타냅니다.
-  approval: 'a' | 'd'; // 'a'는 approved, 'd'는 denied를 의미합니다.
-  approvalComment: string;
+  version: string; // 'h'는 hold, 그 외는 'V.1.0.' 형태의 텍스트
+  isLock: 'l' | 'u'; // 'l'은 locked, 'u'는 unlocked
+  approval: 'u' | 'a' | 'h'; // 'u'는 초기값, 'a'는 approved 승인, 'h'는 hold 보류
+  approvalComment: string; // 승인 또는 보류 이유
   code: string;
   requirementName: string;
   details: RequirementDetail[];
-  manager: Manager;
+  manager: Manager; // 담당자
   targetUser: string;
   createdAt: string;
-  author: Author;
+  author: Author; // 작성자
 }

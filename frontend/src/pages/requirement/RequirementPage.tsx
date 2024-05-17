@@ -8,9 +8,11 @@ import { RequirementInfo } from '@/types/requirementTypes';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
+import Thread from '@/components/requirement/Thread';
 // 6. asset
-import LockClosed from '@/assets/icons/lock-closed.svg?react';
-import LockOpen from '@/assets/icons/lock-open.svg?react';
+import Locked from '@/assets/icons/lock-closed.svg?react';
+import Unlocked from '@/assets/icons/lock-open.svg?react';
+import Pencil from '@/assets/icons/pencil-square.svg?react';
 
 const RequirementPage = () => {
   const navigate = useNavigate();
@@ -43,6 +45,7 @@ const RequirementPage = () => {
           requirementName: response.data.requirementName,
           isRichPage: false,
         });
+        console.log('요구사항 정보 조회 성공 : ', response.data);
       } catch (error) {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
@@ -50,8 +53,14 @@ const RequirementPage = () => {
   }, [projectId, requirementId]);
 
   return (
-    <div className='flex h-full w-full items-center justify-center py-3'>
-      <div className='h-full w-1/2 rounded bg-white p-6 shadow'>
+    <div className='flex h-full w-full justify-center py-3'>
+      {/* 요구사항 */}
+      <div className='relative mr-4 h-full w-1/2 rounded bg-white p-6 shadow'>
+        <button
+          className='absolute right-4 top-4 shrink-0 rounded-full bg-pubble p-3 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
+          onClick={goRich}>
+          <Pencil className='h-6 w-6 stroke-1' />
+        </button>
         <div className='flex flex-col'>
           {requirementInfo && (
             <>
@@ -68,19 +77,32 @@ const RequirementPage = () => {
                 </div>
               </div>
               {requirementInfo.isLock === 'l' ? (
-                <LockClosed className='h-4 w-4' />
+                <div className='flex w-full'>
+                  <div className='mx-2 flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
+                    <Locked className='h-6 w-6 stroke-1' />
+                  </div>
+                  <div className='mx-2 flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
+                    <Unlocked className='h-6 w-6 stroke-1' />
+                  </div>
+                </div>
               ) : (
-                <LockOpen />
+                <>
+                  <Unlocked />
+                </>
               )}
-
               <p>approval : {requirementInfo.approval}</p>
               <p>approvalComment : {requirementInfo.approvalComment}</p>
               <div className='my-3 border-b border-t py-3'>
                 <ul>
                   {requirementInfo.details.map((detail) => (
-                    <li key={detail.requirementDetailId}>
-                      <p>Content: {detail.content}</p>
-                      <p>Status: {detail.status}</p>
+                    <li
+                      key={detail.requirementDetailId}
+                      className='my-2 rounded border-2 border-pubble bg-plblue p-2'>
+                      <p
+                        className={`${detail.status === 'd' ? 'line-through' : ''}`}>
+                        {detail.content}
+                      </p>
+                      <p>status : {detail.status}</p>
                     </li>
                   ))}
                 </ul>
@@ -89,12 +111,9 @@ const RequirementPage = () => {
           )}
           {!requirementInfo && <p>요구사항 정보가 없습니다.</p>}
         </div>
-        <button
-          className='my-3 w-1/4 rounded bg-pubble py-3 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
-          onClick={goRich}>
-          에디터 이동
-        </button>
       </div>
+      {/* 스레드 */}
+      <Thread />
     </div>
   );
 };
