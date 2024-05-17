@@ -33,7 +33,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.title;
   const notificationOptions = {
     body: payload.body,
-    icon: payload.icon || './favicon.ico',
+    icon: payload.icon || '/favicon.ico',
   };
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
