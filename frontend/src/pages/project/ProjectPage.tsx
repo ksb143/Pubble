@@ -3,8 +3,6 @@
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
 import RequirementList from '@/components/requirement/RequirementList';
-import RequirementAddModal from '@/components/requirement/RequirementAddModal';
-import { Button } from '@/components/ui/button';
 // 개별 프로젝트 페이지를 보여주는 페이지 컴포넌트
 const ProjectPage = () => {
   // page 컴포넌트 이므로, setPageType을 설정해준다.

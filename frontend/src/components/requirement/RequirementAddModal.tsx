@@ -55,7 +55,7 @@ const RequirementAddModal = ({ isOpen, onClose }: RequirementAddModalProps) => {
         requirementData.targetUser,
       );
       console.log('api 호출 성공');
-      onClose(); // 요구사항 생성 후 모달 닫기
+      // onClose(); // 요구사항 생성 후 모달 닫기
     } catch (error) {
       console.error('api 호출 실패', error);
     }

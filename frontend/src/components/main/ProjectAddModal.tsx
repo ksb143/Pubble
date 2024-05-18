@@ -14,7 +14,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogFooter,
-  DialogTrigger,
+  // DialogTrigger,
 } from '@/components/ui/dialog';
 
 interface ProjectAddModalProps {
@@ -43,7 +43,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTrigger asChild></DialogTrigger>
+      {/* <DialogTrigger asChild></DialogTrigger> */}
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>프로젝트 생성</DialogTitle>
