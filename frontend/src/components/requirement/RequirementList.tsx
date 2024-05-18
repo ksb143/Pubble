@@ -172,9 +172,17 @@ export const columns: ColumnDef<Summary>[] = [
 // },
 
 const RequirementList = ({ pId, pCode }: RequirementListProps) => {
+  const { setPageType, projectCode } = usePageInfoStore((state) => ({
+    setPageType: state.setPageType,
+    projectCode: state.projectCode,
+    projectName: state.projectName,
+    requirementId: state.requirementId,
+    requirementCode: state.requirementCode,
+    requirementName: state.requirementName,
+  }));
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { setPageType } = usePageInfoStore();
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
   // 요구사항의 목록
@@ -291,23 +299,24 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
 
   // 특정한 요구사항 row 클릭시, 특정 요구사항에 진입할 수 있도록 하는 함수.
   const handleRowClick = (summary: Summary) => {
-    const { code } = summary;
-    const rCode = code;
-    const rId = summary.requirementId;
-    if (!rId) {
-      console.error('Invalid requirement data');
+    const reqId = summary.requirementId; // 선택된 row의 requirementId
+    const reqCode = summary.code; // 선택된 row의 requirementCode
+    const reqName = summary.requirementName; // 선택된 row의 requirementName
+
+    if (reqId) {
+      // 1. 클릭된 row의 reqId, reqCode, reqName을 store에 넣기
+      setPageType('requirement', {
+        requirementId: reqId,
+        requirementCode: reqCode,
+        requirementName: reqName,
+      });
+      // 2. 요구사항 상세 정보 페이지로 이동하기
+      navigate(`/project/${projectCode}/requirement/${reqCode}`);
       return;
+    } else {
+      console.error('Invalid requirement data');
     }
-    setPageType('requirement', {
-      requirementId: rId,
-    });
-    navigate(`/project/${pCode}/requirement/${rCode}`);
   };
-  // {/* 요구사항 생성 모달 */}
-  //           {/* <RequirementAddModal
-  //             isOpen={isModalOpen}
-  //             onClose={handleCloseModal}
-  //           /> */}
   return (
     <div className='p-8 text-center'>
       <p className='mb-4 text-2xl font-bold'>

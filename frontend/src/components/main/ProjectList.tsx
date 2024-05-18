@@ -159,12 +159,13 @@ export const columns: ColumnDef<Project>[] = [
 ];
 // ProjectList: 특정 사용자의 프로젝트를 개괄적으로 보는 컴포넌트
 const ProjectList = () => {
-  const { setPageType } = usePageInfoStore();
+  const { setPageType } = usePageInfoStore((state) => ({
+    setPageType: state.setPageType,
+  }));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
-
-  // useState를 통한 상태변화 관리 들어가기
-  // 프로젝트의 목록
+  // useState
+  // 프로젝트의 목록은 처음에 빈 배열로 설정하고, 비동기로 데이터를 받아온 후에 배열을 갱신한다.
   const [projects, setProjects] = useState<Project[]>([]);
   // 정렬 상태
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -193,7 +194,9 @@ const ProjectList = () => {
       rowSelection,
     },
   });
-  // useEffect를 활용한... 사용자의 프로젝트 목록 화면 UI 갱신
+  // useEffect 속에
+  // fetchProjects 안의 비동기로 getProject api 를 작동시켜서
+  // 사용자의 프로젝트 목록 화면 UI 갱신
   useEffect(() => {
     // fetchProjects 함수 정의
     const fetchProjects = async () => {
@@ -212,10 +215,10 @@ const ProjectList = () => {
             progressRatio: pjt.progressRatio,
             status: pjt.status,
           }));
-          // 현재 컴포넌트에서 사용하는 '프로젝트 목록 배열'(=Project[])의 상태 업데이트 시행
+          // '프로젝트 목록 배열'(=Project[])의 상태 업데이트 시행
           setProjects(projectData);
 
-          // 데이터가 없는 경우
+          // 돌아온 데이터가 없는 경우
         } else {
           // 빈 배열로 프로젝트 목록 데이터 설정
           setProjects([]);
@@ -227,7 +230,7 @@ const ProjectList = () => {
         setProjects([]);
       }
     };
-    // 프로젝트 목록 조회 API 호출
+    // fetchProjects 함수 실행
     fetchProjects();
   }, []); // 빈 배열로 설정하여 컴포넌트 처음 렌더링 시에만 실행
 
@@ -244,22 +247,24 @@ const ProjectList = () => {
   };
 
   // 특정 프로젝트 row 클릭시, 특정 프로젝트에 진입할 수 있도록 하는 함수.
+  // 클릭시 row.original 정보를 이용해서 PageInfoStore의 PId-PCode-PName을 갱신한다.
   const handleRowClick = (row: Row<Project>) => {
     const { prdId, projectId, projectTitle } = row.original;
-    const pId = projectId;
-    const pCode = prdId;
-    const pName = projectTitle;
+    const pjtId = projectId;
+    const pjtCode = prdId;
+    const pjtName = projectTitle;
     // 프로젝트 상세 정보 페이지로 이동
-    console.log('Clicked project ID:', pId);
-    if (pCode && pName) {
-      // 프로젝트 상세 정보 페이지로 이동
-      // ps1.기존에는 state로 정보를 다음 페이지에 넘겼는데, 이제 모두 store 사용하므로 state 파라미터는 사용하지 않음
+    console.log('Clicked project ID:', pjtId);
+    if (pjtCode && pjtName) {
+      // 1. PageInfoStore의 PId-PCode-PName을 갱신하기
       setPageType('project', {
-        projectId: pId,
-        projectCode: pCode,
-        projectName: pName,
+        projectId: pjtId,
+        projectCode: pjtCode,
+        projectName: pjtName,
       });
-      navigate(`/project/${pCode}`);
+      // 2. 프로젝트 상세 정보 페이지로 이동하기
+      navigate(`/project/${pjtCode}`);
+      // PS. 기존에는 state로 정보를 다음 depth로 넘기다가, 이제 전역 변수로 store에 저장하는 방식으로 바뀜
     } else {
       console.error('Missing prdId or projectTitle in the data');
     }
