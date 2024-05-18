@@ -8,6 +8,8 @@ import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.exception.Project.ProjectNotFoundException;
+import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;

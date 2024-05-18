@@ -19,6 +19,6 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
     @Query("SELECT p, r FROM Project p LEFT JOIN FETCH p.requirements r WHERE p.projectId NOT IN (SELECT pa.project.projectId FROM ProjectAssignment pa WHERE pa.user.userId = :userId)")
     List<Object[]> findUneditableProjectsAndRequirementsByUserId(@Param("userId") Integer userId);
 
-
+    boolean existsByProjectId(Integer projectId);
 
 }
