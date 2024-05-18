@@ -16,7 +16,7 @@ export const getThread = async (requirementId: number) => {
   const { data } = await privateApi.get(
     `/requirements/details/requirements-all-threads/${requirementId}`,
   );
-  console.log('스레드 조회 api : ', data);
+  // console.log('스레드 조회 api : ', data);
   return data;
 };
 

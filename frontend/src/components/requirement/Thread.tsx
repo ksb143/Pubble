@@ -18,7 +18,7 @@ interface ThreadProps {
 
 const Thread: React.FC<ThreadProps> = ({ data }) => {
   const [commentInput, setCommentInput] = useState('');
-  console.log('data : ', data);
+  // console.log('data : ', data);
   return (
     <>
       <div className='mb-4 flex h-fit max-h-[50vh] w-full flex-col justify-center rounded bg-white p-4 shadow'>
