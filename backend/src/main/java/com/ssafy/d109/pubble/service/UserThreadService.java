@@ -1,6 +1,7 @@
 package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.CommentCreateDto;
+import com.ssafy.d109.pubble.dto.projectDto.UserInfoDto;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationReceiverRequestDto;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
@@ -81,6 +82,7 @@ public class UserThreadService {
 
     private UserThreadDto convertUserThreadToDto(UserThread userThread) {
         UserThreadDto dto = new UserThreadDto();
+        dto.setThreadAuthorInfo(UserInfoDto.createUserInfo(userThread.getUser())); // (스레드의)작성자 유저 정보 추가
         dto.setUserThreadId(userThread.getUserThreadId());
         dto.setIsLocked(userThread.getLockYN());
         List<CommentResponseData> commentDataList = commentRepository.findAllByUserThread_userThreadId(userThread.getUserThreadId()).stream()
@@ -97,6 +99,7 @@ public class UserThreadService {
         dto.setCommentId(comment.getCommentId());
         dto.setContent(comment.getContent());
         dto.setUserId(comment.getUser().getUserId());
+        dto.setCommentAuthorInfo(UserInfoDto.createUserInfo(comment.getUser())); // (댓글의)작성자 유저 정보 추가
         
         // userInfo 참고
         return dto;
