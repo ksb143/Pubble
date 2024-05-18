@@ -49,10 +49,16 @@ export interface Comment {
   commentAuthorInfo: Person;
 }
 
-// 서버에서 보내는 스레드 정보
+// 스레드 한 개의 정보
 export interface ThreadInfo {
   userThreadId: number;
   commentList: Comment[];
   isLocked: 'y' | 'n'; // 'y' 또는 'n'만 가능
   threadAuthorInfo: Person;
+}
+
+// 서버에서 보내는 스레드 정보
+export interface ThreadListInfo {
+  detailId: number;
+  userThreadDtos: ThreadInfo[];
 }

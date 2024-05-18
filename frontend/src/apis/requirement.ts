@@ -12,9 +12,9 @@ export const getRequirement = async (
 };
 
 // 스레드 조회 함수
-export const getThread = async (detailId: number) => {
+export const getThread = async (requirementId: number) => {
   const { data } = await privateApi.get(
-    `/requirements/details/${detailId}/threads`,
+    `/requirements/details/requirements-all-threads/${requirementId}`,
   );
   console.log('스레드 조회 api : ', data);
   return data;

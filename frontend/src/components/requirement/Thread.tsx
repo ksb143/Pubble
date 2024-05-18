@@ -13,23 +13,23 @@ import Pencil from '@/assets/icons/pencil.svg?react';
 
 // api로 받아온 스레드 타입 설정
 interface ThreadProps {
-  data: ThreadInfo;
+  data: ThreadInfo[];
 }
 
 const Thread: React.FC<ThreadProps> = ({ data }) => {
   const [commentInput, setCommentInput] = useState('');
-
+  console.log('data : ', data);
   return (
     <>
-      <div className='flex h-fit max-h-[50vh] w-1/4 flex-col justify-center rounded bg-white p-4 shadow'>
+      <div className='mb-4 flex h-fit max-h-[50vh] w-full flex-col justify-center rounded bg-white p-4 shadow'>
         {/* 타이틀 */}
         <div className='flex w-full items-center justify-between border-b pb-3 text-lg font-normal'>
           <div className='flex items-center'>
             <Profile
               width='2.5rem'
               height='2.5rem'
-              name={data.threadAuthorInfo.name}
-              profileColor={data.threadAuthorInfo.profileColor}
+              name={data[0].threadAuthorInfo.name}
+              profileColor={data[0].threadAuthorInfo.profileColor}
             />
             <div className='ml-1'>의 스레드</div>
           </div>
@@ -44,9 +44,12 @@ const Thread: React.FC<ThreadProps> = ({ data }) => {
           </div>
         </div>
         {/* 댓글 조회 */}
-        <div className='mx-2 my-5 max-h-72 overflow-y-auto'>
-          {data.commentList.map((comment) => (
-            <div
+        <ul className='mx-2 my-5 max-h-72 overflow-y-auto'>
+          {data[0].commentList.length === 0 && (
+            <p className='text-center'>댓글이 없습니다.</p>
+          )}
+          {data[0].commentList.map((comment) => (
+            <li
               key={comment.commentId}
               className='mb-6 flex items-center last-of-type:mb-0'>
               <Profile
@@ -58,9 +61,9 @@ const Thread: React.FC<ThreadProps> = ({ data }) => {
               <div className='mx-2 w-full rounded-md bg-gray-50 p-2 text-sm'>
                 {comment.content}
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
         {/* 댓글 작성 */}
         <div className='flex items-center'>
           <input

@@ -4,12 +4,11 @@ import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
 import { getRequirement, getThread } from '@/apis/requirement';
-import { RequirementInfo, ThreadInfo } from '@/types/requirementTypes';
+import { RequirementInfo, ThreadListInfo } from '@/types/requirementTypes';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Thread from '@/components/requirement/Thread';
-import AlertModal from '@/components/layout/AlertModal';
 // 6. asset
 import Locked from '@/assets/icons/lock-closed.svg?react';
 import Unlocked from '@/assets/icons/lock-open.svg?react';
@@ -26,7 +25,7 @@ const RequirementPage = () => {
   } = usePageInfoStore();
   const [requirementInfo, setRequirementInfo] =
     useState<RequirementInfo | null>(null); // api로 받은 요구사항 정보
-  const [threadList, setThreadList] = useState<ThreadInfo[]>([]); // api로 받은 스레드 리스트
+  const [threadList, setThreadList] = useState<ThreadListInfo[]>([]); // api로 받은 스레드 리스트
 
   // 리치 에디터로 이동
   const goRich = () => {
@@ -37,31 +36,30 @@ const RequirementPage = () => {
     (async () => {
       try {
         // 요구사항 정보 조회
-        const response = await getRequirement(projectId, requirementId);
-        setRequirementInfo(response.data);
+        const reqRes = await getRequirement(projectId, requirementId);
+        setRequirementInfo(reqRes.data);
 
         // 페이지 정보에 요구사항 정보 저장
         setPageType('requirement', {
-          requirementId: response.data.requirementId,
-          requirementCode: response.data.code,
-          requirementName: response.data.requirementName,
+          requirementId: reqRes.data.requirementId,
+          requirementCode: reqRes.data.code,
+          requirementName: reqRes.data.requirementName,
           isRichPage: false,
         });
-        console.log('요구사항 정보 조회 성공 : ', response.data);
+        // console.log('요구사항 정보 조회 성공 : ', reqRes.data);
 
         // 스레드 정보 조회
-        const threadRes = await getThread(response.data.requirementId);
-        setThreadList(threadRes.resData.totalThreadList);
-        console.log('스레드 조회 성공', threadRes.resData);
+        const threadRes = await getThread(reqRes.data.requirementId);
+        setThreadList(threadRes.data);
+        console.log('스레드 조회 성공', threadRes.data);
       } catch (error) {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
     })();
-  }, [projectId, requirementId]);
+  }, [projectId, requirementId, setPageType]);
 
   return (
     <>
-      <AlertModal />
       <div className='flex h-full w-full justify-center py-3'>
         {/* 요구사항 */}
         <div className='relative mr-4 h-full w-1/2 rounded bg-white p-6 shadow'>
@@ -106,7 +104,7 @@ const RequirementPage = () => {
                     {requirementInfo.details.map((detail) => (
                       <li
                         key={detail.requirementDetailId}
-                        className='my-2 rounded border-2 border-pubble bg-plblue p-2'>
+                        className='my-2 rounded border-2 p-2 hover:border-pubble hover:bg-plblue'>
                         <p
                           className={`${detail.status === 'd' ? 'line-through' : ''}`}>
                           {detail.content}
@@ -122,10 +120,15 @@ const RequirementPage = () => {
           </div>
         </div>
         {/* 스레드 */}
-        {threadList.length > 0 &&
-          threadList.map((thread) => (
-            <Thread key={thread.userThreadId} data={thread} />
-          ))}
+        <div className='flex w-1/3 flex-col'>
+          {threadList.length > 0 &&
+            threadList.map((threadInfo) => (
+              <Thread
+                key={threadInfo.detailId}
+                data={threadInfo.userThreadDtos}
+              />
+            ))}
+        </div>
       </div>
     </>
   );
