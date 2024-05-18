@@ -416,6 +416,11 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
                       )}
                     </TableCell>
                   ))}
+                  {row.original.approval === 'u' && (
+                    <TableCell>
+                      <Button>승인하기</Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
