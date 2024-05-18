@@ -69,17 +69,17 @@ export const addRequirement = async (
   pjtCode: string,
   reqTitle: string,
   reqDetail: string,
-  reqManagerEId: string,
+  reqPersonInChargeEId: string,
   reqAuthorEId: string,
-  targetUserEId: string,
+  targetUser: string,
 ) => {
   const { data } = await privateApi.post(`/projects/${pjtId}/requirements`, {
     code: pjtCode, // 프로젝트 코드
     requirementName: reqTitle, // 요구사항 이름
-    detail: reqDetail, // 요구사항 상세 내용
-    managerEId: reqManagerEId, // 요구사항 담당자
+    detail: [reqDetail], // 요구사항 상세 내용
+    managerEId: reqPersonInChargeEId, // 요구사항 담당자
     authorEId: reqAuthorEId, // 요구사항 작성자
-    targetUser: targetUserEId, // 요구사항 대상자
+    targetUser: targetUser, // 요구사항 대상자
   });
   return data;
 };
