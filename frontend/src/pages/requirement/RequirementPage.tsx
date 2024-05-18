@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import { getRequirement } from '@/apis/requirement';
-import { RequirementInfo } from '@/types/requirementTypes';
+import { getRequirement, getThread } from '@/apis/requirement';
+import { RequirementInfo, ThreadInfo } from '@/types/requirementTypes';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
@@ -25,16 +25,17 @@ const RequirementPage = () => {
   } = usePageInfoStore();
   const [requirementInfo, setRequirementInfo] =
     useState<RequirementInfo | null>(null); // api로 받은 요구사항 정보
+  const [threadList, setThreadList] = useState<ThreadInfo[]>([]); // api로 받은 스레드 리스트
 
   // 리치 에디터로 이동
   const goRich = () => {
     navigate(`/project/${projectCode}/requirement/${requirementCode}/detail`);
   };
 
-  // 요구사항 정보 조회
   useEffect(() => {
     (async () => {
       try {
+        // 요구사항 정보 조회
         const response = await getRequirement(projectId, requirementId);
         setRequirementInfo(response.data);
 
@@ -46,6 +47,11 @@ const RequirementPage = () => {
           isRichPage: false,
         });
         console.log('요구사항 정보 조회 성공 : ', response.data);
+
+        // 스레드 정보 조회
+        const threadRes = await getThread(37);
+        setThreadList(threadRes.resData.totalThreadList);
+        console.log('스레드 조회 성공', threadRes.resData);
       } catch (error) {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
@@ -113,7 +119,10 @@ const RequirementPage = () => {
         </div>
       </div>
       {/* 스레드 */}
-      <Thread />
+      {threadList.length > 0 &&
+        threadList.map((thread) => (
+          <Thread key={thread.userThreadId} data={thread} />
+        ))}
     </div>
   );
 };

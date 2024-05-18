@@ -38,3 +38,19 @@ export interface RequirementInfo {
   createdAt: string;
   author: Author; // 작성자
 }
+
+// 스레드 관련 타입 정의
+
+// 댓글 정보
+export interface Comment {
+  commentId: number;
+  userId: number;
+  content: string;
+}
+
+// 서버에서 보내는 스레드 정보
+export interface ThreadInfo {
+  userThreadId: number;
+  commentList: Comment[];
+  isLocked: 'y' | 'n'; // 'y' 또는 'n'만 가능
+}
