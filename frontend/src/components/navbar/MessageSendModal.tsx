@@ -1,5 +1,5 @@
 // 1. react
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 // 2. library
 // 3. api
 import { sendMessage } from '@/apis/message';
@@ -40,6 +40,7 @@ const MessageSendModal: React.FC<MessageSendModalProps> = ({
   const [filteredUsers, setFilteredUsers] = useState<UserInfo[]>([]); // 자동완성 결과
   const [showDropdown, setShowDropdown] = useState(false); // 자동완성 드롭다운 표시 여부
   const [inputFocused, setInputFocused] = useState(false); // 입력 필드의 포커스 상태
+  const inputRef = useRef<HTMLDivElement>(null); // 받는 사람과 드롭다운 입력 필드 ref
 
   // API로 사용자 목록을 불러오는 함수
   useEffect(() => {
@@ -74,15 +75,45 @@ const MessageSendModal: React.FC<MessageSendModalProps> = ({
     setShowDropdown(false);
   };
 
+  // 받는사람 입력 필드 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [inputRef]);
+
   // 쪽지 서버로 전송하는 함수
   const handleSendMessage = async () => {
-    if (!title || !content || !employeeName) {
-      alert('모든 항목을 입력해주세요!');
+    // 빈 입력값 유효성 검사
+    if (!title || !content || !employeeName || !employeeId) {
+      alert('입력값을 확인해주세요!');
       return;
     }
 
+    // 제목 길이 유효성 검사
     if (title.length > 15) {
-      alert('제목은 15자 이내로 입력해주세요!');
+      alert('제목은 15자 이하로 입력해주세요!');
+      return;
+    }
+
+    // 유저 유효성 검사
+    const isValidUser = filteredUsers.some(
+      (user) => user.name === employeeName,
+    );
+    if (!isValidUser) {
+      alert('유효한 사용자를 선택해주세요!');
+      setEmployeeName('');
+      setEmployeeId('');
       return;
     }
 
@@ -115,11 +146,15 @@ const MessageSendModal: React.FC<MessageSendModalProps> = ({
           </div>
           <Xmark
             className='h-7 w-7 cursor-pointer stroke-gray-900 stroke-1'
-            onClick={closeModal}
+            onClick={() => {
+              setEmployeeName('');
+              setEmployeeId('');
+              closeModal();
+            }}
           />
         </div>
         <div>
-          <div className='relative mb-5'>
+          <div className='relative mb-5' ref={inputRef}>
             <p>받는 사람</p>
             <input
               type='text'

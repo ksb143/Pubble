@@ -2,27 +2,6 @@ import { privateApi } from '@/utils/http-commons.ts';
 import { getToken, messaging, onMessage } from '@/firebaseConfig';
 import useNotificationStore from '@/stores/notificationStore';
 
-// Firebase Service Worker 등록
-export const registerServiceWorker = async () => {
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/firebase-messaging-sw.js').then(
-        (registration) => {
-          console.log(
-            'ServiceWorker가 scope에 등록되었습니다',
-            registration.scope,
-          );
-        },
-        (err) => {
-          console.log('ServiceWorker 등록에 실패했습니다 : ', err);
-        },
-      );
-    });
-  } else {
-    console.log('이 브라우저는 Service Worker를 지원하지 않습니다.');
-  }
-};
-
 // FCM 토큰 전송 함수
 export const sendFCMToken = async (token: string) => {
   await privateApi.post(`/notification/fcm-token`, { token });
@@ -60,6 +39,7 @@ export const setupFCMListener = () => {
       const notificationTitle = payload.notification.title || '알림';
       const notificationOptions = {
         body: payload.notification.body || '알림 내용',
+        icon: payload.notification.icon || '/pubble_logo.png',
       };
 
       // 브라우저 알림 권한이 허용되었으면
@@ -67,11 +47,11 @@ export const setupFCMListener = () => {
         new Notification(notificationTitle, notificationOptions);
       }
 
-      if (payload.data?.type === 'message') {
+      if (payload.data?.type === 'MESSAGE') {
         // 알림 타입이 쪽지인 경우
         useNotificationStore.setState({ hasNewMessage: true });
         useNotificationStore.setState({ hasNewNotification: true });
-      } else if (payload.data?.type !== 'message') {
+      } else if (payload.data?.type !== 'MESSAGE') {
         useNotificationStore.setState({ hasNewNotification: true });
       }
     } else {
@@ -82,8 +62,12 @@ export const setupFCMListener = () => {
 };
 
 // 받은 알림 리스트 조회 함수
-export const getNotificationList = async (page: number, size: number) => {
-  const { data } = await privateApi.get('/notification/list', {
+export const getNotificationList = async (
+  page: number,
+  size: number,
+  userId: number,
+) => {
+  const { data } = await privateApi.get(`/notification/${userId}/list`, {
     params: { page, size },
   });
   return data;

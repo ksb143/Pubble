@@ -110,29 +110,31 @@ const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
           )}
         </ul>
         {/* 페이지네이션 */}
-        <div className='mt-4 flex items-center justify-center'>
-          <button
-            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
-            onClick={() => {
-              setCurrentPage(currentPage - 1);
-            }}
-            disabled={currentPage === 0}>
-            <Left
-              className={`h-6 w-6 ${currentPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
-            />
-          </button>
-          <span className='mx-4 text-center text-lg'>{currentPage + 1}</span>
-          <button
-            className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage - 1 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
-            onClick={() => {
-              setCurrentPage(currentPage + 1);
-            }}
-            disabled={currentPage === totalPage - 1}>
-            <Right
-              className={`h-6 w-6 ${currentPage === totalPage - 1 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
-            />
-          </button>
-        </div>
+        {totalPage > 0 && (
+          <div className='mt-4 flex items-center justify-center'>
+            <button
+              className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
+              onClick={() => {
+                setCurrentPage(currentPage - 1);
+              }}
+              disabled={currentPage === 0}>
+              <Left
+                className={`h-6 w-6 ${currentPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
+              />
+            </button>
+            <span className='mx-4 text-center text-lg'>{currentPage + 1}</span>
+            <button
+              className={`flex h-8 w-8 items-center justify-center rounded ${currentPage === totalPage - 1 || totalPage === 0 ? '' : 'cursor-pointer hover:bg-gray-500/10'}`}
+              onClick={() => {
+                setCurrentPage(currentPage + 1);
+              }}
+              disabled={currentPage === totalPage - 1 || totalPage === 0}>
+              <Right
+                className={`h-6 w-6 ${currentPage === totalPage - 1 || totalPage === 0 ? 'stroke-gray-900/30' : 'stroke-gray-900/70'}`}
+              />
+            </button>
+          </div>
+        )}
       </div>
     </>
   );

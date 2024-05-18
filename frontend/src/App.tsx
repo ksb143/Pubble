@@ -20,19 +20,21 @@ function App() {
     setEmployeeId, // 사원번호 세팅
     setDepartment, // 부서 세팅
     setPosition, // 직급 세팅
+    setUserId, // 유저 아이디 세팅
   } = useUserStore();
 
   useEffect(() => {
     // 로그인 정보 가져오기
     const token = localStorage.getItem('accessToken');
     if (token) {
-      const { name, employeeId, department, position, profileColor } =
+      const { name, employeeId, department, position, profileColor, userId } =
         parseJwt(token);
       setName(name);
       setEmployeeId(employeeId);
       setDepartment(department);
       setPosition(position);
       setProfileColor(profileColor);
+      setUserId(userId);
     }
   }, []);
 

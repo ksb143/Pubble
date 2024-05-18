@@ -1,5 +1,4 @@
 // 1. react 관련
-import { useState } from 'react';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
@@ -13,29 +12,10 @@ const ProjectPage = () => {
   // pId, pCode, pName 를,,, store에서 가져와 정의한다.
   const pId = usePageInfoStore.getState().projectId;
   const pCode = usePageInfoStore.getState().projectCode;
-  const pName = usePageInfoStore.getState().projectName;
-  // setPageType의 type과 argument를 업데이트한다. useEffect를 사용하여.
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
 
   return (
     <>
-      <RequirementList pId={pId} pCode={pCode} pName={pName} />
-      <div>
-        <br />
-        <RequirementAddModal isOpen={isModalOpen} onClose={handleCloseModal} />
-        <Button
-          className='ml-5 bg-blue-500 text-white'
-          onClick={handleOpenModal}>
-          요구사항 추가
-        </Button>
-      </div>
+      <RequirementList pId={pId} pCode={pCode} />
     </>
   );
 };

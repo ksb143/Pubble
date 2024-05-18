@@ -9,5 +9,22 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Firebase Service Worker 등록
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/firebase-messaging-sw.js').then(
+            () => {
+              console.log('ServiceWorker가 scope에 등록되었습니다');
+            },
+            (err) => {
+              console.log('ServiceWorker 등록에 실패했습니다 : ', err);
+            },
+          );
+        });
+      } else {
+        console.log('이 브라우저는 Service Worker를 지원하지 않습니다.');
+      }
+    </script>
   </body>
 </html>

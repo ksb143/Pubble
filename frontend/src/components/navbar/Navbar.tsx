@@ -3,11 +3,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import {
-  registerServiceWorker,
-  getFCMToken,
-  setupFCMListener,
-} from '@/apis/notification';
+import { getFCMToken, setupFCMListener } from '@/apis/notification';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
@@ -45,25 +41,22 @@ const Navbar = () => {
 
   // firebase 초기 설정
   useEffect(() => {
-    // 서비스 워커 등록
-    registerServiceWorker();
     // FCM 토큰 요청
     getFCMToken();
     // FCM 리스너 등록
     setupFCMListener();
   }, []);
 
-  // 쪽지 아이콘 클릭 시 알림 배지 숨김
-  const handleMessageClick = () => {
-    setHasNewMessage(false);
-    toggleMenu('message');
-  };
+  // 해당 메뉴 선택시 배지 비활성화
+  useEffect(() => {
+    if (activeMenu === 'message') {
+      setHasNewMessage(false);
+    }
 
-  // 알림 아이콘 클릭 시 알림 배지 숨김
-  const handleNotificationClick = () => {
-    setHasNewNotification(false);
-    toggleMenu('notification');
-  };
+    if (activeMenu === 'notification') {
+      setHasNewNotification(false);
+    }
+  }, [activeMenu, hasNewMessage, hasNewNotification]);
 
   return (
     <>
@@ -82,6 +75,7 @@ const Navbar = () => {
       <Notification
         isOpen={activeMenu === 'notification'}
         closeMenu={() => setActiveMenu(null)}
+        setActiveMenu={setActiveMenu}
       />
 
       {/* 상단바 전체 */}
@@ -107,7 +101,7 @@ const Navbar = () => {
           {/* 쪽지 아이콘 */}
           <div
             className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
-            onClick={handleMessageClick}>
+            onClick={() => toggleMenu('message')}>
             <Envelope
               className={`h-8 w-8 stroke-gray-900 ${activeMenu === 'message' ? 'stroke-[1.5]' : 'stroke-1'}`}
             />
@@ -117,7 +111,7 @@ const Navbar = () => {
           {/* 알림 아이콘 */}
           <div
             className={`relative mr-8 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'notification' ? ' bg-gray-900/10' : ''}`}
-            onClick={handleNotificationClick}>
+            onClick={() => toggleMenu('notification')}>
             <Bell
               className={`h-8 w-8 fill-gray-900 stroke-gray-900 ${activeMenu === 'notification' ? 'stroke-[6]' : 'stroke-2'}`}
             />

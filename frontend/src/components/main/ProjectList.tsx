@@ -24,10 +24,16 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-// import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-// import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -119,28 +125,37 @@ export const columns: ColumnDef<Project>[] = [
       </div>
     ),
   },
+  {
+    id: 'actions',
+    enableHiding: false,
+    cell: ({ row }: { row: Row<Project> }) => {
+      const handleCheckStatus = (event: React.MouseEvent) => {
+        // 이벤트 버블링 중지
+        event.stopPropagation();
 
-  // {
-  //   id: "actions",
-  //   enableHiding: false,
-  //   cell: ({ row }:{ row: Row<Project> }) => {
+        // 프로젝트 현황을 확인하는 로직 구현
+        // 대시보드 sheet 나오게 하는 로직
+        console.log('프로젝트 현황을 확인합니다:', row.original.projectId);
+      };
 
-  //     return (
-  //       <DropdownMenu>
-  //         <DropdownMenuTrigger asChild>
-  //           <Button variant="ghost" className="h-8 w-8 p-0">
-  //             <span className="sr-only">Open menu</span>
-  //             <MoreHorizontal className="h-4 w-4" />
-  //           </Button>
-  //         </DropdownMenuTrigger>
-  //         <DropdownMenuContent align="end">
-  //           <DropdownMenuLabel>부가기능</DropdownMenuLabel>
-  //             <DropdownMenuItem>프로젝트 현황 확인</DropdownMenuItem>
-  //         </DropdownMenuContent>
-  //       </DropdownMenu>
-  //     )
-  //   },
-  // },
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' className='h-8 w-8 p-0'>
+              <span className='sr-only'>Open menu</span>
+              <MoreHorizontal className='h-4 w-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuLabel>부가기능</DropdownMenuLabel>
+            <DropdownMenuItem onClick={handleCheckStatus}>
+              프로젝트 대시보드
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
 ];
 // ProjectList: 특정 사용자의 프로젝트를 개괄적으로 보는 컴포넌트
 const ProjectList = () => {
