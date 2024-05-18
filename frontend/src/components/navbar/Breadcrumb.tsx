@@ -49,7 +49,7 @@ const Breadcrumb = () => {
               navigate(`/project/${projectCode}`);
             }
           }}>
-          <p className='text-xl font-normal'>{projectName}</p>
+          <p className='text-lg font-normal'>{projectName}</p>
         </div>
         {/* 요구사항 정보 */}
         {requirementName && (
@@ -64,7 +64,7 @@ const Breadcrumb = () => {
                   );
                 }
               }}>
-              <p className='text-xl font-normal'>{requirementName}</p>
+              <p className='text-lg font-normal'>{requirementName}</p>
             </div>
           </>
         )}
@@ -72,7 +72,7 @@ const Breadcrumb = () => {
         {isRichPage && (
           <>
             <Right className='mx-2 h-4 w-4 stroke-gray-500/50 stroke-2' />
-            <p className='cursor-default text-xl font-normal'>에디터</p>
+            <p className='cursor-default text-lg font-normal'>에디터</p>
           </>
         )}
       </div>
