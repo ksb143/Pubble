@@ -8,6 +8,8 @@ import { getLatestRequirementVersion } from '@/apis/project';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
+// import RequirementAddModal from '@/components/requirement/RequirementAddModal';
+import TestModal from '@/components/requirement/TestModal';
 import {
   ColumnDef,
   flexRender,
@@ -170,6 +172,8 @@ export const columns: ColumnDef<Summary>[] = [
 // },
 
 const RequirementList = ({ pId, pCode }: RequirementListProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { setPageType } = usePageInfoStore();
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
@@ -277,6 +281,15 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
     fetchRequirements();
   }, [pId, pCode]);
 
+  // 사용자의 요구사항 추가 모달 열기
+  const handleTestModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // 특정한 요구사항 row 클릭시, 특정 요구사항에 진입할 수 있도록 하는 함수.
   const handleRowClick = (summary: Summary) => {
     const { code } = summary;
     const rCode = code;
@@ -290,18 +303,35 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
     });
     navigate(`/project/${pCode}/requirement/${rCode}`);
   };
-
+  // {/* 요구사항 생성 모달 */}
+  //           {/* <RequirementAddModal
+  //             isOpen={isModalOpen}
+  //             onClose={handleCloseModal}
+  //           /> */}
   return (
     <div className='p-8 text-center'>
       <p className='mb-4 text-2xl font-bold'>
         {requirements[0]?.projectTitle || '예시 프로젝트 제목'}
       </p>
+
       <p className='mb-8 text-lg'>
         {requirements.length > 0 &&
           `${new Date(requirements[0].startAt).toLocaleDateString('ko-KR')} ~ ${new Date(requirements[0].endAt).toLocaleDateString('ko-KR')}`}
       </p>
+
       <div className='rounded-md border'>
+        <div className='flex justify-between'>
+          <Button
+            className='ml-5 mt-5 bg-blue-500 text-white'
+            onClick={handleTestModal}>
+            테스트 버튼
+          </Button>
+          {/* 테스트 모달 */}
+          <TestModal isOpen={isModalOpen} onClose={handleCloseModal} />
+          {/* 요구사항 추가 버튼 */}
+        </div>
         <div className='flex items-center px-5 py-5'>
+          {/* 요구사항 이름 검색 입력창 */}
           <Input
             placeholder='요구사항 이름을 입력해주세요.'
             value={
