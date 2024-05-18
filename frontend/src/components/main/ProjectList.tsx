@@ -2,12 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library 관련
-import { getProject } from '@/apis/project';
-// 3. api 관련
-import ProjectAddModal from '@/components/main/ProjectAddModal';
-// 4. store 관련
-import usePageInfoStore from '@/stores/pageInfoStore';
-// 5. component 관련
 import {
   Cell,
   Header,
@@ -25,6 +19,12 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
+// 3. api 관련
+import { getProject, getProjectStatus } from '@/apis/project';
+// 4. store 관련
+import usePageInfoStore from '@/stores/pageInfoStore';
+// 5. component 관련
+import ProjectAddModal from '@/components/main/ProjectAddModal';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -43,6 +43,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+// 6. image 등 assets
 
 // Project type 정의
 export type Project = {
@@ -129,12 +130,11 @@ export const columns: ColumnDef<Project>[] = [
     id: 'actions',
     enableHiding: false,
     cell: ({ row }: { row: Row<Project> }) => {
-      const handleCheckStatus = (event: React.MouseEvent) => {
+      const handleCheckStatus = async (event: React.MouseEvent) => {
         // 이벤트 버블링 중지
         event.stopPropagation();
-
-        // 프로젝트 현황을 확인하는 로직 구현
-        // 대시보드 sheet 나오게 하는 로직
+        const response = await getProjectStatus(row.original.projectId);
+        onStatusResponse(response.data);
         console.log('프로젝트 현황을 확인합니다:', row.original.projectId);
       };
 
@@ -266,13 +266,9 @@ const ProjectList = () => {
   };
 
   return (
-    <div className='w-full px-2 '>
-      {/* 프로젝트 생성 모달 */}
+    <div className='w-full px-2'>
       <ProjectAddModal isOpen={isModalOpen} onClose={handleCloseModal} />
-      {/* 프로젝트 추가 버튼 */}
-      <Button onClick={handleAddProject}>프로젝트 추가</Button>
-      <div className='flex items-center py-2'>
-        {/* 프로젝트 이름 검색 입력창 */}
+      <div className='mb-2 flex justify-between'>
         <Input
           placeholder='프로젝트 이름을 입력해주요.'
           value={
@@ -283,10 +279,11 @@ const ProjectList = () => {
           }
           className='max-w-sm'
         />
+        <Button onClick={handleAddProject}>프로젝트 추가</Button>
       </div>
-      <div className='rounded-md border'>
+      <div className='overflow-y-auto rounded border'>
         <Table>
-          <TableHeader>
+          <TableHeader className='whitespace-nowrap bg-gray-200'>
             {table
               .getHeaderGroups()
               .map((headerGroup: HeaderGroup<Project>) => (
@@ -308,17 +305,14 @@ const ProjectList = () => {
                 </TableRow>
               ))}
           </TableHeader>
-          {/* 테이블 몸체 */}
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row: Row<Project>) => (
-                // 테이블 행
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
                   onClick={() => handleRowClick(row)}>
                   {row.getVisibleCells().map((cell: Cell<Project, unknown>) => (
-                    // 테이블 셀
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -327,7 +321,6 @@ const ProjectList = () => {
                     </TableCell>
                   ))}
                 </TableRow>
-                // 테이블 행 끝
               ))
             ) : (
               <TableRow>
