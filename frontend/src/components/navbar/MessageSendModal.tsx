@@ -28,10 +28,7 @@ interface UserInfo {
   profileColor: string;
 }
 
-const MessageSendModal: React.FC<MessageSendModalProps> = ({
-  isOpen,
-  closeModal,
-}) => {
+const MessageSendModal = ({ isOpen, closeModal }: MessageSendModalProps) => {
   const [employeeName, setEmployeeName] = useState(''); // 받는 사람 이름
   const [employeeId, setEmployeeId] = useState(''); // 받는 사람 사번
   const [title, setTitle] = useState(''); // 쪽지 제목

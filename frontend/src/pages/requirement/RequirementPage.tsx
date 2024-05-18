@@ -10,11 +10,11 @@ import { extractDate, extractTime } from '@/utils/datetime';
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Thread from '@/components/requirement/Thread';
-import Profile from '@/components/layout/Profile';
 // 6. asset
 import Locked from '@/assets/icons/lock-closed.svg?react';
 import Unlocked from '@/assets/icons/lock-open.svg?react';
 import Pencil from '@/assets/icons/pencil-square.svg?react';
+import ChatBubble from '@/assets/icons/chat-bubble-left-right.svg?react';
 
 const RequirementPage = () => {
   const navigate = useNavigate();
@@ -25,15 +25,18 @@ const RequirementPage = () => {
     requirementCode,
     setPageType,
   } = usePageInfoStore();
+
   const [requirementInfo, setRequirementInfo] =
     useState<RequirementInfo | null>(null); // api로 받은 요구사항 정보
   const [threadList, setThreadList] = useState<ThreadListInfo[]>([]); // api로 받은 스레드 리스트
+  const [selectedDetailId, setSelectedDetailId] = useState<number | null>(null); // 클릭한 디테일 항목 id
 
   // 리치 에디터로 이동
   const goRich = () => {
     navigate(`/project/${projectCode}/requirement/${requirementCode}/detail`);
   };
 
+  // 요구사항, 스레드 정보 조회 및 저장
   useEffect(() => {
     (async () => {
       try {
@@ -48,36 +51,48 @@ const RequirementPage = () => {
           requirementName: reqRes.data.requirementName,
           isRichPage: false,
         });
-        console.log('요구사항 정보 조회 성공 : ', reqRes.data);
 
         // 스레드 정보 조회
         const threadRes = await getThread(reqRes.data.requirementId);
         setThreadList(threadRes.data);
-        // console.log('스레드 조회 성공', threadRes.data);
       } catch (error) {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
     })();
   }, [projectId, requirementId, setPageType]);
 
+  // 승인 여부에 따라 화면에 출력되는 텍스트를 반환하는 함수
+  const getApprovalText = (approval: string) => {
+    const approvalText: { [key: string]: JSX.Element } = {
+      u: <p className='w-fit rounded-full bg-gray-100 px-3 py-1'>미승인</p>,
+      a: <p className='w-fit rounded-full bg-plgreen px-3 py-1'>승인</p>,
+      h: <p className='w-fit rounded-full bg-plred px-3 py-1'>보류</p>,
+    };
+    return approvalText[approval];
+  };
+
+  // 디테일 항목 클릭 함수
+  const handleDetailClick = (detailId: number) => {
+    if (selectedDetailId === detailId) {
+      setSelectedDetailId(null); // 이미 선택된 항목 클릭 시 선택 해제
+    } else {
+      setSelectedDetailId(detailId);
+    }
+  };
+
   return (
     <>
       <div className='flex h-full w-full justify-center py-3'>
-        {/* 요구사항 전체 화면 */}
-        <div className='relative mr-4 h-full w-1/2 rounded bg-white p-10 shadow'>
-          {/* 리치에디터 이동 버튼 */}
-          <button
-            className='absolute right-4 top-4 shrink-0 rounded-full bg-pubble p-3 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
-            onClick={goRich}>
-            <Pencil className='h-6 w-6 stroke-2' />
-          </button>
-          {/* 요구사항 */}
-          <div className='flex flex-col'>
-            {!requirementInfo && <p>요구사항 정보가 없습니다.</p>}
-            {requirementInfo && (
-              <>
-                {/* 타이틀 */}
-                <div className='mb-5 flex items-baseline'>
+        {/* 요구사항 */}
+        <div className='mr-4 flex h-full w-1/2 flex-col rounded bg-white p-10 shadow'>
+          {!requirementInfo && (
+            <p className='flex justify-center'>요구사항 정보가 없습니다.</p>
+          )}
+          {requirementInfo && (
+            <>
+              <div className='mb-5 flex items-baseline justify-between'>
+                {/* 요구사항코드, 요구사항명, 버전 */}
+                <div className='flex items-baseline'>
                   <p className='border-r-2 pr-3 text-xl font-normal'>
                     {requirementInfo.code}
                   </p>
@@ -88,75 +103,98 @@ const RequirementPage = () => {
                     {requirementInfo.version}
                   </div>
                 </div>
-                {requirementInfo.isLock === 'l' ? (
-                  <div className='flex w-full items-center'>
-                    <p>잠금 여부 : </p>
-                    <div className='mx-2 flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
-                      <Locked className='h-6 w-6 stroke-1' />
-                    </div>
-                    <div className='mx-2 flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
-                      <Unlocked className='h-6 w-6 stroke-1' />
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <Unlocked />
-                  </>
+
+                {/* 잠금 여부 */}
+                <div>
+                  {requirementInfo.isLock === 'l' ? (
+                    <>
+                      <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 bg-gray-50'>
+                        <Locked className='h-6 w-6 stroke-1' />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className='flex h-10 w-10 shrink-0 items-center justify-center rounded border-2 bg-gray-50'>
+                        <Unlocked className='h-6 w-6 stroke-1' />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className='relative'>
+                {/* 리치에디터 이동 버튼 */}
+                {requirementInfo.isLock === 'u' && (
+                  <button
+                    className='absolute bottom-0 right-0 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pubble p-1 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
+                    onClick={goRich}>
+                    <Pencil className='h-6 w-6 stroke-[1.5]' />
+                  </button>
                 )}
-                <p>approval : {requirementInfo.approval}</p>
-                <p>approvalComment : {requirementInfo.approvalComment}</p>
-                <div className='flex shrink-0 items-end text-sm'>
-                  <p className='mr-2'>
-                    {extractDate(requirementInfo.createdAt)}
+
+                {/* 승인 여부, 승인 코멘트 */}
+                <div className='mb-3 flex items-center'>
+                  {getApprovalText(requirementInfo.approval)}
+                  <p className='ml-3'>{requirementInfo.approvalComment}</p>
+                </div>
+
+                {/* 작성자, 담당자, 작성일시 */}
+                <div className='flex flex-col px-2'>
+                  <p>
+                    작성자 : {requirementInfo.author.name} (
+                    {requirementInfo.author.department}{' '}
+                    {requirementInfo.author.position})
                   </p>
-                  <p>{extractTime(requirementInfo.createdAt)}</p>
-                </div>
-                <div className='flex items-center'>
-                  <Profile
-                    width='3rem'
-                    height='3rem'
-                    name={requirementInfo.manager.name}
-                    profileColor={requirementInfo.manager.profileColor}
-                  />
-                  <p className='ml-3'>
-                    담당자 : {requirementInfo.manager.name}
+                  <p className='my-2'>
+                    담당자 : {requirementInfo.manager.name} (
+                    {requirementInfo.manager.department}{' '}
+                    {requirementInfo.manager.position})
                   </p>
+                  <div className='flex shrink-0 items-center'>
+                    <p>작성일 : </p>
+                    <p className='mx-1'>
+                      {extractDate(requirementInfo.createdAt)}
+                    </p>
+                    <p>{extractTime(requirementInfo.createdAt)}</p>
+                  </div>
                 </div>
-                <div className='flex items-center'>
-                  <Profile
-                    width='3rem'
-                    height='3rem'
-                    name={requirementInfo.author.name}
-                    profileColor={requirementInfo.author.profileColor}
-                  />
-                  <p className='ml-3'>작성자 : {requirementInfo.author.name}</p>
-                </div>
-                <div className='my-3 border-b border-t py-3'>
-                  <ul>
-                    {requirementInfo.details.map((detail) => (
-                      <li
-                        key={detail.requirementDetailId}
-                        className='my-2 rounded border-2 p-2 hover:border-pubble hover:bg-plblue'>
-                        <p
-                          className={`${detail.status === 'd' ? 'text-gray-300 line-through' : ''}`}>
-                          {detail.content}
-                        </p>
-                        <p>status : {detail.status}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            )}
-          </div>
+              </div>
+
+              {/* 요구사항 디테일 */}
+              <ul className='my-3 border-t py-3'>
+                {requirementInfo.details.map((detail) => (
+                  <li
+                    key={detail.requirementDetailId}
+                    className={`group my-3 flex items-center justify-between rounded border p-4 hover:border-pubble ${selectedDetailId === detail.requirementDetailId ? 'border-pubble' : ''}`}
+                    onClick={() =>
+                      handleDetailClick(detail.requirementDetailId)
+                    }>
+                    <p
+                      className={`text-lg ${detail.status === 'd' ? 'text-gray-300 line-through' : ''}`}>
+                      {detail.content}
+                    </p>
+                    {/* hover 시 나오는 버튼 그룹 */}
+                    <div className='flex opacity-0 transition duration-300 group-hover:opacity-100'>
+                      <div className='flex min-h-9 min-w-9 items-center justify-center rounded-lg p-1 group-hover:border-2 group-hover:border-gray-200'>
+                        <ChatBubble className='h-6 w-6 cursor-pointer stroke-gray-500 stroke-1' />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </div>
+
         {/* 스레드 */}
-        <div className='flex w-1/3 flex-col'>
+        {/* overscroll-y-auto ? */}
+        <div className='flex w-1/3 flex-col overscroll-y-auto pr-4'>
           {threadList.length > 0 &&
             threadList.map((threadInfo) => (
               <Thread
                 key={threadInfo.detailId}
                 data={threadInfo.userThreadDtos}
+                selected={selectedDetailId === threadInfo.detailId}
               />
             ))}
         </div>

@@ -15,11 +15,11 @@ interface AlertModalProps {
 }
 
 // text='쪽지 전송 성공했습니다!' autoClose={true} closeModal={() => setAlertOpen(false)}
-const AlertModal: React.FC<AlertModalProps> = ({
+const AlertModal = ({
   text,
   autoClose = false,
   closeModal,
-}) => {
+}: AlertModalProps) => {
   // 로티 기본 옵션
   const defaultOptions = {
     loop: false,

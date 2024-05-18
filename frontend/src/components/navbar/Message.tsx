@@ -31,7 +31,7 @@ const dialogStyle = css`
   height: calc(100vh - 64px);
 `;
 
-const Message: React.FC<MessageProps> = ({ isOpen, closeMenu }) => {
+const Message = ({ isOpen, closeMenu }: MessageProps) => {
   const { hasNewMessage, isMessageChecked } = useNotificationStore();
   const [isMessageSendModalOpen, setIsMessageSendModalOpen] = useState(false); // 쪽지 쓰기 모달 상태
   const itemsPerPage = 10; // 한 페이지에 보여줄 쪽지 수

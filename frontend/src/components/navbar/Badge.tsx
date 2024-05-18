@@ -4,7 +4,7 @@ interface BadgeProps {
   position: 'left' | 'right-sm' | 'right';
 }
 
-const Badge: React.FC<BadgeProps> = ({ size, position }) => {
+const Badge = ({ size, position }: BadgeProps) => {
   // 배지 크기 스타일 정의
   const sizeStyles = {
     sm: 'h-2 w-2',

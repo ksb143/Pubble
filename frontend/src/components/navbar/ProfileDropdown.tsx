@@ -15,7 +15,7 @@ interface ProfileDropdownProps {
   isOpen: boolean;
 }
 
-const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ isOpen }) => {
+const ProfileDropdown = ({ isOpen }: ProfileDropdownProps) => {
   const navigate = useNavigate();
   const { name, profileColor, department, position, employeeId } =
     useUserStore();

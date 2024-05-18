@@ -33,11 +33,11 @@ const dialogStyle = css`
   height: calc(100vh - 64px);
 `;
 
-const Notification: React.FC<NotificationProps> = ({
+const Notification = ({
   isOpen,
   closeMenu,
   setActiveMenu,
-}) => {
+}: NotificationProps) => {
   const { hasNewMessage, hasNewNotification, isNotificationChecked } =
     useNotificationStore();
   const { userId } = useUserStore();

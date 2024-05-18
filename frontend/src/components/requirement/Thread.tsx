@@ -14,16 +14,18 @@ import Pencil from '@/assets/icons/pencil.svg?react';
 // api로 받아온 스레드 타입 설정
 interface ThreadProps {
   data: ThreadInfo[];
+  selected: boolean;
 }
 
-const Thread: React.FC<ThreadProps> = ({ data }) => {
+const Thread = ({ data, selected }: ThreadProps) => {
   const [commentInput, setCommentInput] = useState('');
-  // console.log('data : ', data);
+
   return (
     <>
-      <div className='mb-4 flex h-fit max-h-[50vh] w-full flex-col justify-center rounded bg-white p-4 shadow'>
-        {/* 타이틀 */}
+      <div
+        className={`mb-4 flex h-fit max-h-[50vh] w-full flex-col justify-center rounded bg-white p-4 shadow transition duration-500 ${selected ? '-translate-x-2 border border-blue-500' : ''}`}>
         <div className='flex w-full items-center justify-between border-b pb-3 text-lg font-normal'>
+          {/* 타이틀 */}
           <div className='flex items-center'>
             <Profile
               width='2.5rem'
@@ -33,18 +35,26 @@ const Thread: React.FC<ThreadProps> = ({ data }) => {
             />
             <div className='ml-1'>의 스레드</div>
           </div>
+
           {/* 잠금 여부 */}
-          <div className='flex items-center'>
-            <div className='mx-2 flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
-              <Locked className='h-4 w-4 stroke-1' />
-            </div>
-            <div className='mx-2 flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
-              <Unlocked className='h-4 w-4 stroke-1' />
-            </div>
-          </div>
+          {data[0].isLocked === 'y' && (
+            <>
+              <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
+                <Locked className='h-4 w-4 stroke-1' />
+              </div>
+            </>
+          )}
+          {data[0].isLocked === 'n' && (
+            <>
+              <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded border-2 border-gray-200 bg-gray-50'>
+                <Unlocked className='h-4 w-4 stroke-1' />
+              </div>
+            </>
+          )}
         </div>
+
         {/* 댓글 조회 */}
-        <ul className='mx-2 my-5 max-h-72 overflow-y-auto'>
+        <ul className='my-5 max-h-72 w-full overflow-y-auto px-3'>
           {data[0].commentList.length === 0 && (
             <p className='text-center'>댓글이 없습니다.</p>
           )}
@@ -64,19 +74,24 @@ const Thread: React.FC<ThreadProps> = ({ data }) => {
             </li>
           ))}
         </ul>
+
         {/* 댓글 작성 */}
-        <div className='flex items-center'>
-          <input
-            type='text'
-            placeholder='댓글을 입력해주세요'
-            className='mr-2 h-10 w-full rounded border-2 border-gray-200 p-2 focus:outline-pubble'
-            value={commentInput}
-            onChange={(e) => setCommentInput(e.target.value)}
-          />
-          <button className='flex h-9 w-9 shrink-0 items-center justify-center rounded bg-pubble p-2 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'>
-            <Pencil />
-          </button>
-        </div>
+        {data[0].isLocked === 'n' && (
+          <>
+            <div className='flex w-full items-center'>
+              <input
+                type='text'
+                placeholder='댓글 달기'
+                className='mr-2 h-10 w-full rounded border-2 border-gray-200 p-2 focus:outline-pubble'
+                value={commentInput}
+                onChange={(e) => setCommentInput(e.target.value)}
+              />
+              <button className='flex h-9 w-9 shrink-0 items-center justify-center rounded bg-pubble p-2 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'>
+                <Pencil />
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
