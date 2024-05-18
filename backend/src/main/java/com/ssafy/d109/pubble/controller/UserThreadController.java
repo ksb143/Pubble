@@ -7,6 +7,7 @@ import com.ssafy.d109.pubble.dto.response.UserThreadListData;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.UserThreadLockResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.UserThreadResponseDto;
+import com.ssafy.d109.pubble.dto.userLocationDto.RequirementThreadsDto;
 import com.ssafy.d109.pubble.entity.User;
 import com.ssafy.d109.pubble.entity.UserThread;
 import com.ssafy.d109.pubble.repository.UserRepository;
@@ -40,7 +41,16 @@ public class UserThreadController {
         this.userThreadRepository = userThreadRepository;
     }
 
-    @Operation(summary = "모든 스레드 조회")
+    @Operation(summary = "요구사항 항목에 해당하는 모든 스레드 조회")
+    @GetMapping("/requirements-all-threads/{requirementId}")
+    public ResponseEntity<ResponseDto> getRequirementsThreads(@PathVariable Integer requirementId) {
+        List<RequirementThreadsDto> dtos = userThreadService.getRequirementsThreads(requirementId);
+
+        response = new ResponseDto(true, "요구사항 항목에 해당하는 모든 스레드 조회", dtos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "세부사항 항목에 해당하는 모든 스레드 조회")
     @GetMapping("/{detailId}/threads")
     public ResponseEntity<UserThreadResponseDto> getAllThreads(@PathVariable Integer detailId) {
 

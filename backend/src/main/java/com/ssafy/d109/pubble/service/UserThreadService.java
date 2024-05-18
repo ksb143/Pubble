@@ -6,6 +6,7 @@ import com.ssafy.d109.pubble.dto.requestDto.NotificationReceiverRequestDto;
 import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
 import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
+import com.ssafy.d109.pubble.dto.userLocationDto.RequirementThreadsDto;
 import com.ssafy.d109.pubble.entity.*;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
@@ -20,6 +21,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,22 @@ public class UserThreadService {
         this.userRepository = userRepository;
     }
 
+    public List<RequirementThreadsDto> getRequirementsThreads(Integer requirementId) {
+        // db에서 id만 뽑아오는게 더 좋을 것 같긴 한데
+        List<RequirementDetail> details = detailRepository.findAllByRequirement_requirementId(requirementId);
+        List<RequirementThreadsDto> dtos = new ArrayList<>();
+
+        for (RequirementDetail detail : details) {
+            List<UserThreadDto> allUserThreads = getAllUserThreads(detail.getRequirementDetailId());
+            RequirementThreadsDto threadsDto = RequirementThreadsDto.builder()
+                    .detailId(detail.getRequirementDetailId())
+                    .userThreadDtos(allUserThreads)
+                    .build();
+            dtos.add(threadsDto);
+            // 멸망해버린 변수명
+        }
+        return dtos;
+    }
 
     public List<UserThreadDto> getAllUserThreads(Integer detailId) {
 
