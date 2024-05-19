@@ -11,6 +11,7 @@ import Warning from '@/assets/lotties/warning-big.json';
 
 interface AlertModalProps {
   text: string;
+  status?: 'success' | 'warning'; // 'success'는 성공, 'warning'은 경고
   buttonsType: 'autoclose' | 'confirm' | 'yesno'; // 버튼 타입: 자동꺼짐, 확인, 네/아니오
   closeModal: () => void;
   onConfirm?: () => void; // '네' 버튼 클릭 시 실행할 로직
@@ -18,6 +19,7 @@ interface AlertModalProps {
 
 const AlertModal = ({
   text,
+  status = 'warning',
   buttonsType = 'confirm',
   closeModal,
   onConfirm,
@@ -57,15 +59,15 @@ const AlertModal = ({
 
   return (
     <div className='fixed inset-0 z-[70] flex w-full items-center justify-center bg-transparent backdrop-blur-none transition duration-700'>
-      <div className='grid h-1/5 w-1/4 -translate-y-1/2 grid-flow-row grid-rows-3 rounded-lg border bg-white p-4 shadow-lg'>
-        <div className='row-span-1'>
-          {buttonsType === 'autoclose' ? (
+      <div className='flex h-56 w-96 -translate-y-1/2 flex-col justify-around rounded-lg border bg-white p-4 shadow-lg'>
+        <div>
+          {status === 'success' ? (
             <Lottie options={successOptions} height={45} width={45} />
           ) : (
             <Lottie options={warningOptions} height={45} width={45} />
           )}
         </div>
-        <div className='row-span-1 flex flex-col items-center justify-center text-center'>
+        <div className='flex flex-col items-center justify-center text-center'>
           {/* 각 문장을 p 태그로 래핑하여 렌더링 */}
           {sentences.map((sentence, index) => (
             <p key={index} className='text-lg font-normal'>
@@ -74,7 +76,7 @@ const AlertModal = ({
             </p>
           ))}
         </div>
-        <div className='row-span-1 flex items-end justify-center'>
+        <div className='flex items-end justify-center'>
           {buttonsType === 'confirm' && (
             <button
               className='mb-1 rounded bg-pubble px-2 py-1 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'

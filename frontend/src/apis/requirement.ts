@@ -12,6 +12,17 @@ export const getRequirement = async (
   return data;
 };
 
+// 요구사항 잠금 함수
+export const lockRequirement = async (
+  projectId: number,
+  requirementId: number,
+) => {
+  const { data } = await privateApi.put(
+    `/projects/${projectId}/requirements/${requirementId}/lock`,
+  );
+  return data;
+};
+
 // 스레드 조회 함수
 export const getThread = async (requirementId: number) => {
   const { data } = await privateApi.get(
