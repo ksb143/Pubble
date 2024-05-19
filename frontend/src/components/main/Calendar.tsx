@@ -45,6 +45,7 @@ const Calendar = () => {
   const [endingBlankDays, setEndingBlankDays] = useState<number[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
 
+  // 프로젝트 스케줄 가져오기
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -70,23 +71,39 @@ const Calendar = () => {
 
   // 프로젝트 스케줄 랜덤 색상 반영
   const getRandomColor = () => {
-    const colors = ['sky', 'indigo', 'yellow', 'emerald', 'red'];
+    const colors = [
+      'sky',
+      'indigo',
+      'yellow',
+      'emerald',
+      'red',
+      'purple',
+      'blue',
+      'gray',
+      'brown',
+    ];
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  // 오늘 날짜 여부 확인
   const isToday = (date: number): boolean => {
     const day = new Date(year, month, date);
     return today.toDateString() === day.toDateString();
   };
 
+  // 이벤트 필터링
   const getEvents = (date: number): Event[] => {
-    return events.filter(
-      (e) =>
-        new Date(e.eventStart).toDateString() ===
-        new Date(year, month, date).toDateString(),
-    );
+    return events.filter((e) => {
+      const eventStartDate = new Date(e.eventStart).toDateString();
+      const eventEndDate = e.eventEnd
+        ? new Date(e.eventEnd).toDateString()
+        : eventStartDate;
+      const currentDate = new Date(year, month, date).toDateString();
+      return currentDate === eventStartDate || currentDate === eventEndDate;
+    });
   };
 
+  // 이벤트 색상
   const eventColor = (color: string): string => {
     switch (color) {
       case 'sky':
@@ -99,11 +116,20 @@ const Calendar = () => {
         return 'text-white bg-emerald-500';
       case 'red':
         return 'text-white bg-rose-400';
+      case 'purple':
+        return 'text-white bg-violet-500';
+      case 'blue':
+        return 'text-white bg-blue-500';
+      case 'brown':
+        return 'text-white bg-brown-500';
+      case 'gray':
+        return 'text-white bg-gray-500';
       default:
         return '';
     }
   };
 
+  // 해당 월의 날짜 수 계산
   const getDays = (): void => {
     const days: number = new Date(year, month + 1, 0).getDate();
 
@@ -125,6 +151,7 @@ const Calendar = () => {
     setDaysInMonth(Array.from({ length: days }, (_, i) => i + 1));
   };
 
+  // 다음 달로 이동
   const handleNextMonth = () => {
     if (month === 11) {
       // 12월인 경우 (월 인덱스는 0부터 시작하므로 11이 12월을 의미)
@@ -136,6 +163,7 @@ const Calendar = () => {
     getDays();
   };
 
+  // 이전 달로 이동
   const handlePreviousMonth = () => {
     if (month === 0) {
       // 1월인 경우
@@ -147,6 +175,7 @@ const Calendar = () => {
     getDays();
   };
 
+  // 오늘 날짜로 이동
   const handleToday = () => {
     const today = new Date();
     setMonth(today.getMonth());
@@ -154,6 +183,20 @@ const Calendar = () => {
     getDays();
   };
 
+  // 두 날짜가 같은 날인지 확인
+  const isSameDay = (date1: Date, date2: Date) => {
+    // 연도 비교
+    const sameYear = date1.getFullYear() === date2.getFullYear();
+    // 월 비교
+    const sameMonth = date1.getMonth() === date2.getMonth();
+    // 일 비교
+    const sameDate = date1.getDate() === date2.getDate();
+
+    // 세 조건이 모두 참이면 true, 아니면 false 반환
+    return sameYear && sameMonth && sameDate;
+  };
+
+  // 해당 월의 날짜 수 계산
   useEffect(() => {
     getDays();
   }, [month, year]);
@@ -271,45 +314,50 @@ const Calendar = () => {
                         {/* Events */}
                         <div className='relative flex grow flex-col overflow-hidden p-0.5 sm:p-1.5'>
                           {getEvents(day).map((event) => {
+                            const eventStart = new Date(event.eventStart);
+                            const eventEnd = new Date(event.eventEnd);
+                            const date = new Date(year, month, day);
                             return (
                               <button
                                 className='relative mb-1 w-full text-left'
                                 key={event.eventName}>
                                 <div
-                                  className={`overflow-hidden rounded px-2 py-0.5 ${eventColor(event.eventColor)}`}>
+                                  className={`min-h-8 rounded px-2 py-0.5 ${eventColor(event.eventColor)}`}>
                                   {/* Event name */}
-                                  <div className='truncate text-xs font-semibold'>
-                                    {event.eventName}
-                                  </div>
+                                  {(isSameDay(eventStart, date) ||
+                                    isSameDay(eventEnd, date)) && (
+                                    <div className='truncate text-xs font-semibold'>
+                                      {event.eventName}
+                                    </div>
+                                  )}
                                   {/* Event time */}
                                   <div className='hidden truncate text-xs uppercase sm:block'>
                                     {/* Start date */}
-                                    {event.eventStart && (
+                                    {isSameDay(eventStart, date) && (
                                       <span>
                                         {event.eventStart.toLocaleTimeString(
                                           [],
                                           {
-                                            hour12: true,
+                                            hour12: false,
                                             hour: 'numeric',
                                             minute: 'numeric',
                                           },
-                                        )}
+                                        )}{' '}
+                                        ~
                                       </span>
                                     )}
                                     {/* End date */}
-                                    {event.eventEnd && (
+                                    {isSameDay(eventEnd, date) && (
                                       <span>
-                                        -{' '}
-                                        <span>
-                                          {event.eventEnd.toLocaleTimeString(
-                                            [],
-                                            {
-                                              hour12: true,
-                                              hour: 'numeric',
-                                              minute: 'numeric',
-                                            },
-                                          )}
-                                        </span>
+                                        ~{' '}
+                                        {event.eventStart.toLocaleTimeString(
+                                          [],
+                                          {
+                                            hour12: false,
+                                            hour: 'numeric',
+                                            minute: 'numeric',
+                                          },
+                                        )}{' '}
                                       </span>
                                     )}
                                   </div>
