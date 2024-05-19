@@ -84,8 +84,7 @@ const RequirementPage = () => {
   // 요구사항 잠금 함수
   const handleRequirementLock = async () => {
     try {
-      const response = await lockRequirement(projectId, requirementId);
-      console.log('요구사항 잠금 성공 : ', response);
+      await lockRequirement(projectId, requirementId);
       setAlertModalProps({
         text: '요구사항 잠금 성공',
         buttonsType: 'autoclose',
@@ -184,13 +183,9 @@ const RequirementPage = () => {
     }
 
     try {
-      const response = await createRequirementDetail(
-        requirementId,
-        inputDetail,
-      );
+      await createRequirementDetail(requirementId, inputDetail);
       setInputDetail('');
       setDetailsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
-      console.log('요구사항 항목 추가 성공 : ', response);
     } catch (error) {
       console.log('요구사항 항목 추가 실패 : ', error);
     }
@@ -198,14 +193,13 @@ const RequirementPage = () => {
 
   const toggleDetailStatus = (detailId: number, status: string) => async () => {
     try {
-      const response = await updateRequirementDetailStatus(
+      await updateRequirementDetailStatus(
         requirementId,
         detailId,
         status === 'd' ? 'a' : 'd',
       );
       toggleDropdown(detailId); // 드롭다운 닫기
       setDetailsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
-      console.log('요구사항 항목 상태 변경 성공 : ', response);
     } catch (error) {
       console.log('요구사항 항목 상태 변경 실패 : ', error);
     }

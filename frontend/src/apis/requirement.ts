@@ -36,7 +36,6 @@ export const createThread = async (detailId: number) => {
   const { data } = await privateApi.post(
     `/requirements/details/${detailId}/threads`,
   );
-  console.log('스레드 생성 api : ', data);
   return data;
 };
 
@@ -49,7 +48,6 @@ export const createComment = async (
     `/requirements/details/threads/${threadId}/comments`,
     CommentData,
   );
-  console.log('댓글 작성 api : ', data);
   return data;
 };
 
@@ -58,7 +56,6 @@ export const lockThread = async (userThreadId: number) => {
   const { data } = await privateApi.put(
     `/requirements/details/threads/${userThreadId}/lock`,
   );
-  console.log('스레드 잠금 api : ', data);
   return data;
 };
 
@@ -71,7 +68,6 @@ export const createRequirementDetail = async (
     `/projects/reuqirements/${requirementId}`,
     { content },
   );
-  console.log('요구사항 디테일 추가 함수 api : ', data);
   return data;
 };
 
@@ -85,6 +81,5 @@ export const updateRequirementDetailStatus = async (
     `/projects/reuqirements/${requirementId}/details/${detailId}/status`,
     { command },
   );
-  console.log('요구사항 디테일 상태 변경 함수 api : ', data);
   return data;
 };
