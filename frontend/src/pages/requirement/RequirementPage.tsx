@@ -93,6 +93,7 @@ const RequirementPage = () => {
         onConfirm: undefined,
       });
       setIsAlertOpen(true);
+      setDetailsUpdated((prev) => !prev);
     } catch (error) {
       console.log('요구사항 잠금 실패 : ', error);
     }
