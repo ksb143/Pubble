@@ -382,10 +382,10 @@ public class RequirementService {
         return requirementSummaryDtos;
     }
 
-    public void addRequirementDetail(Integer requirementId, String content) {
+    public RequirementDetail addRequirementDetail(Integer requirementId, String content) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
-        detailRepository.save(RequirementDetail.builder()
+        return detailRepository.save(RequirementDetail.builder()
                 .content(content)
                 .status("u")
                 .requirement(requirement)
