@@ -18,7 +18,7 @@ interface MessageListProps {
   data: MessageInfo[];
 }
 
-const MessageList: React.FC<MessageListProps> = ({ data }) => {
+const MessageList = ({ data }: MessageListProps) => {
   const { isMessageChecked, setIsMessageChecked } = useNotificationStore();
   // 쪽지 읽었는지 여부 상태
   const [expandedMessageId, setExpandedMessageId] = useState<number | null>(

@@ -13,6 +13,8 @@ import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
 // 6. assets
 
+import Websocket from '@/pages/Websocket'; // 웹소켓 테스트 페이지
+
 function App() {
   const {
     setName, // 이름 세팅
@@ -59,6 +61,7 @@ function App() {
       <Routes>
         {/* 상단바 없는 페이지 */}
         <Route path='/' element={<User />} />
+        <Route path='/websocket' element={<Websocket />} />
 
         {/* 상단바 있는 페이지 */}
         <Route element={<Layout />}>

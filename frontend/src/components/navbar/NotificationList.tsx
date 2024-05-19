@@ -23,11 +23,11 @@ interface NotificationListProps {
   >;
 }
 
-const NotificationList: React.FC<NotificationListProps> = ({
+const NotificationList = ({
   data,
   closeMenu,
   setActiveMenu,
-}) => {
+}: NotificationListProps) => {
   const navigate = useNavigate();
   const { isNotificationChecked, setIsNotificationChecked } =
     useNotificationStore();
