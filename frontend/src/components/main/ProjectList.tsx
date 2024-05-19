@@ -13,8 +13,6 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 // 6. etc
@@ -183,22 +181,17 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
                   onClick={(event) => event.stopPropagation()}>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button>
+                      <button className='outline-none'>
                         <EllipsisVerticalIcon className='h-5 w-5 hover:cursor-pointer' />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className='w-fit'>
-                      <DropdownMenuLabel>상태 상세보기</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
                       <DropdownMenuCheckboxItem
                         className='px-3 hover:cursor-pointer'
                         onClick={(event) => {
                           showProjectStatus(event, project.projectId);
                         }}>
-                        상태 보기
-                      </DropdownMenuCheckboxItem>
-                      <DropdownMenuCheckboxItem className='px-3 hover:cursor-pointer'>
-                        수정 이력 보기
+                        프로젝트 진행 상태
                       </DropdownMenuCheckboxItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
