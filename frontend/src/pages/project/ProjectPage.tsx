@@ -12,8 +12,15 @@ const ProjectPage = () => {
     setPageType: state.setPageType,
   }));
   useEffect(() => {
-    setPageType('project');
-  }, []);
+    const { projectCode: currentCode } = usePageInfoStore.getState();
+    if (projectCode !== currentCode) {
+      setPageType('project', {
+        projectId: projectId,
+        projectCode: projectCode,
+        projectName: '' /* 현재 프로젝트 이름을 상태에 추가할 수 있음 */,
+      });
+    }
+  }, [projectCode, setPageType]);
   return (
     <>
       <RequirementList pId={projectId} pCode={projectCode} />
