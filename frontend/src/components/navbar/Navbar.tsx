@@ -23,6 +23,14 @@ import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
 
+interface RealTimeData {
+  operation: 'e' | 'm' | 'l';
+  employeeId: string;
+  userInfoDto?: Person;
+  locationName?: string;
+  locationUrl?: string;
+}
+
 const Navbar = () => {
   const navigate = useNavigate();
   const { name, profileColor } = useUserStore();
@@ -49,12 +57,53 @@ const Navbar = () => {
 
   useEffect(() => {
     const path = `/sub/project/${projectId}`;
-    subscribe(path, 'projectPresence');
+    const key = 'projectPresence';
+    subscribe(path, key, (message) => {
+      const data = JSON.parse(message.body);
+      console.log('Received message:', data);
+      handleRealTimeUpdate(data);
+    });
 
     return () => {
-      unsubscribe('projectPresence');
+      unsubscribe(key);
     };
   }, [projectId, subscribe, unsubscribe]);
+
+  // 실시간 업데이트 처리
+  const handleRealTimeUpdate = (data: RealTimeData) => {
+    console.log('Received update:', data);
+    switch (data.operation) {
+      case 'e': // Enter
+      case 'm': // Move
+        // 사용자 정보 업데이트
+        if (data.userInfoDto) {
+          updateProjectUser(data.employeeId, data.userInfoDto);
+        }
+        break;
+      case 'l': // Leave
+        // 사용자 정보 제거
+        removeProjectUser(data.employeeId);
+        break;
+      default:
+        console.log('Unknown operation', data.operation);
+    }
+  };
+
+  // 유저 정보 업데이트
+  const updateProjectUser = (employeeId: string, userInfo: Person) => {
+    setProjectUsers((currentUsers) =>
+      currentUsers.map((user) =>
+        user.employeeId === employeeId ? { ...user, ...userInfo } : user,
+      ),
+    );
+  };
+
+  // 유저 정보 삭제
+  const removeProjectUser = (employeeId: string) => {
+    setProjectUsers((currentUsers) =>
+      currentUsers.filter((user) => user.employeeId !== employeeId),
+    );
+  };
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -125,11 +174,11 @@ const Navbar = () => {
         <div className='flex items-center'>
           {/* 접속 여부 표시 */}
           {projectUsers.length > 0 && (
-            <div className='flex w-full items-center justify-center'>
+            <div className='mr-3 flex w-full items-center justify-center'>
               {projectUsers.map((user, index) => (
                 <div
                   key={user.employeeId}
-                  className={`relative z-${1000 - index} -ml-[30%] first-of-type:ml-0 ${userStatus[user.employeeId] === 'online' ? 'opacity-100' : ''}`}>
+                  className={`relative z-${1000 - index} -ml-2 shrink-0 first-of-type:ml-0 ${userStatus[user.employeeId] === 'online' ? 'opacity-100' : ''}`}>
                   <Profile
                     width='3rem'
                     height='3rem'

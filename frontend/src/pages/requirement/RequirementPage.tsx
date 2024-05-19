@@ -16,7 +16,7 @@ import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import useUserStore from '@/stores/userStore';
-import useStompStore from '@/stores/useStompStore';
+// import useStompStore from '@/stores/useStompStore';
 // 5. component
 import Thread from '@/components/requirement/Thread';
 import AlertModal from '@/components/layout/AlertModal';
@@ -71,15 +71,15 @@ const RequirementPage = () => {
   };
 
   // 웹소켓 관련 코드
-  const { subscribe, unsubscribe } = useStompStore();
-  useEffect(() => {
-    const path = `/sub/requirement/${requirementId}`;
-    subscribe(path, 'requirementPresence');
+  // const { subscribe, unsubscribe } = useStompStore();
+  // useEffect(() => {
+  //   const path = `/sub/requirement/${requirementId}`;
+  //   subscribe(path, 'requirementPresence');
 
-    return () => {
-      unsubscribe('requirementPresence');
-    };
-  }, [requirementId, subscribe, unsubscribe]);
+  //   return () => {
+  //     unsubscribe('requirementPresence');
+  //   };
+  // }, [requirementId, subscribe, unsubscribe]);
 
   // 요구사항 잠금 버튼 클릭 함수
   const handleLockButtonClick = () => {

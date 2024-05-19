@@ -30,7 +30,7 @@ const Profile = ({
   height,
   name,
   profileColor,
-  status,
+  status = 'online',
 }: ProfileProps) => {
   const textColor = getTextColor(profileColor); // 프로필 배경색에 따른 텍스트 색상 설정
   const backgroundStatus =

@@ -19,7 +19,6 @@ interface StompState {
   ) => void;
   unsubscribe: (key: string) => void;
   updateUserStatus: (userId: string, status: 'online' | 'offline') => void;
-  updateProjectStatus: (userId: string, status: 'online' | 'offline') => void;
 }
 
 export const useStompStore = create<StompState>((set, get) => ({
@@ -71,33 +70,21 @@ export const useStompStore = create<StompState>((set, get) => ({
 
   unsubscribe: (key) => {
     const { subscriptions } = get();
-    if (subscriptions[key]) {
-      subscriptions[key].unsubscribe();
-      set((state: StompState) => {
-        const newSubscriptions = { ...state.subscriptions };
-        delete newSubscriptions[key];
-        return { subscriptions: newSubscriptions };
-      });
-    }
+    subscriptions[key]?.unsubscribe();
+    set((state) => {
+      const newSubscriptions = { ...state.subscriptions };
+      delete newSubscriptions[key];
+      return { subscriptions: newSubscriptions };
+    });
   },
 
-  updateUserStatus: (userId, status) => {
-    set((state: StompState) => ({
-      userStatus: {
-        ...state.userStatus,
-        [userId]: status,
-      },
-    }));
-  },
-
-  updateProjectStatus: (userId, status) => {
+  updateUserStatus: (userId, status) =>
     set((state) => ({
       userStatus: {
         ...state.userStatus,
         [userId]: status,
       },
-    }));
-  },
+    })),
 }));
 
 export default useStompStore;
