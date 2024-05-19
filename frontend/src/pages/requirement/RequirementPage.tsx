@@ -8,6 +8,8 @@ import {
   lockRequirement,
   getThread,
   createThread,
+  createRequirementDetail,
+  updateRequirementDetailStatus,
 } from '@/apis/requirement';
 import { RequirementInfo, ThreadListInfo } from '@/types/requirementTypes';
 import { extractDate, extractTime } from '@/utils/datetime';
@@ -25,6 +27,7 @@ import ChatBubble from '@/assets/icons/chat-bubble-left-right.svg?react';
 import PanelOpen from '@/assets/icons/panel-left-open.svg?react';
 import Ellipsis from '@/assets/icons/ellipsis-vertical.svg?react';
 import Pencil from '@/assets/icons/pencil.svg?react';
+import Plus from '@/assets/icons/plus.svg?react';
 
 const RequirementPage = () => {
   const navigate = useNavigate();
@@ -57,6 +60,14 @@ const RequirementPage = () => {
   const hasThreads = threadList.some(
     (thread) => thread.userThreadDtos.length > 0,
   );
+  const [activeThreadId, setActiveThreadId] = useState<number | null>(null);
+  const [inputDetail, setInputDetail] = useState<string>('');
+  const [detailsUpdated, setDetailsUpdated] = useState(false);
+  const [threadsUpdated, setThreadsUpdated] = useState(false);
+
+  const updateCommentList = () => {
+    setThreadsUpdated((prev) => !prev); // useEffect 트리거를 위한 상태 업데이트
+  };
 
   // 요구사항 잠금 버튼 클릭 함수
   const handleLockButtonClick = () => {
@@ -135,7 +146,7 @@ const RequirementPage = () => {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
     })();
-  }, [projectId, requirementId, setPageType]);
+  }, [projectId, requirementId, setPageType, detailsUpdated, threadsUpdated]);
 
   // mapping된 스레드가 있는지 확인하는 함수
   const checkThreadExist = (detailId: number) => {
@@ -147,9 +158,15 @@ const RequirementPage = () => {
   };
 
   // 스레드 생성 함수
-  const handleChatClick = (detailId: number) => {
-    createThread(detailId);
-    console.log('채팅 버튼 클릭');
+  const handleChatClick = async (detailId: number) => {
+    try {
+      await createThread(detailId);
+      toggleDropdown(detailId); // 스레드 생성 버튼 클릭 시 드롭다운 닫기
+      setThreadsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
+      setIsThreadsOpen(true); // 스레드 열기
+    } catch (error) {
+      console.log('스레드 생성 실패 : ', error);
+    }
   };
 
   // 드롭다운 토글 함수
@@ -161,7 +178,38 @@ const RequirementPage = () => {
     }
   };
 
-  const [activeThreadId, setActiveThreadId] = useState<number | null>(null);
+  const handlePlusClick = async () => {
+    if (inputDetail.trim() === '') {
+      return;
+    }
+
+    try {
+      const response = await createRequirementDetail(
+        requirementId,
+        inputDetail,
+      );
+      setInputDetail('');
+      setDetailsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
+      console.log('요구사항 항목 추가 성공 : ', response);
+    } catch (error) {
+      console.log('요구사항 항목 추가 실패 : ', error);
+    }
+  };
+
+  const toggleDetailStatus = (detailId: number, status: string) => async () => {
+    try {
+      const response = await updateRequirementDetailStatus(
+        requirementId,
+        detailId,
+        status === 'd' ? 'a' : 'd',
+      );
+      toggleDropdown(detailId); // 드롭다운 닫기
+      setDetailsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
+      console.log('요구사항 항목 상태 변경 성공 : ', response);
+    } catch (error) {
+      console.log('요구사항 항목 상태 변경 실패 : ', error);
+    }
+  };
 
   return (
     <>
@@ -175,10 +223,10 @@ const RequirementPage = () => {
           onConfirm={alertModalProps.onConfirm}
         />
       )}
-      <div className='flex h-full w-full items-center justify-center py-3 transition duration-500'>
-        <div className='flex h-full min-w-[40vw] max-w-[90vw] rounded bg-white shadow'>
+      <div className='flex h-full w-full items-center justify-center py-3 transition-all duration-500'>
+        <div className='flex h-full min-w-[40vw] max-w-[90vw] justify-center rounded bg-white shadow'>
           {/* 요구사항 컨테이너 */}
-          <div className='flex h-full w-full min-w-[40vw] max-w-[50vw] flex-col items-center px-6 py-4'>
+          <div className='flex h-full w-full min-w-[40vw] max-w-[50vw] flex-col items-center overflow-y-auto px-6 py-4'>
             {!requirementInfo && (
               <p className='translate-y-10 text-2xl font-normal'>
                 요구사항 정보를 불러오지 못했습니다.
@@ -283,59 +331,84 @@ const RequirementPage = () => {
                           </p>
                         </li>
                         {/* 드롭다운 - 스레드생성, 요구사항 항목 수정 */}
-                        <div className='relative p-2'>
-                          <div
-                            className='flex items-center justify-center opacity-0 group-hover:opacity-100'
-                            onClick={() => {
-                              toggleDropdown(detail.requirementDetailId);
-                            }}>
-                            <Ellipsis
-                              className={`h-6 w-6  ${openDropdownId === detail.requirementDetailId ? 'stroke-gray-700' : ' stroke-gray-400 hover:stroke-gray-700'}`}
-                            />
-                          </div>
-                          {/* 드롭다운 컨테이너 */}
-                          {openDropdownId === detail.requirementDetailId && (
-                            <div className='fixed m-2 bg-white p-2 shadow '>
-                              {/* 스레드 생성 */}
-                              {!checkThreadExist(
-                                detail.requirementDetailId,
-                              ) && (
-                                <div className='flex items-center'>
-                                  <div className='flex h-8 w-8 items-center justify-center'>
-                                    <ChatBubble
-                                      className='h-5 w-5 cursor-pointer stroke-gray-400 stroke-1 group-hover:stroke-gray-600'
-                                      onClick={() => {
-                                        handleChatClick(
-                                          detail.requirementDetailId,
-                                        );
-                                      }}
-                                    />
+                        {requirementInfo.isLock === 'u' && (
+                          <div className='relative p-2'>
+                            <div
+                              className='flex items-center justify-center opacity-0 group-hover:opacity-100'
+                              onClick={() => {
+                                toggleDropdown(detail.requirementDetailId);
+                              }}>
+                              <Ellipsis
+                                className={`h-6 w-6  ${openDropdownId === detail.requirementDetailId ? 'stroke-gray-700' : ' stroke-gray-400 hover:stroke-gray-700'}`}
+                              />
+                            </div>
+                            {/* 드롭다운 컨테이너 */}
+                            {openDropdownId === detail.requirementDetailId && (
+                              <div className='fixed z-30 m-2 bg-white p-2 shadow'>
+                                {/* 스레드 생성 */}
+                                {!checkThreadExist(
+                                  detail.requirementDetailId,
+                                ) && (
+                                  <div
+                                    className='flex items-center hover:bg-gray-50'
+                                    onClick={() => {
+                                      handleChatClick(
+                                        detail.requirementDetailId,
+                                      );
+                                    }}>
+                                    <div className='flex h-8 w-8 items-center justify-center'>
+                                      <ChatBubble className='h-5 w-5 cursor-pointer stroke-gray-400 stroke-1 group-hover:stroke-gray-600' />
+                                    </div>
+                                    <p className='mr-2 cursor-pointer group-hover:font-normal'>
+                                      스레드 생성
+                                    </p>
                                   </div>
-                                  <p className='mr-2 group-hover:font-normal'>
-                                    스레드 생성
+                                )}
+                                <div
+                                  className='flex items-center hover:bg-gray-50'
+                                  onClick={toggleDetailStatus(
+                                    detail.requirementDetailId,
+                                    detail.status,
+                                  )}>
+                                  <div className='flex h-8 w-8 items-center justify-center'>
+                                    <Pencil className='h-5 w-5 cursor-pointer stroke-gray-400 stroke-1 group-hover:stroke-gray-600' />
+                                  </div>
+                                  <p className='mr-2 cursor-pointer group-hover:font-normal'>
+                                    {detail.status === 'd'
+                                      ? '활성화'
+                                      : '비활성화'}
                                   </p>
                                 </div>
-                              )}
-                              <div className='flex items-center'>
-                                <div className='flex h-8 w-8 items-center justify-center'>
-                                  <Pencil className='h-5 w-5 cursor-pointer stroke-gray-400 stroke-1 group-hover:stroke-gray-600' />
-                                </div>
-                                <p>요구사항 수정</p>
                               </div>
-                            </div>
-                          )}
-                        </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </ul>
-                  {/* <div className='text-red-500'>요구사항 추가하기</div> */}
+                  {requirementInfo.isLock === 'u' && (
+                    <div className='flex w-full items-center justify-between'>
+                      <input
+                        type='text'
+                        placeholder='요구사항 항목 추가하기'
+                        className='h-14 w-full rounded border px-4 py-3 hover:border-gray-500'
+                        value={inputDetail}
+                        onChange={(e) => setInputDetail(e.target.value)}
+                      />
+                      <button
+                        className='ml-2 flex h-8 w-8 items-center justify-center text-nowrap rounded bg-pubble p-1 text-white hover:bg-dpubble hover:outline-double hover:outline-4 hover:outline-gray-200'
+                        onClick={handlePlusClick}>
+                        <Plus />
+                      </button>
+                    </div>
+                  )}
                 </div>
               </>
             )}
           </div>
           {/* 스레드 */}
           <div
-            className={`flex flex-col overflow-y-auto ${hasThreads ? 'w-full min-w-[20vw] max-w-[30vw] px-10 py-6 ' : 'w-0'}`}>
+            className={`flex flex-col overflow-y-auto transition duration-500 ${hasThreads && isThreadsOpen ? 'min-w-[30vw] max-w-[40vw] px-10 py-6 opacity-100' : 'max-w-0 overflow-hidden opacity-0'}`}>
             {threadList.map((threadInfo) => (
               <Thread
                 key={threadInfo.detailId}
@@ -343,6 +416,8 @@ const RequirementPage = () => {
                 selected={selectedDetailId === threadInfo.detailId}
                 isActive={activeThreadId === threadInfo.detailId}
                 setActiveThreadId={setActiveThreadId}
+                updateCommentList={updateCommentList}
+                isRequirementLocked={requirementInfo?.isLock === 'l'}
               />
             ))}
           </div>
