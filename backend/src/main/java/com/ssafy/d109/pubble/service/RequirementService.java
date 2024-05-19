@@ -382,14 +382,20 @@ public class RequirementService {
         return requirementSummaryDtos;
     }
 
-    public void addRequirementDetail(Integer requirementId, AddRequirementDetailDto dto) {
+    public RequirementDetailDto addRequirementDetail(Integer requirementId, AddRequirementDetailDto dto) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
-        detailRepository.save(RequirementDetail.builder()
+        RequirementDetail detail = detailRepository.save(RequirementDetail.builder()
                 .content(dto.getContent())
                 .status("u")
                 .requirement(requirement)
                 .build());
+
+        return RequirementDetailDto.builder()
+                .requirementDetailId(detail.getRequirementDetailId())
+                .content(detail.getContent())
+                .status(detail.getStatus())
+                .build();
     }
 
     @Transactional

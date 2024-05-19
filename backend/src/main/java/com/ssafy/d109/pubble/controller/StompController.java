@@ -1,10 +1,12 @@
 package com.ssafy.d109.pubble.controller;
 
+import com.ssafy.d109.pubble.dto.realtimeRequirementDto.StompDto;
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.AllUserLocationResponseDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationRequestDto;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.service.RealTimeRequirementService;
 import com.ssafy.d109.pubble.service.UserLocationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 public class StompController {
@@ -27,6 +27,7 @@ public class StompController {
     private final CommonUtil commonUtil;
     private final UserLocationService userLocationService;
     private final SimpMessageSendingOperations sendingOperations;
+    private final RealTimeRequirementService requirementService;
 
     @MessageMapping("/project/{projectId}")
     public void enter(@DestinationVariable Integer projectId, UserLocationRequestDto requestDto) {
@@ -46,6 +47,12 @@ public class StompController {
                 sendingOperations.convertAndSend("/sub/project/" + projectId, leaveUserDto);
             }
         }
+    }
+
+    @MessageMapping("/requirement/{requirementId}")
+    public void requirement(@DestinationVariable Integer requirementId, StompDto<?> dto) {
+        StompDto<?> responseDto = requirementService.realtimeRequirementService(dto);
+        sendingOperations.convertAndSend("/sub/requirement/" + requirementId, responseDto);
     }
 
     @GetMapping("/project/{projectId}/current-user")
