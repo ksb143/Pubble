@@ -1,2 +1,0 @@
-nginx 로 cicd 하기
-INF/NGINX 브랜치
