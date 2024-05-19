@@ -7,7 +7,7 @@ import {
   getRequirement,
   lockRequirement,
   getThread,
-  createThread,
+  // createThread,
 } from '@/apis/requirement';
 import { RequirementInfo, ThreadListInfo } from '@/types/requirementTypes';
 import { extractDate, extractTime } from '@/utils/datetime';
@@ -125,6 +125,7 @@ const RequirementPage = () => {
         // 스레드 정보 조회
         const threadRes = await getThread(reqRes.data.requirementId);
         setThreadList(threadRes.data);
+        console.log(threadList);
       } catch (error) {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
