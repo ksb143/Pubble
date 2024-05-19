@@ -165,7 +165,6 @@ export const columns: ColumnDef<Summary>[] = [
   {
     id: 'history',
     cell: ({ row }) => {
-      console.log(row);
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -179,7 +178,10 @@ export const columns: ColumnDef<Summary>[] = [
             <DropdownMenuItem
               onClick={
                 () =>
-                  console.log(`이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
+                  console.log(
+                    `이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`,
+                    row,
+                  ) // 함수 추가 후 콘솔 로그 삭제예정
               }>
               버전 히스토리
             </DropdownMenuItem>
@@ -312,22 +314,21 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
   }, [pId, pCode]);
 
   // const handleLock = (summary: Summary) => {
-  //   const reqId = summary.requirementId; // 선택된 row의 requirementId
-  //   const reqCode = summary.code; // 선택된 row의 requirementCode
-  //   const reqName = summary.requirementName; // 선택된 row의 requirementName
+  //   // const reqId = summary.requirementId; // 선택된 row의 requirementId
+  //   // const reqCode = summary.code; // 선택된 row의 requirementCode
+  //   // const reqName = summary.requirementName; // 선택된 row의 requirementName
   // };
 
   // const handleConfirm = (summary: Summary) => {
-  //   const reqId = summary.requirementId; // 선택된 row의 requirementId
-  //   const reqbody = {
-  //     projectId: requirements[0].projectId,
-  //     isLock: summary.isLock,
-  //     approval: summary.approval,
-  //     requirementName: summary.requirementName,
-  //     approvalComment: summary.approvalComment || '',
-  //   };
-
-  //   requestConfirm(reqId, reqbody);
+  //   // const reqId = summary.requirementId; // 선택된 row의 requirementId
+  //   // const reqbody = {
+  //   //   projectId: requirements[0].projectId,
+  //   //   isLock: summary.isLock,
+  //   //   approval: summary.approval,
+  //   //   requirementName: summary.requirementName,
+  //   //   approvalComment: summary.approvalComment || '',
+  //   // };
+  //   // requestConfirm(reqId, reqbody);
   // };
 
   // 사용자의 요구사항 추가 모달 열기
@@ -372,7 +373,7 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
             <Button
               className='ml-3 mt-3 bg-blue-500 text-base text-white'
               onClick={handleTestModal}>
-              테스트 버튼
+              요구사항 생성 테스트
             </Button>
             {/* 테스트 모달 */}
             {/* <TestModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
