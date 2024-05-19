@@ -8,14 +8,13 @@ import com.ssafy.d109.pubble.dto.response.CommentResponseData;
 import com.ssafy.d109.pubble.dto.response.UserThreadDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.RequirementThreadsDto;
 import com.ssafy.d109.pubble.entity.*;
+import com.ssafy.d109.pubble.exception.Project.ProjectNotFoundException;
+import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadAlreadyLockedException;
 import com.ssafy.d109.pubble.exception.UserThread.UserThreadNotFoundException;
-import com.ssafy.d109.pubble.repository.CommentRepository;
-import com.ssafy.d109.pubble.repository.RequirementDetailRepository;
-import com.ssafy.d109.pubble.repository.UserRepository;
-import com.ssafy.d109.pubble.repository.UserThreadRepository;
+import com.ssafy.d109.pubble.repository.*;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
@@ -37,15 +36,19 @@ public class UserThreadService {
 
     private final RequirementDetailRepository detailRepository;
     private final UserRepository userRepository;
+    private final ProjectRepository projectRepository;
+    private final RequirementRepository requirementRepository;
 
 
-    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil, RequirementDetailRepository detailRepository, NotificationService notificationService, UserRepository userRepository) {
+    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil, RequirementDetailRepository detailRepository, NotificationService notificationService, UserRepository userRepository, ProjectRepository projectRepository, RequirementRepository requirementRepository) {
         this.userThreadRepository = userThreadRepository;
         this.commentRepository = commentRepository;
         this.commonUtil = commonUtil;
         this.detailRepository = detailRepository;
         this.notificationService = notificationService;
         this.userRepository = userRepository;
+        this.projectRepository = projectRepository;
+        this.requirementRepository = requirementRepository;
     }
 
     public List<RequirementThreadsDto> getRequirementsThreads(Integer requirementId) {
@@ -148,12 +151,15 @@ public class UserThreadService {
 
         commentRepository.save(comment);
 
-        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getReceiverInfo(), user, comment);
+        Project project = projectRepository.findByProjectId(commentCreateDto.getProjectId()).orElseThrow(ProjectNotFoundException::new);
+        Requirement requirement = requirementRepository.findByRequirementId(commentCreateDto.getRequirementId()).orElseThrow(RequirementNotFoundException::new);
+
+        sendNotificationForMention(commentCreateDto.getContent(), commentCreateDto.getReceiverInfo(), user, comment, project, requirement);
         return convertCommentToDto(comment);
     }
 
 
-    private void sendNotificationForMention(String content, NotificationReceiverRequestDto receiverInfo, User sender, Comment comment) {
+    private void sendNotificationForMention(String content, NotificationReceiverRequestDto receiverInfo, User sender, Comment comment, Project project, Requirement requirement) {
 
         if (!receiverInfo.getIsMentioned()) {
             return;
@@ -174,8 +180,8 @@ public class UserThreadService {
                     NotificationType.MENTION,
                     receiver.getUserId(),
                     sender.getUserId(),
-                    null,
-                    null,
+                    project,
+                    requirement,
                     comment.getUserThread()
             );
         } catch(Exception e) {
