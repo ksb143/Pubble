@@ -1,4 +1,5 @@
 import { privateApi } from '@/utils/http-commons.ts';
+import { CommentData } from '@/types/requirementTypes.ts';
 
 // 요구사항 조회 함수
 export const getRequirement = async (
@@ -29,9 +30,13 @@ export const createThread = async (detailId: number) => {
 };
 
 // 댓글 작성 함수
-export const createComment = async (threadId: number) => {
+export const createComment = async (
+  threadId: number,
+  CommentData: CommentData,
+) => {
   const { data } = await privateApi.post(
     `/requirements/details/threads/${threadId}/comments`,
+    CommentData,
   );
   console.log('댓글 작성 api : ', data);
   return data;

@@ -31,6 +31,11 @@ const RequirementPage = () => {
   const [threadList, setThreadList] = useState<ThreadListInfo[]>([]); // api로 받은 스레드 리스트
   const [selectedDetailId, setSelectedDetailId] = useState<number | null>(null); // 클릭한 디테일 항목 id
 
+  // 스레드 데이터가 있는지 확인하는 변수
+  const hasThreads = threadList.some(
+    (thread) => thread.userThreadDtos.length > 0,
+  );
+
   // 리치 에디터로 이동
   const goRich = () => {
     navigate(`/project/${projectCode}/requirement/${requirementCode}/detail`);
@@ -55,6 +60,7 @@ const RequirementPage = () => {
         // 스레드 정보 조회
         const threadRes = await getThread(reqRes.data.requirementId);
         setThreadList(threadRes.data);
+        console.log('스레드 정보 조회 : ', threadRes.data);
       } catch (error) {
         console.log('요구사항 정보 조회 실패 : ', error);
       }
@@ -73,18 +79,15 @@ const RequirementPage = () => {
 
   // 디테일 항목 클릭 함수
   const handleDetailClick = (detailId: number) => {
-    if (selectedDetailId === detailId) {
-      setSelectedDetailId(null); // 이미 선택된 항목 클릭 시 선택 해제
-    } else {
-      setSelectedDetailId(detailId);
-    }
+    setSelectedDetailId(detailId === selectedDetailId ? null : detailId);
   };
 
   return (
     <>
       <div className='flex h-full w-full justify-center py-3'>
         {/* 요구사항 */}
-        <div className='mr-4 flex h-full w-1/2 flex-col rounded bg-white p-10 shadow'>
+        <div
+          className={`flex h-full w-1/2 flex-col rounded bg-white p-10 shadow transition-transform duration-700 ${hasThreads ? 'translate-x-0' : 'translate-x-1/3'}`}>
           {!requirementInfo && (
             <p className='flex justify-center'>요구사항 정보가 없습니다.</p>
           )}
@@ -187,16 +190,15 @@ const RequirementPage = () => {
         </div>
 
         {/* 스레드 */}
-        {/* overscroll-y-auto ? */}
-        <div className='flex w-1/3 flex-col overscroll-y-auto pr-4'>
-          {threadList.length > 0 &&
-            threadList.map((threadInfo) => (
-              <Thread
-                key={threadInfo.detailId}
-                data={threadInfo.userThreadDtos}
-                selected={selectedDetailId === threadInfo.detailId}
-              />
-            ))}
+        <div
+          className={`flex h-[90vh] w-1/3 flex-col overflow-auto pl-8 pr-4 transition duration-700 ease-in ${threadList.length > 0 && hasThreads ? 'translate-x-0 opacity-100' : '-translate-x-1/2 opacity-0'}`}>
+          {threadList.map((threadInfo) => (
+            <Thread
+              key={threadInfo.detailId}
+              data={threadInfo.userThreadDtos}
+              selected={selectedDetailId === threadInfo.detailId}
+            />
+          ))}
         </div>
       </div>
     </>
