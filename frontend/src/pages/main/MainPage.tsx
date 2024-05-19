@@ -7,7 +7,7 @@ import { getProjectStatus } from '@/apis/project.ts';
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. components
 import ProjectList from '@/components/main/ProjectList';
-import Calendar from '@/components/main/Calendar';
+import Calendar from '@/components/main/Calendar.tsx';
 import ProjectStatusSheet from '@/components/main/ProjectStatusSheet';
 // 6. image 등 assets
 
@@ -33,10 +33,9 @@ const MainDashboardPage = () => {
     setPageType('init');
   }, []);
 
+  // 프로젝트 상태 시트 열기
   const showProjectStatus = async (prjectId: number) => {
     const projectData = await getProjectStatus(prjectId);
-    console.log(projectData.data.approveRatio);
-    console.log(projectData.data.changedRatio);
     setProjectStatus({
       lockRatio: Math.round(projectData.data.lockRatio * 100),
       approveRatio: Math.round(projectData.data.approveRatio * 100),
@@ -62,12 +61,12 @@ const MainDashboardPage = () => {
         closeSheet={() => setIsProjectStatusSheet(false)}
         projectStatus={projectStatus}
       />
-      <div className='p-4'>
+      <div className='mx-4 mt-4 flex'>
         <div className='flex items-center justify-center'>
-          <div className='h-full w-1/3 items-center text-black'>
+          <div className='h-full w-2/5 items-center py-4 pr-3 text-black'>
             <Calendar />
           </div>
-          <div className='flex h-full w-2/3 items-center justify-center overflow-auto text-black'>
+          <div className='flex h-full w-3/5 items-center justify-center overflow-auto text-black'>
             <ProjectList openProjectStatus={showProjectStatus} />
           </div>
         </div>
