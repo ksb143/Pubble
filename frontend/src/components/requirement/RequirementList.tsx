@@ -54,6 +54,8 @@ interface RequirementListProps {
 }
 
 const RequirementList = ({ requirements }: RequirementListProps) => {
+  const { setPageType } = usePageInfoStore();
+
   const navigate = useNavigate();
   const { projectCode, projectId } = usePageInfoStore();
   const [currentPage, setCurrentPage] = useState(1);
@@ -119,11 +121,21 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
     }
   };
 
-  const handleRequirementClick = (requirementCode: string) => {
-    if (!requirementCode || !projectCode) {
+  const handleRequirementClick = (
+    requirementId: number,
+    requirementCode: string,
+    requirementName: string,
+  ) => {
+    if (!requirementId || !projectCode) {
       console.error('Invalid project data');
       return;
     }
+    setPageType('requirement', {
+      requirementId,
+      requirementCode,
+      requirementName,
+    });
+
     navigate(`/project/${projectCode}/requirement/${requirementCode}`);
   };
 
@@ -160,8 +172,14 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
           <tbody>
             {currentItems.map((requirement: Requirement) => (
               <tr
-                className='break h-16 cursor-pointer whitespace-normal break-keep border-t border-gray-200 hover:bg-gray-100'
-                onClick={() => handleRequirementClick(requirement.code)}
+                className='break border-gray-2000 h-16 cursor-pointer whitespace-normal break-keep border-t hover:bg-gray-100'
+                onClick={() =>
+                  handleRequirementClick(
+                    requirement.requirementId,
+                    requirement.code,
+                    requirement.requirementName,
+                  )
+                }
                 key={requirement.requirementId}>
                 <td className='px-4 py-2'>
                   {requirement.approval === 'a' ? (
