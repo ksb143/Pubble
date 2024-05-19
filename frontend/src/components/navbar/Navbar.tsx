@@ -4,9 +4,13 @@ import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
 import { getFCMToken, setupFCMListener } from '@/apis/notification';
+import { getUserByProject } from '@/apis/user';
+import { Person } from '@/types/requirementTypes';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
+import useStompStore from '@/stores/useStompStore';
+import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Message from '@/components/navbar/Message';
 import Notification from '@/components/navbar/Notification';
@@ -28,6 +32,29 @@ const Navbar = () => {
     setHasNewMessage,
     setHasNewNotification,
   } = useNotificationStore();
+
+  // 웹소켓 관련 코드
+  const { projectId, requirementId, isRichPage } = usePageInfoStore();
+  const { subscribe, unsubscribe, userStatus } = useStompStore();
+  const [projectUsers, setProjectUsers] = useState<Person[]>([]);
+
+  useEffect(() => {
+    const fetchProjectUsers = async () => {
+      const response = await getUserByProject(projectId);
+      setProjectUsers(response.data);
+      // console.log(response.data);
+    };
+    fetchProjectUsers();
+  }, [projectId, requirementId, isRichPage]);
+
+  useEffect(() => {
+    const path = `/sub/project/${projectId}`;
+    subscribe(path, 'projectPresence');
+
+    return () => {
+      unsubscribe('projectPresence');
+    };
+  }, [projectId, subscribe, unsubscribe]);
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -96,7 +123,24 @@ const Navbar = () => {
         </div>
 
         <div className='flex items-center'>
-          <div className='mr-8'>현재 접속자 표시</div>
+          {/* 접속 여부 표시 */}
+          {projectUsers.length > 0 && (
+            <div className='flex w-full items-center justify-center'>
+              {projectUsers.map((user, index) => (
+                <div
+                  key={user.employeeId}
+                  className={`relative z-${1000 - index} -ml-[30%] first-of-type:ml-0 ${userStatus[user.employeeId] === 'online' ? 'opacity-100' : ''}`}>
+                  <Profile
+                    width='3rem'
+                    height='3rem'
+                    name={user.name}
+                    profileColor={user.profileColor}
+                    status={userStatus[user.employeeId]}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* 쪽지 아이콘 */}
           <div

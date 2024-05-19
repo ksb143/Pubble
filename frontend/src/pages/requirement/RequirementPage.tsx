@@ -16,6 +16,7 @@ import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import useUserStore from '@/stores/userStore';
+import useStompStore from '@/stores/useStompStore';
 // 5. component
 import Thread from '@/components/requirement/Thread';
 import AlertModal from '@/components/layout/AlertModal';
@@ -69,6 +70,17 @@ const RequirementPage = () => {
     setThreadsUpdated((prev) => !prev); // useEffect 트리거를 위한 상태 업데이트
   };
 
+  // 웹소켓 관련 코드
+  const { subscribe, unsubscribe } = useStompStore();
+  useEffect(() => {
+    const path = `/sub/requirement/${requirementId}`;
+    subscribe(path, 'requirementPresence');
+
+    return () => {
+      unsubscribe('requirementPresence');
+    };
+  }, [requirementId, subscribe, unsubscribe]);
+
   // 요구사항 잠금 버튼 클릭 함수
   const handleLockButtonClick = () => {
     setAlertModalProps({
@@ -84,8 +96,7 @@ const RequirementPage = () => {
   // 요구사항 잠금 함수
   const handleRequirementLock = async () => {
     try {
-      const response = await lockRequirement(projectId, requirementId);
-      console.log('요구사항 잠금 성공 : ', response);
+      await lockRequirement(projectId, requirementId);
       setAlertModalProps({
         text: '요구사항 잠금 성공',
         buttonsType: 'autoclose',
@@ -184,13 +195,9 @@ const RequirementPage = () => {
     }
 
     try {
-      const response = await createRequirementDetail(
-        requirementId,
-        inputDetail,
-      );
+      await createRequirementDetail(requirementId, inputDetail);
       setInputDetail('');
       setDetailsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
-      console.log('요구사항 항목 추가 성공 : ', response);
     } catch (error) {
       console.log('요구사항 항목 추가 실패 : ', error);
     }
@@ -198,14 +205,13 @@ const RequirementPage = () => {
 
   const toggleDetailStatus = (detailId: number, status: string) => async () => {
     try {
-      const response = await updateRequirementDetailStatus(
+      await updateRequirementDetailStatus(
         requirementId,
         detailId,
         status === 'd' ? 'a' : 'd',
       );
       toggleDropdown(detailId); // 드롭다운 닫기
       setDetailsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
-      console.log('요구사항 항목 상태 변경 성공 : ', response);
     } catch (error) {
       console.log('요구사항 항목 상태 변경 실패 : ', error);
     }
