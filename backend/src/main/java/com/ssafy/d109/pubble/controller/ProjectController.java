@@ -147,9 +147,9 @@ public class ProjectController {
     // 세부사항 항목 추가
     @Operation(summary = "세부사항 항목 추가")
     @PostMapping("/reuqirements/{requirement-id}")
-    public ResponseEntity<ResponseDto> addRequirementDetail(@PathVariable("requirement-id") Integer requirementId, @RequestBody String content) {
+    public ResponseEntity<ResponseDto> addRequirementDetail(@PathVariable("requirement-id") Integer requirementId, @RequestBody AddRequirementDetailDto dto) {
         try {
-            requirementService.addRequirementDetail(requirementId, content);
+            requirementService.addRequirementDetail(requirementId, dto);
 
             response = new ResponseDto(true, "세부사항 항목 추가", null);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -162,10 +162,10 @@ public class ProjectController {
     // 세부사항 상태 변경
     @Operation(summary = "세부사항 상태 변경")
     @PutMapping("/reuqirements/{requirementId}/details/{detailId}/status")
-    public ResponseEntity<ResponseDto> updateDetailStatus(@PathVariable Integer requirementId, @PathVariable Integer detailId, @RequestBody String command) {
+    public ResponseEntity<ResponseDto> updateDetailStatus(@PathVariable Integer requirementId, @PathVariable Integer detailId, @RequestBody UpdateDetailStatusDto dto) {
         Integer userId = commonUtil.getUser().getUserId();
         try {
-            requirementService.updateDetailStatus(userId, requirementId, detailId, command);
+            requirementService.updateDetailStatus(userId, requirementId, detailId, dto);
 
             response = new ResponseDto(true, "세부사항 상태 변경 완료", null);
             return ResponseEntity.status(HttpStatus.OK).body(response);

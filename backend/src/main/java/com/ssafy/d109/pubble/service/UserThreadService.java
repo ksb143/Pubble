@@ -141,7 +141,6 @@ public class UserThreadService {
 
     public CommentResponseData createComment(User user, Integer userThreadId, CommentCreateDto commentCreateDto) {
         UserThread userThread = userThreadRepository.findUserThreadByUserThreadId(userThreadId).orElseThrow();
-        System.out.println("commentCreateDto = " + commentCreateDto.getContent());
 
         Comment comment = Comment.builder()
                 .content(commentCreateDto.getContent())
