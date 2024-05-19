@@ -167,15 +167,21 @@ public class UserThreadService {
                 .message(content)
                 .type("MENTION")
                 .build();
-        notificationService.sendNotification(notificationDto, receiverInfo.getReceiverId());
-        notificationService.saveNotificationMessage("MENTION", content,
-                NotificationType.MENTION,
-                receiver.getUserId(),
-                sender.getUserId(),
-                null,
-                null,
-                comment.getUserThread()
-                );
+
+        try{
+            notificationService.sendNotification(notificationDto, receiverInfo.getReceiverId());
+            notificationService.saveNotificationMessage("MENTION", content,
+                    NotificationType.MENTION,
+                    receiver.getUserId(),
+                    sender.getUserId(),
+                    null,
+                    null,
+                    comment.getUserThread()
+            );
+        } catch(Exception e) {
+            log.info("Error sending notification", e);
+        }
+
 
     }
 }
