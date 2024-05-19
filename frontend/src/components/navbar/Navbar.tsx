@@ -96,7 +96,7 @@ const Navbar = () => {
         </div>
 
         <div className='flex items-center'>
-          <div className='mr-8'>프로젝트 참여 인원 및 현재 접속자 표시</div>
+          <div className='mr-8'>현재 접속자 표시</div>
 
           {/* 쪽지 아이콘 */}
           <div

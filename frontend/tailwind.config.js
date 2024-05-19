@@ -32,6 +32,7 @@ const oldConfig = {
         },
       },
       animation: {
+        // 알림 배지 1초동안 퍼지고, 2초동안 대기, 무한반복
         'badge-ping': 'badge-ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
     },
