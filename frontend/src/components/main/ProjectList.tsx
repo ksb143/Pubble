@@ -140,66 +140,82 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
           />
           <Button onClick={() => setIsModalOpen(true)}>프로젝트 추가</Button>
         </div>
-        <table className='mt-4 w-full text-center'>
-          <thead className='whitespace-nowrap text-lg'>
-            <tr>
-              <th className='px-4 py-2'>프로젝트 코드</th>
-              <th className='px-4 py-2'>프로젝트 이름</th>
-              <th className='p-2'>구성원</th>
-              <th className='p-2'>진행률</th>
-              <th className='px-4 py-2'>상태</th>
-              <th className='px-4 py-2'>시작일</th>
-              <th className='px-4 py-2'>종료일</th>
-              <th className='px-4 py-2'></th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((project) => (
-              <tr
-                className='break h-16 cursor-pointer whitespace-normal break-keep border-t border-gray-200 hover:bg-gray-100'
-                onClick={() =>
-                  handleProjectClick(
-                    project.projectId,
-                    project.prdId,
-                    project.projectTitle,
-                  )
-                }
-                key={project.projectId}>
-                <td className='px-4 py-2'># {project.prdId}</td>
-                <td className='px-4 py-2 text-start'>{project.projectTitle}</td>
-                <td className='p-2'>{Object.keys(project.people).length}</td>
-                <td className='p-2'>
-                  {Math.round(project.progressRatio * 100)}%
-                </td>
-                <td className='px-4 py-2'>{project.status}</td>
-                <td className='px-4 py-2'>
-                  {project.startAt.substring(0, 10)}
-                </td>
-                <td className='px-4 py-2'>{project.endAt.substring(0, 10)}</td>
-                <td
-                  className='px-4 py-2'
-                  onClick={(event) => event.stopPropagation()}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className='outline-none'>
-                        <EllipsisVerticalIcon className='h-5 w-5 hover:cursor-pointer' />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className='w-fit'>
-                      <DropdownMenuCheckboxItem
-                        className='px-3 hover:cursor-pointer'
-                        onClick={(event) => {
-                          showProjectStatus(event, project.projectId);
-                        }}>
-                        프로젝트 진행 상태
-                      </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </td>
+        <div className='mt-4 h-[30rem] overflow-y-auto'>
+          <table className='w-full text-center'>
+            <thead className='whitespace-nowrap text-lg'>
+              <tr>
+                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                  프로젝트 코드
+                </th>
+                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                  프로젝트 이름
+                </th>
+                <th className='sticky top-0 z-10 bg-gray-200 p-2'>구성원</th>
+                <th className='sticky top-0 z-10 bg-gray-200 p-2'>진행률</th>
+                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                  상태
+                </th>
+                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                  시작일
+                </th>
+                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                  종료일
+                </th>
+                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentItems.map((project) => (
+                <tr
+                  className='break h-16 cursor-pointer whitespace-normal break-keep border-t border-gray-200 hover:bg-gray-100'
+                  onClick={() =>
+                    handleProjectClick(
+                      project.projectId,
+                      project.prdId,
+                      project.projectTitle,
+                    )
+                  }
+                  key={project.projectId}>
+                  <td className='px-4 py-2'># {project.prdId}</td>
+                  <td className='px-4 py-2 text-start'>
+                    {project.projectTitle}
+                  </td>
+                  <td className='p-2'>{Object.keys(project.people).length}</td>
+                  <td className='p-2'>
+                    {Math.round(project.progressRatio * 100)}%
+                  </td>
+                  <td className='px-4 py-2'>{project.status}</td>
+                  <td className='px-4 py-2'>
+                    {project.startAt.substring(0, 10)}
+                  </td>
+                  <td className='px-4 py-2'>
+                    {project.endAt.substring(0, 10)}
+                  </td>
+                  <td
+                    className='px-4 py-2'
+                    onClick={(event) => event.stopPropagation()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className='outline-none'>
+                          <EllipsisVerticalIcon className='h-5 w-5 hover:cursor-pointer' />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className='w-fit'>
+                        <DropdownMenuCheckboxItem
+                          className='px-3 hover:cursor-pointer'
+                          onClick={(event) => {
+                            showProjectStatus(event, project.projectId);
+                          }}>
+                          프로젝트 진행 상태
+                        </DropdownMenuCheckboxItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div className='my-4 flex w-full justify-end'>
         <button
