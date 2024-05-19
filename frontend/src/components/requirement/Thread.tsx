@@ -62,6 +62,7 @@ const Thread = ({
   }); // 알림 모달 props 정보
   const inputRef = useRef<HTMLDivElement>(null); // 입력창과 드롭다운 입력 필드 ref
   const scrollRef = useRef<HTMLUListElement>(null); // 스크롤 위치를 조정할 ref 생성
+  const [hasNewComment, setHasNewComment] = useState(false); // 새로운 댓글이 있는지 여부
 
   // 댓글 목록이 업데이트 될 때마다 스크롤을 맨 아래로 이동
   useEffect(() => {
@@ -119,6 +120,7 @@ const Thread = ({
     setMentionList([]); // 멘션 리스트 초기화
   };
 
+  // 댓글 작성 버튼 클릭 함수
   const handleSendClick = async () => {
     if (commentInput.trim() === '') {
       return;
@@ -140,6 +142,7 @@ const Thread = ({
         receiverName: '',
       });
       updateCommentList(); // 상태 플립하여 useEffect 트리거
+      setHasNewComment(!hasNewComment); // 새로운 댓글 실시간 렌더링 트리거
     } catch (error) {
       console.log('댓글 작성 실패 : ', error);
     }
