@@ -39,7 +39,6 @@ import {
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 // import { Checkbox } from '@/components/ui/checkbox';
 
 // Person 타입 정의
@@ -394,7 +393,7 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
                       onCheckedChange={(value) =>
                         column.toggleVisibility(!!value)
                       }>
-                      {flexRender(column.columnDef.header, column.getContext())}
+                      {column.id}
                       {/* 여기에서 header 값을 렌더링 */}
                     </DropdownMenuCheckboxItem>
                   ))}
