@@ -3,6 +3,8 @@ import { useState, MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
+import { updateRequirementLockStatus } from '@/apis/project';
+import { requestConfirm } from '@/apis/confirm';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. components
@@ -53,7 +55,7 @@ interface RequirementListProps {
 
 const RequirementList = ({ requirements }: RequirementListProps) => {
   const navigate = useNavigate();
-  const { projectCode } = usePageInfoStore();
+  const { projectCode, projectId } = usePageInfoStore();
   const [currentPage, setCurrentPage] = useState(1);
 
   // 페이지네이션 처리
@@ -66,6 +68,51 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
       setCurrentPage(currentPage + 1);
     }
   };
+  const handleConfirm = async (
+    event: React.MouseEvent,
+    requirement: Requirement,
+  ) => {
+    event.stopPropagation();
+    const reqId = requirement.requirementId; // 선택된 row의 requirementId
+    const requestBody = {
+      projectId: projectId,
+      isLock: requirement.isLock,
+      approval: requirement.approval,
+      requirementName: requirement.requirementName,
+      approvalComment: requirement.approvalComment || '',
+    };
+    try {
+      const response = await requestConfirm(reqId, requestBody);
+      if (response.message === 'Confirm Complete') {
+        console.log('승인 허가', response);
+      } else if (response.message === 'Confirm Hold') {
+        console.log('승인 보류', response);
+      } else {
+        console.log('승인 요청 실패', response);
+      }
+    } catch (error) {
+      console.error('Failed to request confirm:', error);
+    }
+  };
+
+  const handleLock = async (
+    event: React.MouseEvent,
+    requirement: Requirement,
+  ) => {
+    event.stopPropagation();
+    const reqId = requirement.requirementId; // 선택된 row의 requirementId
+    try {
+      const response = await updateRequirementLockStatus(projectId, reqId);
+      if (response.data) {
+        console.log('잠금 상태 변경');
+      } else {
+        console.log('잠금 상태 변경 실패', response);
+      }
+    } catch (error) {
+      console.error('Failed to update lock status:', error);
+    }
+  };
+
   const handlePrevious = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
@@ -95,7 +142,7 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
           <thead className='whitespace-nowrap text-lg'>
             <tr>
               <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
-                잠금 여부
+                승인여부
               </th>
               <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>코드</th>
               <th className='sticky top-0 z-10 bg-gray-200 p-2'>요구사항명</th>
@@ -116,7 +163,27 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                 className='break h-16 cursor-pointer whitespace-normal break-keep border-t border-gray-200 hover:bg-gray-100'
                 onClick={() => handleRequirementClick(requirement.code)}
                 key={requirement.requirementId}>
-                <td className='px-4 py-2'># {requirement.isLock}</td>
+                <td className='px-4 py-2'>
+                  {requirement.isLock === 'l' ? (
+                    <button
+                      className='rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600'
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleConfirm(event, requirement);
+                      }}>
+                      승인대기
+                    </button>
+                  ) : (
+                    <button
+                      className='rounded bg-green-500 px-3 py-1 text-sm text-white hover:bg-green-600'
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleLock(event, requirement);
+                      }}>
+                      잠금대기
+                    </button>
+                  )}
+                </td>
                 <td className='px-4 py-2'>{requirement.code}</td>
                 <td className='p-2 px-4 text-start'>
                   {requirement.requirementName}
@@ -124,9 +191,9 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                 <td className='px-4 py-2'>
                   {requirement.detail ? (
                     <ul>
-                      {requirement.detail.map((contentInfo: Detail) => (
-                        <li key={contentInfo.requirementDetailId}>
-                          {contentInfo.content}
+                      {requirement.detail.map((detail) => (
+                        <li key={detail.requirementDetailId}>
+                          {detail.content}
                         </li>
                       ))}
                     </ul>
@@ -150,6 +217,7 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                       <DropdownMenuCheckboxItem
                         className='px-3 hover:cursor-pointer'
                         onClick={(event) => {
+                          event.stopPropagation();
                           showRequirementHistory(event, requirement.code);
                         }}>
                         버전 히스토리

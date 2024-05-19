@@ -66,20 +66,20 @@ export const getRequirementDetail = async (pjtId: number, reqId: number) => {
 // 특정 프로젝트의 새로운 요구사항 추가하기 - POST
 export const addRequirement = async (
   pjtId: number,
-  pjtCode: string,
-  reqTitle: string,
-  reqDetail: string,
-  reqPersonInChargeEId: string,
-  reqAuthorEId: string,
+  pjtCode: string, // 프로젝트 코드 추가
+  reqName: string,
+  detailContents: Array<string>,
+  managerEId: string,
+  authorEId: string,
   targetUser: string,
 ) => {
   const { data } = await privateApi.post(`/projects/${pjtId}/requirements`, {
-    code: pjtCode, // 프로젝트 코드
-    requirementName: reqTitle, // 요구사항 이름
-    detail: [reqDetail], // 요구사항 상세 내용
-    managerEId: reqPersonInChargeEId, // 요구사항 담당자
-    authorEId: reqAuthorEId, // 요구사항 작성자
-    targetUser: targetUser, // 요구사항 대상자
+    code: pjtCode,
+    requirementName: reqName,
+    detailContents: detailContents,
+    managerEId: managerEId,
+    authorEId: authorEId,
+    targetUser: targetUser,
   });
   return data;
 };
@@ -97,9 +97,12 @@ export const updateRequirementVersion = async (
   return data;
 };
 
-// export const updateRequirementLockStatus = async (
-//   reqId: number,
-//   requestBody: {
-
-//   }
-// )
+export const updateRequirementLockStatus = async (
+  pjtId: number,
+  reqId: number,
+) => {
+  const { data } = await privateApi.put(
+    `/projects/${pjtId}/requirements/${reqId}/lock`,
+  );
+  return data;
+};
