@@ -86,6 +86,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     setPageType,
   } = usePageInfoStore();
   const [status, setStatus] = useState('connecting');
+  const [currentUser, setCurrentUser] = useState({ name: '', color: '' });
   const [currentVersion, setCurrentVersion] = useState(0);
   const [latestVersion, setLatestVersion] = useState(0);
   const [versions, setVersions] = useState<CollabHistoryVersion[]>([]);
@@ -109,6 +110,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     setPageType('rich', {
       isRichPage: true,
     });
+    setCurrentUser({ name: name, color: profileColor });
   }, []);
 
   const ydoc = new Y.Doc();
@@ -127,16 +129,8 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
           console.error('인증 실패: ', reason);
         },
       }),
-    [tiptapToken, ydoc],
+    [tiptapToken],
   );
-
-  // 현재 사용자 정보 설정
-  useEffect(() => {
-    provider.setAwarenessField('user', {
-      name: name,
-      color: profileColor,
-    });
-  }, [name, profileColor]);
 
   // 접속 상태 확인
   useEffect(() => {
@@ -144,6 +138,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       setStatus(status);
     };
     provider.on('status', statusHandler);
+
     return () => {
       provider.off('status', statusHandler);
     };
@@ -190,6 +185,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
           }),
           CollaborationCursor.configure({
             provider: provider,
+            user: currentUser,
           }),
           CollaborationHistory.configure({
             provider: provider,
@@ -221,14 +217,11 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
 
   // 현재 접속 유저 감지
   useEffect(() => {
-    if (editor && name && profileColor) {
-      editor
-        .chain()
-        .focus()
-        .updateUser({ name: name, color: profileColor })
-        .run();
+    if (editor && currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      editor.chain().focus().updateUser(currentUser).run();
     }
-  }, [editor, name, profileColor]);
+  }, [editor, currentUser]);
 
   // 버전 관리 모달
   const showVersioningModal = useCallback(() => {
@@ -346,6 +339,10 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
   };
 
+  if (!editor) {
+    return null;
+  }
+
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
       {provider && (
@@ -450,7 +447,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
             className={`mr-4 h-2 w-2 rounded-full ${status === 'connected' ? 'bg-pubble' : status === 'connecting' ? 'bg-plblue' : 'bg-gray-400'}`}></div>
           <div>
             {status === 'connected'
-              ? `${editor?.storage?.collaborationCursor?.users?.length ?? 0} 명의 유저가 이 문서에 있습니다.`
+              ? `${editor.storage.collaborationCursor.users.length} 명의 유저가 이 문서에 있습니다.`
               : status === 'connecting'
                 ? '연결 중...'
                 : '오프라인'}
