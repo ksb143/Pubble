@@ -475,7 +475,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
           />
           <div>Auto Save {isAutoVersioning ? 'ON' : 'OFF'}</div>
           <button
-            className='p-2 text-sm text-gray-800 hover:text-pubble hover:text-white'
+            className='p-2 text-sm text-gray-800 hover:text-pubble'
             onClick={showVersioningModal}>
             버전 히스토리 확인
           </button>
