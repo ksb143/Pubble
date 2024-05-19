@@ -61,3 +61,30 @@ export const lockThread = async (userThreadId: number) => {
   console.log('스레드 잠금 api : ', data);
   return data;
 };
+
+// 요구사항 디테일 추가 함수
+export const createRequirementDetail = async (
+  requirementId: number,
+  content: string,
+) => {
+  const { data } = await privateApi.post(
+    `/projects/reuqirements/${requirementId}`,
+    { content },
+  );
+  console.log('요구사항 디테일 추가 함수 api : ', data);
+  return data;
+};
+
+// 요구사항 디테일 상태 변경 함수
+export const updateRequirementDetailStatus = async (
+  requirementId: number,
+  detailId: number,
+  command: string,
+) => {
+  const { data } = await privateApi.put(
+    `/projects/reuqirements/${requirementId}/details/${detailId}/status`,
+    { command },
+  );
+  console.log('요구사항 디테일 상태 변경 함수 api : ', data);
+  return data;
+};
