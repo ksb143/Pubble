@@ -4,13 +4,9 @@ import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
 import { getFCMToken, setupFCMListener } from '@/apis/notification';
-import { getUserByProject } from '@/apis/user';
-import { Person } from '@/types/requirementTypes';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
-import useStompStore from '@/stores/useStompStore';
-import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Message from '@/components/navbar/Message';
 import Notification from '@/components/navbar/Notification';
@@ -23,14 +19,6 @@ import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
 
-interface RealTimeData {
-  operation: 'e' | 'm' | 'l';
-  employeeId: string;
-  userInfoDto?: Person;
-  locationName?: string;
-  locationUrl?: string;
-}
-
 const Navbar = () => {
   const navigate = useNavigate();
   const { name, profileColor } = useUserStore();
@@ -40,70 +28,6 @@ const Navbar = () => {
     setHasNewMessage,
     setHasNewNotification,
   } = useNotificationStore();
-
-  // 웹소켓 관련 코드
-  const { projectId, requirementId, isRichPage } = usePageInfoStore();
-  const { subscribe, unsubscribe, userStatus } = useStompStore();
-  const [projectUsers, setProjectUsers] = useState<Person[]>([]);
-
-  useEffect(() => {
-    const fetchProjectUsers = async () => {
-      const response = await getUserByProject(projectId);
-      setProjectUsers(response.data);
-      // console.log(response.data);
-    };
-    fetchProjectUsers();
-  }, [projectId, requirementId, isRichPage]);
-
-  useEffect(() => {
-    const path = `/sub/project/${projectId}`;
-    const key = 'projectPresence';
-    subscribe(path, key, (message) => {
-      const data = JSON.parse(message.body);
-      console.log('Received message:', data);
-      handleRealTimeUpdate(data);
-    });
-
-    return () => {
-      unsubscribe(key);
-    };
-  }, [projectId, subscribe, unsubscribe]);
-
-  // 실시간 업데이트 처리
-  const handleRealTimeUpdate = (data: RealTimeData) => {
-    console.log('Received update:', data);
-    switch (data.operation) {
-      case 'e': // Enter
-      case 'm': // Move
-        // 사용자 정보 업데이트
-        if (data.userInfoDto) {
-          updateProjectUser(data.employeeId, data.userInfoDto);
-        }
-        break;
-      case 'l': // Leave
-        // 사용자 정보 제거
-        removeProjectUser(data.employeeId);
-        break;
-      default:
-        console.log('Unknown operation', data.operation);
-    }
-  };
-
-  // 유저 정보 업데이트
-  const updateProjectUser = (employeeId: string, userInfo: Person) => {
-    setProjectUsers((currentUsers) =>
-      currentUsers.map((user) =>
-        user.employeeId === employeeId ? { ...user, ...userInfo } : user,
-      ),
-    );
-  };
-
-  // 유저 정보 삭제
-  const removeProjectUser = (employeeId: string) => {
-    setProjectUsers((currentUsers) =>
-      currentUsers.filter((user) => user.employeeId !== employeeId),
-    );
-  };
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -172,25 +96,6 @@ const Navbar = () => {
         </div>
 
         <div className='flex items-center'>
-          {/* 접속 여부 표시 */}
-          {projectUsers.length > 0 && (
-            <div className='mr-3 flex w-full items-center justify-center'>
-              {projectUsers.map((user, index) => (
-                <div
-                  key={user.employeeId}
-                  className={`relative z-${1000 - index} -ml-2 shrink-0 first-of-type:ml-0 ${userStatus[user.employeeId] === 'online' ? 'opacity-100' : ''}`}>
-                  <Profile
-                    width='3rem'
-                    height='3rem'
-                    name={user.name}
-                    profileColor={user.profileColor}
-                    status={userStatus[user.employeeId]}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* 쪽지 아이콘 */}
           <div
             className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
