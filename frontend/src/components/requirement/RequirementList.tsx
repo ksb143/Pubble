@@ -8,6 +8,8 @@ import { getLatestRequirementVersion } from '@/apis/project';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
+// import RequirementAddModal from '@/components/requirement/RequirementAddModal';
+import TestModal from '@/components/requirement/TestModal';
 import {
   ColumnDef,
   flexRender,
@@ -37,7 +39,6 @@ import {
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 // import { Checkbox } from '@/components/ui/checkbox';
 
 // Person 타입 정의
@@ -93,6 +94,37 @@ interface RequirementListProps {
 // RequirementList component의 columns 정의
 export const columns: ColumnDef<Summary>[] = [
   {
+    id: 'actions', // 고유 ID로 'actions'를 사용할 수 있습니다.
+    header: '승인',
+    cell: ({ row }) => {
+      const { isLock, approval } = row.original;
+      if (isLock === 'u') {
+        return (
+          <Button onClick={() => console.log('승인 로직 실행')}>
+            승인하기
+          </Button>
+        );
+      } else if (isLock === 'l') {
+        if (approval === 'u') {
+          return (
+            <Button onClick={() => console.log('승인 로직 실행')}>
+              승인하기
+            </Button>
+          );
+        } else if (approval === 'h') {
+          return (
+            <Button onClick={() => console.log('보류 로직 실행')}>
+              승인보류
+            </Button>
+          );
+        } else if (approval === 'a') {
+          return <span>승인완료</span>;
+        }
+      }
+      return null; // 다른 경우에는 아무것도 표시하지 않음
+    },
+  },
+  {
     accessorKey: 'approval',
     header: '승인여부',
     cell: (info) => info.getValue(),
@@ -132,7 +164,7 @@ export const columns: ColumnDef<Summary>[] = [
   },
   {
     accessorKey: 'version',
-    header: '현재 버전',
+    header: 'version',
     cell: (info) => info.getValue(),
   },
 ];
@@ -170,7 +202,17 @@ export const columns: ColumnDef<Summary>[] = [
 // },
 
 const RequirementList = ({ pId, pCode }: RequirementListProps) => {
-  const { setPageType } = usePageInfoStore();
+  const { setPageType, projectCode } = usePageInfoStore((state) => ({
+    setPageType: state.setPageType,
+    projectCode: state.projectCode,
+    projectName: state.projectName,
+    requirementId: state.requirementId,
+    requirementCode: state.requirementCode,
+    requirementName: state.requirementName,
+  }));
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
   // 요구사항의 목록
@@ -180,7 +222,10 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
   // column 필터링 상태
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   // column 보이기 상태
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    approval: false, // approval 컬럼을 숨깁니다.
+    isLock: false, // isLock 컬럼을 숨깁니다.
+  });
   // row 선택 상태
   const [rowSelection, setRowSelection] = useState({});
   // table 상태
@@ -277,50 +322,62 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
     fetchRequirements();
   }, [pId, pCode]);
 
-  const handleRowClick = (summary: Summary) => {
-    const { code } = summary;
-    const rCode = code;
-    const rId = summary.requirementId;
-    if (!rId) {
-      console.error('Invalid requirement data');
-      return;
-    }
-    setPageType('requirement', {
-      requirementId: rId,
-    });
-    navigate(`/project/${pCode}/requirement/${rCode}`);
+  // 사용자의 요구사항 추가 모달 열기
+  const handleTestModal = () => {
+    setIsModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
   };
 
+  // 특정한 요구사항 row 클릭시, 특정 요구사항에 진입할 수 있도록 하는 함수.
+  const handleRowClick = (summary: Summary) => {
+    const reqId = summary.requirementId; // 선택된 row의 requirementId
+    const reqCode = summary.code; // 선택된 row의 requirementCode
+    const reqName = summary.requirementName; // 선택된 row의 requirementName
+
+    if (reqId) {
+      // 1. 클릭된 row의 reqId, reqCode, reqName을 store에 넣기
+      setPageType('requirement', {
+        requirementId: reqId,
+        requirementCode: reqCode,
+        requirementName: reqName,
+      });
+      // 2. 요구사항 상세 정보 페이지로 이동하기
+      navigate(`/project/${projectCode}/requirement/${reqCode}`);
+      return;
+    } else {
+      console.error('Invalid requirement data');
+    }
+  };
   return (
     <div className='p-8 text-center'>
       <p className='mb-4 text-2xl font-bold'>
         {requirements[0]?.projectTitle || '예시 프로젝트 제목'}
       </p>
+
       <p className='mb-8 text-lg'>
         {requirements.length > 0 &&
           `${new Date(requirements[0].startAt).toLocaleDateString('ko-KR')} ~ ${new Date(requirements[0].endAt).toLocaleDateString('ko-KR')}`}
       </p>
+
       <div className='rounded-md border'>
-        <div className='flex items-center px-5 py-5'>
-          <Input
-            placeholder='요구사항 이름을 입력해주세요.'
-            value={
-              (table
-                .getColumn('requirementName')
-                ?.getFilterValue() as string) ?? ''
-            }
-            onChange={(event) =>
-              table
-                .getColumn('requirementName')
-                ?.setFilterValue(event.target.value)
-            }
-            className='max-w-sm text-lg'
-          />
+        <div className='flex'>
+          <div>
+            <Button
+              className='ml-3 mt-3 bg-blue-500 text-base text-white'
+              onClick={handleTestModal}>
+              테스트 버튼
+            </Button>
+            {/* 테스트 모달 */}
+            <TestModal isOpen={isModalOpen} onClose={handleCloseModal} />
+            {/* 요구사항 추가 버튼 */}
+          </div>
           <div className='ml-auto'>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant='outline' className='text-lg'>
-                  컬럼선택
+                <Button variant='outline' className='mr-3 mt-3 text-base'>
+                  정렬
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align='end'>
@@ -337,6 +394,7 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
                         column.toggleVisibility(!!value)
                       }>
                       {column.id}
+                      {/* 여기에서 header 값을 렌더링 */}
                     </DropdownMenuCheckboxItem>
                   ))}
               </DropdownMenuContent>

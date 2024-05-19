@@ -1,10 +1,10 @@
 // 1. react 관련
+import { useState } from 'react';
 // 2. library
 // 3. api
+import { addProject } from '@/apis/project';
 // 4. store
 // 5. components
-import { useState } from 'react';
-import { addProject } from '@/apis/project';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -14,13 +14,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogFooter,
-  DialogTrigger,
+  // DialogTrigger,
 } from '@/components/ui/dialog';
 
 interface ProjectAddModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
 const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
   const [title, setTitle] = useState('');
   const [code, setCode] = useState('');
@@ -42,7 +43,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogTrigger asChild></DialogTrigger>
+      {/* <DialogTrigger asChild></DialogTrigger> */}
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
           <DialogTitle>프로젝트 생성</DialogTitle>
@@ -79,7 +80,7 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
             <Input
               id='projectParticipant'
               placeholder='ex) SSAFY1001, SSAFY1002'
-              type='ty'
+              type='text'
               value={participant}
               onChange={(e) => setParticipant(e.target.value)}
               className='col-span-3'
