@@ -10,7 +10,7 @@ import lombok.Setter;
 @Builder
 public class UserLocationDto {
 
-    private String operation;
+    private String operation; // e : enter 입장, m : move 이동, l : leave 퇴장/
 
     private String employeeId; // 유저 정보 내에 존재하지만 편의를 위해
     private UserInfoDto userInfoDto; // 유저 정보

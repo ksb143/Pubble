@@ -1,20 +1,26 @@
 package com.ssafy.d109.pubble.service;
 
 import com.ssafy.d109.pubble.dto.projectDto.UserInfoDto;
+import com.ssafy.d109.pubble.dto.userLocationDto.AllUserLocationResponseDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationRequestDto;
+import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserLocationService {
 
+    private final ProjectAssignmentRepository projectAssignmentRepository;
     private final ConcurrentHashMap<Integer, ConcurrentHashMap<String, UserLocationDto>> projectUserLocations = new ConcurrentHashMap<>();
 
     public UserLocationDto enter(User user, Integer projectId, UserLocationRequestDto dto) {
@@ -59,13 +65,32 @@ public class UserLocationService {
                 .build();
     }
 
-    public List<UserLocationDto> getCurrentUserLocations(Integer projectId) {
+    public AllUserLocationResponseDto getAllUserLocations(Integer projectId) {
+        List<User> participants = projectAssignmentRepository.findUsersByProjectId(projectId);
         ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
-        List<UserLocationDto> userLocationDtos = new ArrayList<>();
-        if (userLocations == null) {
-            return userLocationDtos;
-        }
-        userLocationDtos.addAll(userLocations.values());
-        return userLocationDtos;
+
+        Set<String> connectedEmployeeIds = userLocations.values().stream()
+                .map(UserLocationDto::getEmployeeId)
+                .collect(Collectors.toSet());
+
+        // 접속자
+        List<UserLocationDto> connectedUserLocations = new ArrayList<>(userLocations.values());
+
+        // 비접속자
+        // 전체 유저 중 - 비접속자 유저를 걸러 - 각각 userLocationDto로 담아 - 리스트로 반환
+        List<UserLocationDto> nonConnectedUserLocations = participants.stream()
+                .filter(user -> !connectedEmployeeIds.contains(user.getEmployeeId()))
+                .map(user -> UserLocationDto.builder()
+                        .employeeId(user.getEmployeeId())
+                        .userInfoDto(UserInfoDto.createUserInfo(user))
+                        .locationName("비접속 상태")
+                        .locationUrl("비접속 상태")
+                        .build())
+                .toList();
+
+        return AllUserLocationResponseDto.builder()
+                .nonConnected(nonConnectedUserLocations)
+                .connected(connectedUserLocations)
+                .build();
     }
 }

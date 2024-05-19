@@ -1,6 +1,7 @@
 package com.ssafy.d109.pubble.controller;
 
 import com.ssafy.d109.pubble.dto.responseDto.ResponseDto;
+import com.ssafy.d109.pubble.dto.userLocationDto.AllUserLocationResponseDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationRequestDto;
 import com.ssafy.d109.pubble.entity.User;
@@ -48,10 +49,10 @@ public class StompController {
     }
 
     @GetMapping("/project/{projectId}/current-user")
-    public ResponseEntity<ResponseDto> getCurrentUserLocations(@PathVariable Integer projectId) {
-        List<UserLocationDto> currentUserLocations = userLocationService.getCurrentUserLocations(projectId);
+    public ResponseEntity<ResponseDto> getAllUserLocations(@PathVariable Integer projectId) {
+        AllUserLocationResponseDto allUserLocations = userLocationService.getAllUserLocations(projectId);
 
-        response = new ResponseDto(true, "현재 프로젝트에 접속중인 유저들의 정보", currentUserLocations);
+        response = new ResponseDto(true, "비접속/접속중인 모든 프로젝트 인원 위치 정보", allUserLocations);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
