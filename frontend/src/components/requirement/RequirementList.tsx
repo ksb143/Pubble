@@ -40,7 +40,7 @@ interface Requirement {
   isLock: 'u' | 'l';
   approval: 'u' | 'h' | 'a';
   approvalComment: string | null;
-  detail: Detail[];
+  details: Detail[];
   manager: Person;
   targetUse: string;
   createdAt: string;
@@ -213,9 +213,9 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                   {requirement.requirementName}
                 </td>
                 <td className='px-4 py-2'>
-                  {requirement.detail ? (
+                  {requirement.details && requirement.details.length > 0 ? (
                     <ul>
-                      {requirement.detail.map((detail) => (
+                      {requirement.details.map((detail) => (
                         <li key={detail.requirementDetailId}>
                           {detail.content}
                         </li>

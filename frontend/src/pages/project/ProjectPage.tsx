@@ -32,7 +32,7 @@ interface Summary {
   isLock: 'u' | 'l';
   approval: 'u' | 'h' | 'a';
   approvalComment: string | null;
-  detail: Detail[];
+  details: Detail[];
   manager: Person;
   targetUse: string;
   createdAt: string;
@@ -69,6 +69,7 @@ const ProjectPage = () => {
       const response = await getLatestRequirementVersion(projectId);
       const { data } = response;
       if (data) {
+        console.log(data);
         setPageType('project', {
           projectId: data.projectId,
           projectCode: data.code,
