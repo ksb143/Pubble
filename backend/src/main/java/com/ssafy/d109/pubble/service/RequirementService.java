@@ -59,7 +59,7 @@ public class RequirementService {
                 approvalRatio = 1;
             }
         } else {
-            approvalRatio = (float) approved / unapproved;
+            approvalRatio = (float) approved / approved + unapproved;
         }
         return approvalRatio;
     }
@@ -107,7 +107,7 @@ public class RequirementService {
                 lockRatio = 1;
             }
         } else {
-            lockRatio = (float) locked / unlocked;
+            lockRatio = (float) locked / locked + unlocked;
         }
 
         if (unapproved == 0) {
@@ -117,7 +117,7 @@ public class RequirementService {
                 approvalRatio = 1;
             }
         } else {
-            approvalRatio = (float) approved / unapproved;
+            approvalRatio = (float) approved / approved + unapproved;
         }
 
         if (unchanged == 0) {
@@ -127,7 +127,7 @@ public class RequirementService {
                 changeRatio = 1;
             }
         } else {
-            changeRatio = (float) changed / unchanged;
+            changeRatio = (float) changed / changed + unchanged;
         }
 
         return ProgressRatio.builder().lockRatio(lockRatio).approvalRatio(approvalRatio).changeRatio(changeRatio).build();
