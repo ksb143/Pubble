@@ -163,8 +163,7 @@ const Thread = ({
   // 요구사항 잠금 함수
   const handleThreadLock = async () => {
     try {
-      const response = await lockThread(data[0].userThreadId);
-      console.log('스레드 잠금 성공 : ', response);
+      await lockThread(data[0].userThreadId);
       setAlertModalProps({
         text: '스레드 잠금 성공',
         buttonsType: 'autoclose',
