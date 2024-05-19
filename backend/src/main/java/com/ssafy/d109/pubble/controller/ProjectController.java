@@ -126,11 +126,12 @@ public class ProjectController {
     // 일단 인자 받아서 잠금 풀기도 가능은 하게 해놓음
     @Operation(summary = "해당 요구사항 항목의 잠금 상태 변경")
     @PutMapping("/{project-id}/requirements/{requirement-id}/lock")
-    public ResponseEntity<ResponseDto> updateRequirementLock(@PathVariable("requirement-id") Integer requirementId, @RequestBody String lock) {
-        requirementService.updateRequirementLock(requirementId, lock);
+    public ResponseEntity<ResponseDto> updateRequirementLock(@PathVariable("requirement-id") Integer requirementId) {
+        // 권한확인도하면좋은데..
+        requirementService.updateRequirementLock(requirementId);
 
         response = new ResponseDto(true, "해당 요구사항 항목의 잠금 상태 변경", null);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "해당 요구사항 항목의 승인 상태 변경")
@@ -139,7 +140,7 @@ public class ProjectController {
         requirementService.updateRequirementApproval(requirementId, approvalDto);
 
         response = new ResponseDto(true, "해당 요구사항 항목의 승인 상태 변경", null);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 위의 안쓰는 url 부분들 줄여버릴지

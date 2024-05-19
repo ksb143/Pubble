@@ -341,19 +341,16 @@ public class RequirementService {
     }
 
     @Transactional
-    public void updateRequirementLock(Integer requirementId, String lock) {
-        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
+    public void updateRequirementLock(Integer requirementId/*, String lock*/) {
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
-        if (optionalRequirement.isPresent()) {
-            Requirement requirement = optionalRequirement.get();
-            if ("u".equals(lock)) {
-                requirement.setIsLock("u");
-            } else if ("l".equals(lock)) {
-                requirement.setIsLock("l");
-            }
+//        if ("u".equals(lock)) {
+//                requirement.setIsLock("u");
+//            } else if ("l".equals(lock)) {
+//                requirement.setIsLock("l");
+        requirement.setIsLock("l");
 
-            requirementRepository.save(requirement);
-        }
+        requirementRepository.save(requirement);
     }
 
     @Transactional
