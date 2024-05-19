@@ -1,9 +1,15 @@
+// 1. react
 import { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+// 2. library
+// 3. api
+import { generateJwt } from '@/utils/tiptap';
+// 4. store
+// 5. component
 import ProjectPage from '@/pages/project/ProjectPage';
 import RequirementPage from '@/pages/requirement/RequirementPage';
 import RichEditorPage from '@/pages/rich/RichEditorPage.tsx';
-import { generateJwt } from '@/utils/tiptap';
+// 6. asset
 
 const Project = () => {
   const [token, setToken] = useState('');
