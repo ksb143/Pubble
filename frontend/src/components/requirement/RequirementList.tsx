@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 // import { FiMoreHorizontal } from 'react-icons/fi';
 // 3. api 관련
 import { getLatestRequirementVersion } from '@/apis/project';
+import { requestConfirm } from '@/apis/confirm';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
@@ -31,16 +32,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  // DropdownMenuLabel,
+  DropdownMenuLabel,
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  // DropdownMenuItem,
+  DropdownMenuItem,
   DropdownMenuCheckboxItem,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 // import { Checkbox } from '@/components/ui/checkbox';
-
+import { FiMoreHorizontal } from 'react-icons/fi';
 // Person 타입 정의
 type Person = {
   name: string;
@@ -94,32 +95,26 @@ interface RequirementListProps {
 // RequirementList component의 columns 정의
 export const columns: ColumnDef<Summary>[] = [
   {
-    id: 'actions', // 고유 ID로 'actions'를 사용할 수 있습니다.
-    header: '승인',
+    id: 'lockActions', // 고유 ID로 'actions'를 사용할 수 있습니다.
+    header: '요구사항 잠금',
     cell: ({ row }) => {
-      const { isLock, approval } = row.original;
+      const { isLock } = row.original;
       if (isLock === 'u') {
         return (
-          <Button onClick={() => console.log('승인 로직 실행')}>
-            승인하기
+          <Button
+            className='bg-black'
+            onClick={() => console.log('해당 요구사항 항목의 잠금 상태 변경')}>
+            잠금대기
           </Button>
         );
       } else if (isLock === 'l') {
-        if (approval === 'u') {
-          return (
-            <Button onClick={() => console.log('승인 로직 실행')}>
-              승인하기
-            </Button>
-          );
-        } else if (approval === 'h') {
-          return (
-            <Button onClick={() => console.log('보류 로직 실행')}>
-              승인보류
-            </Button>
-          );
-        } else if (approval === 'a') {
-          return <span>승인완료</span>;
-        }
+        return (
+          <Button
+            className='bg-pubble'
+            onClick={() => console.log('잠금 된 요구사항의 confirm 진행')}>
+            승인대기
+          </Button>
+        );
       }
       return null; // 다른 경우에는 아무것도 표시하지 않음
     },
@@ -167,39 +162,32 @@ export const columns: ColumnDef<Summary>[] = [
     header: 'version',
     cell: (info) => info.getValue(),
   },
+  {
+    id: 'history',
+    cell: ({ row }) => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' className='h-8 w-8 p-0'>
+              <span className='sr-only'>Open menu</span>
+              <FiMoreHorizontal className='h-4 w-4' />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='end'>
+            <DropdownMenuLabel>확인</DropdownMenuLabel>
+            <DropdownMenuItem
+              onClick={
+                () =>
+                  console.log(`이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
+              }>
+              버전 히스토리
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
 ];
-// 액션 컬럼
-// {
-//   id: 'actions',
-//   cell: ({ row }) => {
-//     return (
-//       <DropdownMenu>
-//         <DropdownMenuTrigger asChild>
-//           <Button variant='ghost' className='h-8 w-8 p-0'>
-//             <span className='sr-only'>Open menu</span>
-//             <FiMoreHorizontal className='h-4 w-4' />
-//           </Button>
-//         </DropdownMenuTrigger>
-//         <DropdownMenuContent align='end'>
-//           <DropdownMenuLabel></DropdownMenuLabel>
-//           <DropdownMenuItem
-//             onClick={
-//               () => console.log(`Delete 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
-//             }>
-//             삭제하기
-//           </DropdownMenuItem>
-//           <DropdownMenuItem
-//             onClick={
-//               () =>
-//                 console.log(`이전 버전확인 함수 추가 후 콘솔 로그 삭제예정`) // 함수 추가 후 콘솔 로그 삭제예정
-//             }>
-//             버전확인
-//           </DropdownMenuItem>
-//         </DropdownMenuContent>
-//       </DropdownMenu>
-//     );
-//   },
-// },
 
 const RequirementList = ({ pId, pCode }: RequirementListProps) => {
   const { setPageType, projectCode } = usePageInfoStore((state) => ({
@@ -322,6 +310,25 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
     fetchRequirements();
   }, [pId, pCode]);
 
+  const handleLock = (summary: Summary) => {
+    const reqId = summary.requirementId; // 선택된 row의 requirementId
+    const reqCode = summary.code; // 선택된 row의 requirementCode
+    const reqName = summary.requirementName; // 선택된 row의 requirementName
+  };
+
+  const handleConfirm = (summary: Summary) => {
+    const reqId = summary.requirementId; // 선택된 row의 requirementId
+    const reqbody = {
+      projectId: requirements[0].projectId,
+      isLock: summary.isLock,
+      approval: summary.approval,
+      requirementName: summary.requirementName,
+      approvalComment: summary.approvalComment || '',
+    };
+
+    requestConfirm(reqId, reqbody);
+  };
+
   // 사용자의 요구사항 추가 모달 열기
   const handleTestModal = () => {
     setIsModalOpen(true);
@@ -394,7 +401,7 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
                         column.toggleVisibility(!!value)
                       }>
                       {column.id}
-                      {/* 여기에서 header 값을 렌더링 */}
+                      {/* column을 변수로 쓸때, 한국어 header 값을 추출할 수 있는 방법이 없음. 현재 deprecated 된 방법들 외에는 없음.*/}
                     </DropdownMenuCheckboxItem>
                   ))}
               </DropdownMenuContent>
