@@ -164,7 +164,13 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                 onClick={() => handleRequirementClick(requirement.code)}
                 key={requirement.requirementId}>
                 <td className='px-4 py-2'>
-                  {requirement.isLock === 'l' ? (
+                  {requirement.approval === 'a' ? (
+                    <button
+                      className='rounded bg-gray-500 px-3 py-1 text-sm text-white'
+                      disabled={true}>
+                      승인완료
+                    </button>
+                  ) : requirement.isLock === 'l' ? (
                     <button
                       className='rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600'
                       onClick={(event) => {
