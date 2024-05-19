@@ -24,6 +24,7 @@ import PencilSquare from '@/assets/icons/pencil-square.svg?react';
 import ChatBubble from '@/assets/icons/chat-bubble-left-right.svg?react';
 import PanelOpen from '@/assets/icons/panel-left-open.svg?react';
 import Ellipsis from '@/assets/icons/ellipsis-vertical.svg?react';
+import Pencil from '@/assets/icons/pencil.svg?react';
 
 const RequirementPage = () => {
   const navigate = useNavigate();
@@ -160,6 +161,8 @@ const RequirementPage = () => {
     }
   };
 
+  const [activeThreadId, setActiveThreadId] = useState<number | null>(null);
+
   return (
     <>
       {/* 알림 모달 */}
@@ -287,7 +290,7 @@ const RequirementPage = () => {
                               toggleDropdown(detail.requirementDetailId);
                             }}>
                             <Ellipsis
-                              className={`h-6 w-6 ${openDropdownId === detail.requirementDetailId ? 'stroke-gray-700' : 'stroke-gray-400 hover:stroke-gray-700 '}`}
+                              className={`h-6 w-6  ${openDropdownId === detail.requirementDetailId ? 'stroke-gray-700' : ' stroke-gray-400 hover:stroke-gray-700'}`}
                             />
                           </div>
                           {/* 드롭다운 컨테이너 */}
@@ -313,25 +316,33 @@ const RequirementPage = () => {
                                   </p>
                                 </div>
                               )}
+                              <div className='flex items-center'>
+                                <div className='flex h-8 w-8 items-center justify-center'>
+                                  <Pencil className='h-5 w-5 cursor-pointer stroke-gray-400 stroke-1 group-hover:stroke-gray-600' />
+                                </div>
+                                <p>요구사항 수정</p>
+                              </div>
                             </div>
                           )}
                         </div>
                       </div>
                     ))}
                   </ul>
-                  <div className='text-red-500'>요구사항 추가하기</div>
+                  {/* <div className='text-red-500'>요구사항 추가하기</div> */}
                 </div>
               </>
             )}
           </div>
           {/* 스레드 */}
           <div
-            className={`flex flex-col overflow-auto ${hasThreads ? 'w-full min-w-[20vw] max-w-[30vw] px-10 py-6 ' : 'w-0'}`}>
+            className={`flex flex-col overflow-y-auto ${hasThreads ? 'w-full min-w-[20vw] max-w-[30vw] px-10 py-6 ' : 'w-0'}`}>
             {threadList.map((threadInfo) => (
               <Thread
                 key={threadInfo.detailId}
                 data={threadInfo.userThreadDtos}
                 selected={selectedDetailId === threadInfo.detailId}
+                isActive={activeThreadId === threadInfo.detailId}
+                setActiveThreadId={setActiveThreadId}
               />
             ))}
           </div>

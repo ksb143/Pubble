@@ -1,5 +1,5 @@
 // 검색에 사용할 유저 타입 정의
-interface UserInfo {
+export interface UserInfo {
   name: string;
   employeeId: string;
   department: string;
