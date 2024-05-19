@@ -5,12 +5,12 @@ import { useNavigate } from 'react-router-dom';
 // import { FiMoreHorizontal } from 'react-icons/fi';
 // 3. api 관련
 import { getLatestRequirementVersion } from '@/apis/project';
-import { requestConfirm } from '@/apis/confirm';
+// import { requestConfirm } from '@/apis/confirm';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
 // import RequirementAddModal from '@/components/requirement/RequirementAddModal';
-import TestModal from '@/components/requirement/TestModal';
+// import TestModal from '@/components/requirement/TestModal';
 import {
   ColumnDef,
   flexRender,
@@ -165,6 +165,7 @@ export const columns: ColumnDef<Summary>[] = [
   {
     id: 'history',
     cell: ({ row }) => {
+      console.log(row);
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -199,7 +200,7 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
     requirementName: state.requirementName,
   }));
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
   // useState를 통한 상태변화 관리 들어가기
@@ -310,31 +311,28 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
     fetchRequirements();
   }, [pId, pCode]);
 
-  const handleLock = (summary: Summary) => {
-    const reqId = summary.requirementId; // 선택된 row의 requirementId
-    const reqCode = summary.code; // 선택된 row의 requirementCode
-    const reqName = summary.requirementName; // 선택된 row의 requirementName
-  };
+  // const handleLock = (summary: Summary) => {
+  //   const reqId = summary.requirementId; // 선택된 row의 requirementId
+  //   const reqCode = summary.code; // 선택된 row의 requirementCode
+  //   const reqName = summary.requirementName; // 선택된 row의 requirementName
+  // };
 
-  const handleConfirm = (summary: Summary) => {
-    const reqId = summary.requirementId; // 선택된 row의 requirementId
-    const reqbody = {
-      projectId: requirements[0].projectId,
-      isLock: summary.isLock,
-      approval: summary.approval,
-      requirementName: summary.requirementName,
-      approvalComment: summary.approvalComment || '',
-    };
+  // const handleConfirm = (summary: Summary) => {
+  //   const reqId = summary.requirementId; // 선택된 row의 requirementId
+  //   const reqbody = {
+  //     projectId: requirements[0].projectId,
+  //     isLock: summary.isLock,
+  //     approval: summary.approval,
+  //     requirementName: summary.requirementName,
+  //     approvalComment: summary.approvalComment || '',
+  //   };
 
-    requestConfirm(reqId, reqbody);
-  };
+  //   requestConfirm(reqId, reqbody);
+  // };
 
   // 사용자의 요구사항 추가 모달 열기
   const handleTestModal = () => {
-    setIsModalOpen(true);
-  };
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+    console.log('테스트버튼 누름');
   };
 
   // 특정한 요구사항 row 클릭시, 특정 요구사항에 진입할 수 있도록 하는 함수.
@@ -377,7 +375,7 @@ const RequirementList = ({ pId, pCode }: RequirementListProps) => {
               테스트 버튼
             </Button>
             {/* 테스트 모달 */}
-            <TestModal isOpen={isModalOpen} onClose={handleCloseModal} />
+            {/* <TestModal isOpen={isModalOpen} onClose={handleCloseModal} /> */}
             {/* 요구사항 추가 버튼 */}
           </div>
           <div className='ml-auto'>

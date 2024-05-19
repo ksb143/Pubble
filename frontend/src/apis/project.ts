@@ -96,3 +96,10 @@ export const updateRequirementVersion = async (
   );
   return data;
 };
+
+// export const updateRequirementLockStatus = async (
+//   reqId: number,
+//   requestBody: {
+
+//   }
+// )
