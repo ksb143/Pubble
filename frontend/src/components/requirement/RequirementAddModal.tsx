@@ -35,27 +35,27 @@ const RequirementAddModal = ({ isOpen, onClose }: RequirementAddModalProps) => {
 
   const handleAddRequirement = async () => {
     try {
-      const requirementData = {
+      const reqData = {
         pjtId: projectId,
         pjtCode: code,
-        reqTitle: title,
-        reqDetail: detail,
-        reqPersonInChargeEId: personInChargeEId,
-        reqAuthorEId: employeeId,
+        reqName: title,
+        detailContents: [detail], // 상세 내용이 string 배열이기 때문에 배열로 변환
+        managerEId: personInChargeEId,
+        authorEId: employeeId,
         targetUser: targetUser,
       };
 
       await addRequirement(
-        requirementData.pjtId,
-        requirementData.pjtCode,
-        requirementData.reqTitle,
-        requirementData.reqDetail,
-        requirementData.reqPersonInChargeEId,
-        requirementData.reqAuthorEId,
-        requirementData.targetUser,
+        reqData.pjtId,
+        reqData.pjtCode,
+        reqData.reqName,
+        reqData.detailContents,
+        reqData.managerEId,
+        reqData.authorEId,
+        reqData.targetUser,
       );
       console.log('api 호출 성공');
-      // onClose(); // 요구사항 생성 후 모달 닫기
+      onClose(); // 요구사항 생성 후 모달 닫기
     } catch (error) {
       console.error('api 호출 실패', error);
     }
