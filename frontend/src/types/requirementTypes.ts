@@ -62,3 +62,18 @@ export interface ThreadListInfo {
   detailId: number;
   userThreadDtos: ThreadInfo[];
 }
+
+// 댓글 작성 api에 전달할 받는사람 정보
+export interface ReceiverInfo {
+  isMentioned: boolean;
+  receiverId: string;
+  receiverName: string;
+}
+
+// 댓글 작성 api에 전달할 댓글 정보
+export interface CommentData {
+  content: string;
+  receiverInfo: ReceiverInfo;
+  projectId: number;
+  requirementId: number;
+}

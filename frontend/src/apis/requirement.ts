@@ -1,4 +1,5 @@
 import { privateApi } from '@/utils/http-commons.ts';
+import { CommentData } from '@/types/requirementTypes.ts';
 
 // 요구사항 조회 함수
 export const getRequirement = async (
@@ -11,12 +12,22 @@ export const getRequirement = async (
   return data;
 };
 
+// 요구사항 잠금 함수
+export const lockRequirement = async (
+  projectId: number,
+  requirementId: number,
+) => {
+  const { data } = await privateApi.put(
+    `/projects/${projectId}/requirements/${requirementId}/lock`,
+  );
+  return data;
+};
+
 // 스레드 조회 함수
 export const getThread = async (requirementId: number) => {
   const { data } = await privateApi.get(
     `/requirements/details/requirements-all-threads/${requirementId}`,
   );
-  // console.log('스레드 조회 api : ', data);
   return data;
 };
 
@@ -30,9 +41,13 @@ export const createThread = async (detailId: number) => {
 };
 
 // 댓글 작성 함수
-export const createComment = async (threadId: number) => {
+export const createComment = async (
+  threadId: number,
+  CommentData: CommentData,
+) => {
   const { data } = await privateApi.post(
     `/requirements/details/threads/${threadId}/comments`,
+    CommentData,
   );
   console.log('댓글 작성 api : ', data);
   return data;
