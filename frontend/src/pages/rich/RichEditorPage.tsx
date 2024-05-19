@@ -86,7 +86,6 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     setPageType,
   } = usePageInfoStore();
   const [status, setStatus] = useState('connecting');
-  const [currentUser, setCurrentUser] = useState({ name: '', color: '' });
   const [currentVersion, setCurrentVersion] = useState(0);
   const [latestVersion, setLatestVersion] = useState(0);
   const [versions, setVersions] = useState<CollabHistoryVersion[]>([]);
@@ -110,7 +109,6 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     setPageType('rich', {
       isRichPage: true,
     });
-    setCurrentUser({ name: name, color: profileColor });
   }, []);
 
   const ydoc = new Y.Doc();
@@ -185,7 +183,10 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
           }),
           CollaborationCursor.configure({
             provider: provider,
-            user: currentUser,
+            user: {
+              name: name,
+              color: profileColor,
+            },
           }),
           CollaborationHistory.configure({
             provider: provider,
@@ -214,14 +215,6 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     },
     [editor],
   );
-
-  // 현재 접속 유저 감지
-  useEffect(() => {
-    if (editor && currentUser) {
-      localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      editor.chain().focus().updateUser(currentUser).run();
-    }
-  }, [editor, currentUser]);
 
   // 버전 관리 모달
   const showVersioningModal = useCallback(() => {
