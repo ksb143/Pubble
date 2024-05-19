@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { createComment } from '@/apis/requirement';
 import { ThreadInfo } from '@/types/requirementTypes';
 // 4. store
+import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Profile from '@/components/layout/Profile';
 // 6. asset
@@ -19,6 +20,7 @@ interface ThreadProps {
 }
 
 const Thread = ({ data, selected }: ThreadProps) => {
+  const { projectId, requirementId } = usePageInfoStore();
   const [commentInput, setCommentInput] = useState('');
 
   const handleSendClick = () => {
@@ -29,13 +31,14 @@ const Thread = ({ data, selected }: ThreadProps) => {
     const commentData = {
       content: commentInput,
       receiverInfo: {
-        isMentioned: false,
-        receiverId: data[0].threadAuthorInfo.employeeId,
-        receiverName: data[0].threadAuthorInfo.name,
+        isMentioned: true,
+        receiverId: 'SSAFY1002',
+        receiverName: '심규영',
       },
+      projectId: projectId,
+      requirementId: requirementId,
     };
     createComment(data[0].userThreadId, commentData);
-    console.log('댓글 작성 api 호출');
     setCommentInput('');
   };
 

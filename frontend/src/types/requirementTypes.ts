@@ -74,4 +74,6 @@ export interface ReceiverInfo {
 export interface CommentData {
   content: string;
   receiverInfo: ReceiverInfo;
+  projectId: number;
+  requirementId: number;
 }
