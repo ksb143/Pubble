@@ -382,23 +382,23 @@ public class RequirementService {
         return requirementSummaryDtos;
     }
 
-    public void addRequirementDetail(Integer requirementId, String content) {
+    public void addRequirementDetail(Integer requirementId, AddRequirementDetailDto dto) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
         detailRepository.save(RequirementDetail.builder()
-                .content(content)
+                .content(dto.getContent())
                 .status("u")
                 .requirement(requirement)
                 .build());
     }
 
     @Transactional
-    public void updateDetailStatus(Integer userId, Integer requirementId, Integer detailId, String command) {
+    public void updateDetailStatus(Integer userId, Integer requirementId, Integer detailId, UpdateDetailStatusDto dto) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
         if (userId.equals(requirement.getAuthor().getUserId())) {
             RequirementDetail detail = detailRepository.findByRequirementDetailId(detailId);
-            detail.setStatus(command);
+            detail.setStatus(dto.getCommand());
             detailRepository.save(detail);
         }
     }
