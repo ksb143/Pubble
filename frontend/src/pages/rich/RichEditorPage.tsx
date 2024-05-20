@@ -113,6 +113,10 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
 
   const ydoc = new Y.Doc();
 
+  const onUpdate = () => {
+    setHasChanges(true);
+  };
+
   const provider = useMemo(
     () =>
       new TiptapCollabProvider({
@@ -125,6 +129,9 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
         },
         onAuthenticationFailed({ reason }: { reason: string }) {
           console.error('인증 실패: ', reason);
+        },
+        onSynced() {
+          ydoc.on('update', onUpdate);
         },
       }),
     [tiptapToken],
@@ -141,22 +148,6 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       provider.off('status', statusHandler);
     };
   }, []);
-
-  // 버전 변경사항 상태 확인
-  useEffect(() => {
-    const onUpdate = () => {
-      setHasChanges(true);
-    };
-    const onSynced = () => {
-      ydoc.on('update', onUpdate);
-    };
-    provider.on('synced', onSynced);
-
-    return () => {
-      provider.off('synced', onSynced);
-      ydoc.off('update', onUpdate);
-    };
-  }, [ydoc]);
 
   // 공급자 이벤트 리스너 파괴 설정
   useEffect(() => {
@@ -231,15 +222,16 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
   const handleNewVersion = useCallback(
     (event: FormEvent<HTMLElement>) => {
       event.preventDefault();
-      if (!commitDescription) {
+      if (!commitDescription.trim()) {
+        alert('버전 설명을 입력해주세요.');
         return;
       }
-      editor?.commands.saveVersion(commitDescription);
+      editor?.commands.saveVersion(commitDescription.trim());
       setCommitDescription('');
+      setHasChanges(false);
       alert(
         `버전 ${commitDescription}이 생성되었습니다. 버전 히스토리 모달을 확인해주세요!`,
       );
-      setHasChanges(false);
     },
     [editor, commitDescription],
   );
