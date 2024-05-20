@@ -228,10 +228,10 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
       }
       editor?.commands.saveVersion(commitDescription.trim());
       setCommitDescription('');
-      setHasChanges(false);
       alert(
         `버전 ${commitDescription}이 생성되었습니다. 버전 히스토리 모달을 확인해주세요!`,
       );
+      setHasChanges(false);
     },
     [editor, commitDescription],
   );
@@ -444,7 +444,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
             <div>
               <form className='commit-panel'>
                 <input
-                  className='px-4 py-1'
+                  className='rounded-l border border-gray-200 bg-white px-4 py-1 focus:outline-none disabled:bg-gray-50'
                   disabled={!hasChanges}
                   type='text'
                   placeholder='버전 이름 설정'
@@ -453,7 +453,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
                 />
                 <button
                   disabled={!hasChanges || commitDescription.length === 0}
-                  className='rounded bg-plblue px-4 py-1 text-white hover:bg-pubble disabled:bg-plblue'
+                  className='rounded-r border border-gray-200 bg-pubble px-4 py-1 text-white hover:bg-dpubble hover:shadow-custom disabled:bg-plblue disabled:shadow-none'
                   type='submit'
                   onClick={handleNewVersion}>
                   Create

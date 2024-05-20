@@ -145,7 +145,7 @@ const VersioningModal = memo(
           <Dialog.Content className='fixed left-1/2 top-1/2 z-20 h-2/3 w-3/5 -translate-x-1/2 -translate-y-1/2 transform overflow-hidden rounded bg-white'>
             <div className='flex h-full w-full overflow-hidden'>
               <div className='h-full w-3/5 overflow-auto'>
-                <div className='flex h-full flex-col'>
+                <div className='flex h-full flex-col p-8'>
                   <EditorContent editor={editor} />
                 </div>
               </div>
