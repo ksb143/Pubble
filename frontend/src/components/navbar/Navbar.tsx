@@ -2,11 +2,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
+import { Client } from '@stomp/stompjs';
 // 3. api
 import { getFCMToken, setupFCMListener } from '@/apis/notification';
+import { getVisitor } from '@/apis/user';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
+import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Message from '@/components/navbar/Message';
 import Notification from '@/components/navbar/Notification';
@@ -19,15 +22,43 @@ import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
 
+// 웹소켓 관련 코드
+interface UserInfoDto {
+  name: string;
+  employeeId: string;
+  department: string;
+  position: string;
+  role: string;
+  isApprovable: string;
+  profileColor: string;
+}
+
+interface MessagePayload {
+  operation: 'e' | 'm' | 'l';
+  employeeId?: string;
+  userInfoDto?: UserInfoDto;
+  locationName?: string;
+  locationUrl?: string;
+}
+
 const Navbar = () => {
   const navigate = useNavigate();
-  const { name, profileColor } = useUserStore();
+  const {
+    name,
+    profileColor,
+    employeeId,
+    department,
+    position,
+    role,
+    isApprovable,
+  } = useUserStore();
   const {
     hasNewMessage,
     hasNewNotification,
     setHasNewMessage,
     setHasNewNotification,
   } = useNotificationStore();
+  const { projectId } = usePageInfoStore();
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -57,6 +88,102 @@ const Navbar = () => {
       setHasNewNotification(false);
     }
   }, [activeMenu, hasNewMessage, hasNewNotification]);
+
+  // 웹소켓 관련 코드
+  let stompClient: Client;
+
+  const connectWebSocket = () => {
+    stompClient = new Client({
+      brokerURL: `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      debug: function (str) {
+        console.log('STOMP: ' + str);
+      },
+      reconnectDelay: 5000,
+      heartbeatIncoming: 4000,
+      heartbeatOutgoing: 4000,
+      onConnect: async () => {
+        console.log('Connected');
+
+        // Subscribe to the topic
+        stompClient.subscribe(`/sub/project/${projectId}`, (message) => {
+          console.log('Received message: ', JSON.parse(message.body));
+        });
+
+        const response = await getVisitor(projectId);
+        console.log('Current user list: ', response);
+
+        // sendMessage
+        sendMessage(
+          'e',
+          employeeId,
+          {
+            name,
+            employeeId,
+            department,
+            position,
+            role,
+            isApprovable,
+            profileColor,
+          },
+          'navbar',
+          `/project/${projectId}`,
+        );
+      },
+      onStompError: (frame) => {
+        console.error(`Broker reported error: ${frame.headers['message']}`);
+        console.error(`Additional details: ${frame.body}`);
+      },
+    });
+
+    stompClient.activate();
+  };
+
+  useEffect(() => {
+    connectWebSocket();
+    return () => {
+      stompClient.deactivate();
+    };
+  }, []);
+
+  // Send a message
+  const sendMessage = (
+    operation: 'e' | 'm' | 'l',
+    employeeId?: string,
+    userInfoDto?: UserInfoDto,
+    locationName?: string,
+    locationUrl?: string,
+  ) => {
+    let messageBody: MessagePayload = { operation };
+
+    // 입장(e)과 이동(m) 처리
+    if (operation === 'e' || operation === 'm') {
+      messageBody = {
+        ...messageBody,
+        employeeId,
+        userInfoDto,
+        locationName,
+        locationUrl,
+      };
+    }
+
+    // 퇴장(l) 처리
+    if (operation === 'l') {
+      messageBody = {
+        operation,
+        employeeId, // 퇴장 시에는 employeeId만 필요하다고 가정, 나머지는 포함하지 않음
+      };
+    }
+
+    stompClient.publish({
+      destination: `/pub/project/${projectId}`, // 주의: 서버로 메시지를 보내는 경로가 "/app/project/${projectId}"일 수 있습니다. 정확한 경로 확인 필요
+      body: JSON.stringify(messageBody),
+    });
+
+    console.log('Message sent:', messageBody);
+  };
 
   return (
     <>
