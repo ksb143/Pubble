@@ -79,7 +79,6 @@ const Calendar = () => {
       'red',
       'purple',
       'blue',
-      'gray',
       'brown',
     ];
     return colors[Math.floor(Math.random() * colors.length)];
@@ -122,10 +121,8 @@ const Calendar = () => {
         return 'text-white bg-blue-500';
       case 'brown':
         return 'text-white bg-brown-500';
-      case 'gray':
-        return 'text-white bg-gray-500';
       default:
-        return '';
+        return 'text-white bg-gray-500';
     }
   };
 
