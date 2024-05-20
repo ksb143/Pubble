@@ -113,6 +113,7 @@ public class JWTUtil {
                 .claim("department", department)
                 .claim("position", position)
                 .claim("allowedDocumentNames", reponseDto)
+                .claim("isApprovable", user.getIsApprovable())
 //                .claim("editable", editableProjects)
 //                .claim("uneditable", uneditableProjects)
                 .issuedAt(new Date(System.currentTimeMillis()))
