@@ -17,6 +17,7 @@ import CollaborationHistory from '@tiptap-pro/extension-collaboration-history';
 import { CollabHistoryVersion } from '@tiptap-pro/extension-collaboration-history';
 import * as Y from 'yjs';
 import styled from '@emotion/styled';
+import Lottie from 'react-lottie';
 // 3. api
 // 4. store
 import useUserStore from '@/stores/userStore.ts';
@@ -38,6 +39,7 @@ import UnderlineIcon from '@/assets/icons/underline.svg?react';
 import StrikeIcon from '@/assets/icons/strikethrough.svg?react';
 import PaletteIcon from '@/assets/icons/palette-line.svg?react';
 import MarkPenIcon from '@/assets/icons/mark-pen-line.svg?react';
+import loadingAnimation from '@/assets/lotties/loading.json';
 const { VITE_TIPTAP_APP_ID } = import.meta.env;
 
 // 컬러팔레트 커스텀
@@ -103,6 +105,17 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
   const [linkModalOpen, setLinkModalOpen] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [commitDescription, setCommitDescription] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // 로티 기본 옵션
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: loadingAnimation,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
 
   // 공동편집 기능 및 리치에디터 전역변수 설정
   useEffect(() => {
@@ -324,12 +337,22 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
     editor?.chain().focus().setResizableImage({ src: image, width: 300 }).run();
   };
 
+  // 로딩 로티 상태 설정
+  const handleLoading = (value: boolean) => {
+    setIsLoading(value);
+  };
+
   if (!editor) {
     return null;
   }
 
   return (
     <div className='mx-32 my-4 flex h-[40rem] flex-col rounded border-2 border-gray-200 bg-white'>
+      {isLoading && (
+        <div className='absolute inset-0 z-10 flex items-center justify-center bg-white bg-opacity-90'>
+          <Lottie options={defaultOptions} height={200} width={200} />
+        </div>
+      )}
       {provider && (
         <VersioningModal
           versions={versions}
@@ -361,6 +384,7 @@ const RichEditorPage = ({ tiptapToken }: RichEditorPageProps) => {
         isOpen={linkModalOpen}
         onClose={handleLinkModalClose}
         onInsert={handleLinkInsert}
+        loading={handleLoading}
       />
       {editor && (
         <MenuBar

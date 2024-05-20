@@ -13,12 +13,14 @@ interface LinkUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onInsert: (link: string, linkType: string) => void;
+  loading: (value: boolean) => void;
 }
 
 const LinkUploadModal = ({
   isOpen,
   onClose,
   onInsert,
+  loading,
 }: LinkUploadModalProps) => {
   const [linkType, setLinkType] = useState('link');
   const [url, setUrl] = useState('');
@@ -47,8 +49,10 @@ const LinkUploadModal = ({
       const fileName = `screenshot-${new Date().getTime()}.gif`;
       const file = new File([blob], fileName, { type: blob.type });
       const imageUrl = await getImageUrl(file);
+      loading(false);
       return imageUrl;
     } catch (error) {
+      loading(false);
       console.error('Failed to upload image: ', error);
       alert('이미지 업로드에 실패했습니다');
     }
@@ -59,6 +63,7 @@ const LinkUploadModal = ({
     if (linkType === 'link') {
       onInsert(url, linkType);
     } else if (linkType === 'webImage') {
+      loading(true);
       fetchScreenshotData(url).then((imageUrl) => {
         onInsert(imageUrl, linkType);
       });

@@ -206,9 +206,9 @@ const Calendar = () => {
       {/* Content area */}
       <div className='relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden'>
         <main className='grow'>
-          <div className='max-w-9xl mx-auto w-full px-4 py-8 sm:px-6 lg:px-8'>
+          <div className='max-w-9xl mx-auto w-full px-4 pb-4 sm:px-6 lg:px-8'>
             {/* Page header */}
-            <div className='sticky top-0 z-10 mb-4 bg-gray-50 sm:flex sm:items-center sm:justify-between'>
+            <div className='sticky top-0 z-[5] mb-4 bg-gray-50 sm:flex sm:items-center sm:justify-between'>
               {/* Left: Title */}
               <div className='mb-4 sm:mb-0'>
                 <h1 className='text-2xl font-bold text-slate-800 md:text-3xl dark:text-slate-100'>

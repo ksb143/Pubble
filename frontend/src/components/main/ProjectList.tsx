@@ -144,24 +144,24 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
           <table className='w-full text-center'>
             <thead className='whitespace-nowrap text-lg'>
               <tr>
-                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                   프로젝트 코드
                 </th>
-                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                   프로젝트 이름
                 </th>
-                <th className='sticky top-0 z-10 bg-gray-200 p-2'>구성원</th>
-                <th className='sticky top-0 z-10 bg-gray-200 p-2'>진행률</th>
-                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                <th className='sticky top-0 z-[5] bg-gray-200 p-2'>구성원</th>
+                <th className='sticky top-0 z-[5] bg-gray-200 p-2'>진행률</th>
+                <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                   상태
                 </th>
-                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                   시작일
                 </th>
-                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+                <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                   종료일
                 </th>
-                <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'></th>
+                <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'></th>
               </tr>
             </thead>
             <tbody>
