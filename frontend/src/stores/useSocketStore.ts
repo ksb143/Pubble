@@ -13,7 +13,25 @@ interface SocketState {
   ) => void;
   disconnect: () => void;
   subscribe: (url: string, callback: (message: any) => void) => void;
-  publish: (url: string, message: string) => void;
+  publish: (url: string, message: PublishMessage) => void;
+}
+
+interface UserInfo {
+  name: string;
+  employeeId: string;
+  department: string;
+  position: string;
+  role: string;
+  isApprovable: 'y' | 'n';
+  profileColor: string;
+}
+
+interface PublishMessage {
+  operation: string;
+  employeeId: string;
+  userInfoDto?: UserInfo;
+  locationName?: string;
+  locationUrl?: string;
 }
 
 const useSocketStore = create<SocketState>((set, get) => ({
@@ -60,7 +78,8 @@ const useSocketStore = create<SocketState>((set, get) => ({
     });
   },
   publish: (url, message) => {
-    get().client?.publish({ destination: url, body: message });
+    const messageString = JSON.stringify(message);
+    get().client?.publish({ destination: url, body: messageString });
   },
 }));
 
