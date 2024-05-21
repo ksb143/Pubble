@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 import Lottie from 'react-lottie';
 // 3. api
 import { getMessageList } from '@/apis/message';
-import { MessageInfo } from '@/types/messageTypes';
+import { MessageInfo } from '@/types/messageType';
 // 4. store
 import useNotificationStore from '@/stores/notificationStore';
 // 5. component

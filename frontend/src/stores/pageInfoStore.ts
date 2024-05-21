@@ -36,12 +36,13 @@ const usePageInfoStore = create(
   persist<PageInfoStore>(
     (set) => ({
       ...initialState,
+
       // 입력받은 페이지 타입에 따라 상태 변경
       setPageType: (type, args = {}) => {
         switch (type) {
-          // project 페이지의 초기 렌더링 세팅 or
-          // project 관련 변수 세팅, 입력받은 값이 있으면 변경
           case 'project':
+            // project 페이지의 초기 렌더링 세팅 or
+            // project 관련 변수 세팅, 입력받은 값이 있으면 변경
             set({
               ...initialState, // 나머지 변수는 초기값으로 설정
               projectId: args.projectId ?? initialState.projectId,
@@ -49,9 +50,10 @@ const usePageInfoStore = create(
               projectName: args.projectName ?? initialState.projectName,
             });
             break;
-          // requirement 페이지의 초기 렌더링 세팅 or
-          // requirement 관련 변수 세팅, 입력받은 값이 있으면 변경
+
           case 'requirement':
+            // requirement 페이지의 초기 렌더링 세팅 or
+            // requirement 관련 변수 세팅, 입력받은 값이 있으면 변경
             set((state) => ({
               ...state, // 프로젝트 관련 변수는 기존 값 유지
               requirementId: args.requirementId ?? initialState.requirementId,
@@ -62,16 +64,18 @@ const usePageInfoStore = create(
               isRichPage: initialState.isRichPage,
             }));
             break;
-          // rich 페이지의 초기 렌더링 세팅 or
-          // rich 관련 변수 중 입력받은 값이 있으면 변경
+
           case 'rich':
+            // rich 페이지의 초기 렌더링 세팅 or
+            // rich 관련 변수 중 입력받은 값이 있으면 변경
             set((state) => ({
               ...state, // 나머지 변수는 기존 값 유지
               isRichPage: args.isRichPage ?? initialState.isRichPage,
             }));
             break;
-          // 모든 변수를 초기값으로 설정
+
           case 'init':
+            // 모든 변수를 초기값으로 설정
             set(initialState);
             break;
         }

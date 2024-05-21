@@ -1,5 +1,5 @@
 import { privateApi } from '@/utils/http-commons.ts';
-import { CommentData } from '@/types/requirementTypes.ts';
+import { CommentData } from '@/types/threadType';
 
 // 요구사항 조회 함수
 export const getRequirement = async (

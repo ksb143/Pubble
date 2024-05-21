@@ -1,12 +1,17 @@
+/** @jsxImportSource @emotion/react */
 // 1. react
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
+import { css } from '@emotion/react';
 // 3. api
 import { getFCMToken, setupFCMListener } from '@/apis/notification';
+import { getVisitor, getUserByProject } from '@/apis/user';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
+import useSocketStore from '@/stores/useSocketStore';
+import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component
 import Message from '@/components/navbar/Message';
 import Notification from '@/components/navbar/Notification';
@@ -14,20 +19,59 @@ import Profile from '@/components/layout/Profile';
 import ProfileDropdown from '@/components/navbar/ProfileDropdown';
 import Breadcrumb from '@/components/navbar/Breadcrumb';
 import Badge from '@/components/navbar/Badge';
-// 6. assets
+// 6. asset
 import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
+// 7. type
+import { UserInfo } from '@/types/userType';
+import { SocketInfo } from '@/types/socketType';
+
+interface ConnectionInfo {
+  connected: SocketInfo[];
+  nonConnected: SocketInfo[];
+}
+
+// 프로필 스타일
+const zIndexStyle = (index: number) => css`
+  z-index: ${1000 - index};
+`;
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { name, profileColor } = useUserStore();
+
+  // 스토어
+  const userState = useUserStore();
+  const { projectId } = usePageInfoStore();
+  const { connect, disconnect, subscribe, publish } = useSocketStore();
   const {
     hasNewMessage,
     hasNewNotification,
     setHasNewMessage,
     setHasNewNotification,
   } = useNotificationStore();
+
+  const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(
+    null,
+  );
+  const [projectUsers, setProjectUsers] = useState<UserInfo[]>([]);
+
+  // 소켓 통신 데이터
+  const socketMessage = {
+    operation: `${projectId === 0 ? 'l' : 'e'}`,
+    employeeId: userState.employeeId,
+    userInfoDto: {
+      name: userState.name,
+      employeeId: userState.employeeId,
+      department: userState.department,
+      position: userState.position,
+      role: userState.role,
+      isApprovable: userState.isApprovable,
+      profileColor: userState.profileColor,
+    },
+    locationName: 'project',
+    locationUrl: '/project',
+  };
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -47,7 +91,7 @@ const Navbar = () => {
     setupFCMListener();
   }, []);
 
-  // 해당 메뉴 선택시 배지 비활성화
+  // 해당 메뉴를 선택하거나, 이미 모달이 열려있으면 배지 비활성화
   useEffect(() => {
     if (activeMenu === 'message') {
       setHasNewMessage(false);
@@ -57,6 +101,42 @@ const Navbar = () => {
       setHasNewNotification(false);
     }
   }, [activeMenu, hasNewMessage, hasNewNotification]);
+
+  // 유저 정보 받기
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      // 접속한 유저 정보 받기
+      const response = await getVisitor(projectId);
+      setConnectionInfo(response.data);
+      console.log(response.data);
+
+      // 프로젝트에 소속된 유저 정보 받기
+      const users = await getUserByProject(projectId);
+      setProjectUsers(users.data);
+    };
+    fetchUserInfo();
+  }, [projectId]);
+
+  // 소켓 연결, 구독, 발행
+  useEffect(() => {
+    connect(
+      `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
+      async () => {
+        console.log('웹소켓 연결 성공');
+        subscribe(`/sub/project/${projectId}`, () => {
+          console.log('프로젝트 구독 성공');
+          publish(`/pub/project/${projectId}`, socketMessage);
+        });
+      },
+      (error) => {
+        console.error('Connection error:', error);
+      },
+    );
+
+    return () => {
+      disconnect();
+    };
+  }, [projectId]);
 
   return (
     <>
@@ -74,7 +154,6 @@ const Navbar = () => {
       {/* 알림 모달 */}
       <Notification
         isOpen={activeMenu === 'notification'}
-        closeMenu={() => setActiveMenu(null)}
         setActiveMenu={setActiveMenu}
       />
 
@@ -96,6 +175,33 @@ const Navbar = () => {
         </div>
 
         <div className='flex items-center'>
+          {/* 접속 유저 */}
+          {projectId > 0 && (
+            <div className='mr-6 flex w-full items-center justify-center'>
+              {projectUsers.map((user, index) => {
+                // 접속 상태 확인: connected 목록에 해당 사용자의 employeeId가 있는지 검사
+                const isOnline = connectionInfo?.connected.some(
+                  (conn) => conn.userInfoDto?.employeeId === user.employeeId,
+                );
+
+                return (
+                  <div
+                    key={user.employeeId}
+                    css={zIndexStyle(index)}
+                    className={`relative -ml-2 shrink-0 first-of-type:ml-0 ${isOnline ? 'opacity-100' : ''}`}>
+                    <Profile
+                      width='3rem'
+                      height='3rem'
+                      name={user.name}
+                      profileColor={user.profileColor}
+                      status={isOnline ? 'online' : 'offline'}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* 쪽지 아이콘 */}
           <div
             className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
@@ -124,8 +230,8 @@ const Navbar = () => {
               <Profile
                 width='3rem'
                 height='3rem'
-                name={name}
-                profileColor={profileColor}
+                name={userState.name}
+                profileColor={userState.profileColor}
               />
             </div>
             {/* 프로필 모달 */}

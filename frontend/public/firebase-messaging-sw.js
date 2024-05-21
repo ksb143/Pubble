@@ -10,7 +10,7 @@ self.addEventListener('install', function (e) {
 });
 
 self.addEventListener('activate', function (e) {
-  console.log('FCM service worker가 실행되었습니다.');
+  console.log('FCM service worker 실행');
 });
 
 // Firebase 설정 값

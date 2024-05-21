@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
 import { updateNotificationStatus } from '@/apis/notification';
-import { NotificationInfo } from '@/types/notificationTypes';
+import { NotificationInfo } from '@/types/notificationType';
 import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
 import useNotificationStore from '@/stores/notificationStore';
@@ -17,17 +17,12 @@ import ArrowRight from '@/assets/icons/arrow-right-circle.svg?react';
 // api로 받아온 알림 리스트 타입 설정
 interface NotificationListProps {
   data: NotificationInfo[];
-  closeMenu: () => void;
   setActiveMenu: React.Dispatch<
     React.SetStateAction<null | 'message' | 'notification' | 'profile'>
   >;
 }
 
-const NotificationList = ({
-  data,
-  closeMenu,
-  setActiveMenu,
-}: NotificationListProps) => {
+const NotificationList = ({ data, setActiveMenu }: NotificationListProps) => {
   const navigate = useNavigate();
   const { isNotificationChecked, setIsNotificationChecked } =
     useNotificationStore();
@@ -95,12 +90,12 @@ const NotificationList = ({
         break;
       case 'PROJECT':
         path = '/main';
-        closeMenu();
+        setActiveMenu(null);
         break;
       case 'NEW_REQUIREMENT':
         path = `/project/${notification.typeData.projectCode}`;
         setPageType('project', { projectId: notification.typeData.projectId });
-        closeMenu();
+        setActiveMenu(null);
         break;
       case 'MENTION':
         path = `/project/${notification.typeData.projectCode}/requirement/${notification.typeData.requirementCode}`;
@@ -108,7 +103,7 @@ const NotificationList = ({
         setPageType('requirement', {
           requirementId: notification.typeData.requirementId,
         });
-        closeMenu();
+        setActiveMenu(null);
         break;
       default:
         alert('이동할 수 없는 페이지입니다.');
