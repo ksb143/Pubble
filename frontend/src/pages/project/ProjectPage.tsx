@@ -63,6 +63,11 @@ const ProjectPage = () => {
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
+  const [updateRequirement, setUpdateRequirement] = useState(false);
+
+  const updateRequirementList = () => {
+    setUpdateRequirement((prev) => !prev);
+  };
 
   useEffect(() => {
     const getRequirementList = async () => {
@@ -79,7 +84,7 @@ const ProjectPage = () => {
       setRequirementList(data);
     };
     getRequirementList();
-  }, []);
+  }, [updateRequirement]);
 
   // Date 변환 코드
   const dateParse = (date: string) => {
@@ -121,6 +126,7 @@ const ProjectPage = () => {
       {requirementList?.requirementSummaryDtos && (
         <RequirementList
           requirements={requirementList.requirementSummaryDtos}
+          updateRequirementList={updateRequirementList}
         />
       )}
     </div>

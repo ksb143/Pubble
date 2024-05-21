@@ -1,21 +1,15 @@
 // 1. react 관련
-import { useState, MouseEvent } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import { updateRequirementLockStatus } from '@/apis/project';
 import { requestConfirm } from '@/apis/confirm';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
+import userStore from '@/stores/userStore.ts';
 // 5. components
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu.tsx';
 // 6. etc
-import EllipsisVerticalIcon from '@/assets/icons/ellipsis-vertical.svg?react';
+import HistoryIcon from '@/assets/icons/history-line.svg?react';
 
 interface Person {
   name: string;
@@ -51,11 +45,15 @@ interface Requirement {
 
 interface RequirementListProps {
   requirements: Requirement[];
+  updateRequirementList: () => void;
 }
 
-const RequirementList = ({ requirements }: RequirementListProps) => {
+const RequirementList = ({
+  requirements,
+  updateRequirementList,
+}: RequirementListProps) => {
   const { setPageType } = usePageInfoStore();
-
+  const { employeeId } = userStore();
   const navigate = useNavigate();
   const { projectCode, projectId } = usePageInfoStore();
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,31 +85,15 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
       const response = await requestConfirm(reqId, requestBody);
       if (response.message === 'Confirm Complete') {
         console.log('승인 허가', response);
+        updateRequirementList();
       } else if (response.message === 'Confirm Hold') {
         console.log('승인 보류', response);
+        updateRequirementList();
       } else {
-        console.log('승인 요청 실패', response);
+        alert('승인 요청에 실패했습니다.');
       }
     } catch (error) {
       console.error('Failed to request confirm:', error);
-    }
-  };
-
-  const handleLock = async (
-    event: React.MouseEvent,
-    requirement: Requirement,
-  ) => {
-    event.stopPropagation();
-    const reqId = requirement.requirementId; // 선택된 row의 requirementId
-    try {
-      const response = await updateRequirementLockStatus(projectId, reqId);
-      if (response.data) {
-        console.log('잠금 상태 변경');
-      } else {
-        console.log('잠금 상태 변경 실패', response);
-      }
-    } catch (error) {
-      console.error('Failed to update lock status:', error);
     }
   };
 
@@ -139,34 +121,26 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
     navigate(`/project/${projectCode}/requirement/${requirementCode}`);
   };
 
-  const showRequirementHistory = (
-    event: MouseEvent,
-    requirementCode: string,
-  ) => {
-    event.stopPropagation();
-    console.log('showRequirementHistory', requirementCode);
-  };
-
   return (
     <div className='w-full'>
       <div className='mt-4 h-[30rem] w-full overflow-y-auto'>
         <table className='w-full text-center'>
           <thead className='whitespace-nowrap text-lg'>
             <tr>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                 승인여부
               </th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>코드</th>
-              <th className='sticky top-0 z-10 bg-gray-200 p-2'>요구사항명</th>
-              <th className='sticky top-0 z-10 bg-gray-200 p-2'>상세설명</th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>코드</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 p-2'>요구사항명</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 p-2'>상세설명</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                 담당자
               </th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                 작성자
               </th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>버전</th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'></th>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>버전</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>이력</th>
             </tr>
           </thead>
           <tbody>
@@ -182,39 +156,50 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                 }
                 key={requirement.requirementId}>
                 <td className='px-4 py-2'>
-                  {requirement.approval === 'a' ? (
+                  {requirement.isLock === 'u' ? (
                     <button
-                      className='rounded bg-gray-500 px-3 py-1 text-sm text-white'
+                      className='w-24 rounded bg-gray-200 px-3 py-2 text-sm text-white'
                       disabled={true}>
-                      승인완료
+                      승인 요청 전
                     </button>
-                  ) : requirement.isLock === 'l' ? (
+                  ) : requirement.isLock === 'l' &&
+                    requirement.approval === 'u' ? (
                     <button
-                      className='rounded bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600'
+                      disabled={requirement.manager.employeeId !== employeeId}
+                      className='w-24 rounded bg-pubble px-3 py-2 text-sm text-white hover:bg-dpubble disabled:bg-plblue disabled:text-black'
                       onClick={(event) => {
                         event.stopPropagation();
                         handleConfirm(event, requirement);
                       }}>
-                      승인대기
+                      승인 대기
+                    </button>
+                  ) : requirement.isLock === 'l' &&
+                    requirement.approval === 'h' ? (
+                    <button
+                      disabled={true}
+                      className='w-24 rounded bg-red-600 px-3 py-2 text-sm text-white'>
+                      승인 보류
+                    </button>
+                  ) : requirement.isLock === 'l' &&
+                    requirement.approval === 'a' ? (
+                    <button
+                      disabled={true}
+                      className='w-24 rounded bg-green-600 px-3 py-2 text-sm text-white'>
+                      승인 완료
                     </button>
                   ) : (
                     <button
-                      className='rounded bg-green-500 px-3 py-1 text-sm text-white hover:bg-green-600'
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleLock(event, requirement);
-                      }}>
-                      잠금대기
+                      className='w-24 rounded bg-gray-50 px-3 py-2 text-sm text-gray-200'
+                      disabled={true}>
+                      상태 미지정
                     </button>
                   )}
                 </td>
                 <td className='px-4 py-2'>{requirement.code}</td>
-                <td className='p-2 px-4 text-start'>
-                  {requirement.requirementName}
-                </td>
-                <td className='px-4 py-2'>
+                <td className='p-2 px-4'>{requirement.requirementName}</td>
+                <td className='px-4 py-2 text-start'>
                   {requirement.details && requirement.details.length > 0 ? (
-                    <ul>
+                    <ul className='list-disc'>
                       {requirement.details.map((detail) => (
                         <li key={detail.requirementDetailId}>
                           {detail.content}
@@ -231,23 +216,9 @@ const RequirementList = ({ requirements }: RequirementListProps) => {
                 <td
                   className='px-4 py-2'
                   onClick={(event) => event.stopPropagation()}>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className='outline-none'>
-                        <EllipsisVerticalIcon className='h-5 w-5 hover:cursor-pointer' />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className='w-fit'>
-                      <DropdownMenuCheckboxItem
-                        className='px-3 hover:cursor-pointer'
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          showRequirementHistory(event, requirement.code);
-                        }}>
-                        버전 히스토리
-                      </DropdownMenuCheckboxItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className='flex h-full w-full items-center justify-center'>
+                    <HistoryIcon className='h-6 w-6 fill-gray-900/60' />
+                  </div>
                 </td>
               </tr>
             ))}
