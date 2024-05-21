@@ -29,6 +29,12 @@ public class StompController {
     private final SimpMessageSendingOperations sendingOperations;
     private final RealTimeRequirementService requirementService;
 
+        
+    @MessageMapping("/test")
+    public void test(StompDto dto) {
+        sendingOperations.convertAndSend("/sub/test", dto);
+    }
+
     @MessageMapping("/project/{projectId}")
     public void enter(@DestinationVariable Integer projectId, UserLocationRequestDto requestDto) {
         User user = commonUtil.getUser();
