@@ -69,6 +69,11 @@ public class UserLocationService {
         List<User> participants = projectAssignmentRepository.findUsersByProjectId(projectId);
         ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
 
+        // userLocations가 null일 경우 빈 HashMap을 사용
+        if (userLocations == null) {
+            userLocations = new ConcurrentHashMap<>();
+        }
+
         Set<String> connectedEmployeeIds = userLocations.values().stream()
                 .map(UserLocationDto::getEmployeeId)
                 .collect(Collectors.toSet());
