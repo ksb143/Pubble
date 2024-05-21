@@ -8,8 +8,6 @@ import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.Project.ProjectNotFoundException;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
@@ -23,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
 import static com.ssafy.d109.pubble.entity.NotificationType.PROJECT;
 

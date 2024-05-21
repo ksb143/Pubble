@@ -77,6 +77,7 @@ public class JWTUtil {
         String department = user.getDepartment();
         String position = user.getPosition();
 
+        /*
         List<String> reponseDto = new ArrayList<>();
         List<String> editableProjects = new ArrayList<>();
         List<String> uneditableProjects = new ArrayList<>();
@@ -86,6 +87,8 @@ public class JWTUtil {
         for (ProjectListDto dto : projectListDtos) {
             reponseDto.add(dto.getProjectId() + dto.getProjectTitle() + "/*");
         }
+
+         */
 
 
         /*
@@ -112,7 +115,7 @@ public class JWTUtil {
                 .claim("name", name)
                 .claim("department", department)
                 .claim("position", position)
-                .claim("allowedDocumentNames", reponseDto)
+//                .claim("allowedDocumentNames", reponseDto)
                 .claim("isApprovable", user.getIsApprovable())
 //                .claim("editable", editableProjects)
 //                .claim("uneditable", uneditableProjects)
