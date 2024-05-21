@@ -71,7 +71,7 @@ const Socket = () => {
         //   console.log('Received:', userInfo);
         // });
         subscribe(`/sub/test`, (message) => {
-          console.log('Received:', message);
+          console.log('Received Test:', message);
         });
 
         const response = await getVisitor(projectId);
@@ -97,7 +97,7 @@ const Socket = () => {
         subscribe(`/sub/project/${projectId}`, (message) => {
           console.log('Received:', message);
           const userInfo = JSON.parse(message.body);
-          console.log('Received:', userInfo);
+          console.log('Received Project:', userInfo);
         });
 
         const response = await getVisitor(projectId);
