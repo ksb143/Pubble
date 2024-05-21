@@ -29,6 +29,8 @@ const LoginPage = () => {
     setPosition,
     setAllowedDocumentNames,
     setUserId,
+    setRole,
+    setIsApprovable,
   } = useUserStore();
 
   // 로티 기본 옵션
