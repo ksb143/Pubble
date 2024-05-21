@@ -130,6 +130,7 @@ const RequirementPage = () => {
         // 요구사항 정보 조회
         const reqRes = await getRequirement(projectId, requirementId);
         setRequirementInfo(reqRes.data);
+        console.log('reqRes', reqRes.data);
 
         // 페이지 정보 업데이트
         setPageType('requirement', {

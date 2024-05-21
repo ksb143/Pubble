@@ -23,5 +23,6 @@ export const requestConfirm = async (
     `/requirements/confirm/${reqId}`,
     fullRequestBody,
   );
+  console.log('response', response.data);
   return response.data;
 };
