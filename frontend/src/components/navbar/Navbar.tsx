@@ -58,7 +58,7 @@ const Navbar = () => {
 
   // 소켓 통신 데이터
   const socketMessage = {
-    operation: 'e',
+    operation: `${projectId === 0 ? 'l' : 'e'}`,
     employeeId: userState.employeeId,
     userInfoDto: {
       name: userState.name,
@@ -176,7 +176,7 @@ const Navbar = () => {
 
         <div className='flex items-center'>
           {/* 접속 유저 */}
-          {projectId && (
+          {projectId > 0 && (
             <div className='mr-6 flex w-full items-center justify-center'>
               {projectUsers.map((user, index) => {
                 // 접속 상태 확인: connected 목록에 해당 사용자의 employeeId가 있는지 검사
