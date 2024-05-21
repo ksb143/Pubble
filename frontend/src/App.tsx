@@ -8,12 +8,9 @@ import useUserStore from '@/stores/userStore';
 // 5. component
 import User from '@/routers/User';
 import Project from '@/routers/Project';
-import Admin from '@/routers/Admin';
 import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
-// 6. assets
-
-import Socket from '@/pages/Socket';
+// 6. asset
 
 function App() {
   const {
@@ -61,7 +58,6 @@ function App() {
       <Routes>
         {/* 상단바 없는 페이지 */}
         <Route path='/' element={<User />} />
-        <Route path='/socket' element={<Socket />} />
 
         {/* 상단바 있는 페이지 */}
         <Route element={<Layout />}>
@@ -69,8 +65,6 @@ function App() {
           <Route path='/main' element={<MainPage />} />
           {/* 프로젝트 페이지들*/}
           <Route path='/project/*' element={<Project />} />
-          {/* 관리자 페이지 */}
-          <Route path='/admin/*' element={<Admin />} />
         </Route>
       </Routes>
     </Router>

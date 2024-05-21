@@ -1,13 +1,4 @@
-// 검색에 사용할 유저 타입 정의
-export interface UserInfo {
-  name: string;
-  employeeId: string;
-  department: string;
-  position: string;
-  role: string;
-  isApprovable: 'y' | 'n';
-  profileColor: string;
-}
+import { UserInfo } from '@/types/userType';
 
 /**
  * 사용자 검색어에 따라 자동완성 결과를 반환하는 함수

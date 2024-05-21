@@ -1,10 +1,11 @@
 import create from 'zustand';
-import { Client } from '@stomp/stompjs';
+import { Client, Message } from '@stomp/stompjs';
+import { SocketInfo } from '@/types/socketType';
 
 interface SocketState {
   client: Client | null;
   isConnected: boolean;
-  messages: any[];
+  messages: Message[];
   setClient: (client: Client | null) => void;
   connect: (
     url: string,
@@ -12,26 +13,8 @@ interface SocketState {
     onError: (error: string) => void,
   ) => void;
   disconnect: () => void;
-  subscribe: (url: string, callback: (message: any) => void) => void;
-  publish: (url: string, message: PublishMessage) => void;
-}
-
-interface UserInfo {
-  name: string;
-  employeeId: string;
-  department: string;
-  position: string;
-  role: string;
-  isApprovable: 'y' | 'n';
-  profileColor: string;
-}
-
-interface PublishMessage {
-  operation: string;
-  employeeId: string;
-  userInfoDto?: UserInfo;
-  locationName?: string;
-  locationUrl?: string;
+  subscribe: (url: string, callback: (message: Message) => void) => void;
+  publish: (url: string, message: SocketInfo) => void;
 }
 
 const useSocketStore = create<SocketState>((set, get) => ({
@@ -45,9 +28,9 @@ const useSocketStore = create<SocketState>((set, get) => ({
       connectHeaders: {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
-      debug: function (str) {
-        console.log(str);
-      },
+      // debug: function (str) {
+      //   console.log(str);
+      // },
       reconnectDelay: 5000,
       heartbeatIncoming: 4000,
       heartbeatOutgoing: 4000,
@@ -72,7 +55,7 @@ const useSocketStore = create<SocketState>((set, get) => ({
     set({ client: null, isConnected: false });
   },
   subscribe: (url, callback) => {
-    get().client?.subscribe(url, (message) => {
+    get().client?.subscribe(url, (message: Message) => {
       callback(message);
       set((state) => ({ messages: [...state.messages, message] }));
     });

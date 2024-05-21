@@ -3,7 +3,7 @@ import { useState } from 'react';
 // 2. library
 // 3. api
 import { updateMessageStatus } from '@/apis/message';
-import { MessageInfo } from '@/types/messageTypes';
+import { MessageInfo } from '@/types/messageType';
 import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
 import useNotificationStore from '@/stores/notificationStore';

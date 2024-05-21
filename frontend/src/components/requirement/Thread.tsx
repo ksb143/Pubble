@@ -6,8 +6,9 @@ import { css } from '@emotion/react';
 // 3. api
 import { getUserByProject } from '@/apis/user';
 import { createComment, lockThread } from '@/apis/requirement';
-import { ThreadInfo, ReceiverInfo } from '@/types/requirementTypes';
-import { autocompleteUser, UserInfo } from '@/utils/search';
+import { ThreadInfo, ReceiverInfo } from '@/types/threadType';
+import { autocompleteUser } from '@/utils/search';
+import { UserInfo } from '@/types/userType';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import useUserStore from '@/stores/userStore';
