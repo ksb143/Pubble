@@ -42,9 +42,9 @@ const useSocketStore = create<SocketState>((set, get) => ({
   connect: (url, onConnect, onError) => {
     const client = new Client({
       brokerURL: url,
-      // connectHeaders: {
-      //   Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      // },
+      connectHeaders: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
       debug: function (str) {
         console.log(str);
       },
