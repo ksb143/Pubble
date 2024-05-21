@@ -11,7 +11,8 @@ import {
   createRequirementDetail,
   updateRequirementDetailStatus,
 } from '@/apis/requirement';
-import { RequirementInfo, ThreadListInfo } from '@/types/requirementTypes';
+import { RequirementInfo } from '@/types/requirementType';
+import { ThreadListInfo } from '@/types/threadType';
 import { extractDate, extractTime } from '@/utils/datetime';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';

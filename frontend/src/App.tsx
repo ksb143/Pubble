@@ -5,16 +5,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // 3. api
 // 4. store
 import useUserStore from '@/stores/userStore';
-import useStompStore from '@/stores/useStompStore';
 // 5. component
 import User from '@/routers/User';
 import Project from '@/routers/Project';
-import Admin from '@/routers/Admin';
 import Layout from '@/components/layout/Layout';
 import MainPage from '@/pages/main/MainPage';
-// 6. assets
-
-import Socket from '@/pages/Socket';
+// 6. asset
 
 function App() {
   const {
@@ -25,7 +21,6 @@ function App() {
     setPosition, // 직급 세팅
     setUserId, // 유저 아이디 세팅
   } = useUserStore();
-  const { connect, disconnect } = useStompStore();
 
   useEffect(() => {
     // 로그인 정보 가져오기
@@ -58,22 +53,11 @@ function App() {
     return JSON.parse(jsonPayload);
   };
 
-  useEffect(() => {
-    // 서버와의 연결을 활성화
-    connect();
-
-    // 컴포넌트 언마운트 시 연결 해제
-    return () => {
-      disconnect();
-    };
-  }, [connect, disconnect]);
-
   return (
     <Router>
       <Routes>
         {/* 상단바 없는 페이지 */}
         <Route path='/' element={<User />} />
-        <Route path='/socket' element={<Socket />} />
 
         {/* 상단바 있는 페이지 */}
         <Route element={<Layout />}>
@@ -81,8 +65,6 @@ function App() {
           <Route path='/main' element={<MainPage />} />
           {/* 프로젝트 페이지들*/}
           <Route path='/project/*' element={<Project />} />
-          {/* 관리자 페이지 */}
-          <Route path='/admin/*' element={<Admin />} />
         </Route>
       </Routes>
     </Router>
