@@ -127,20 +127,20 @@ const RequirementList = ({
         <table className='w-full text-center'>
           <thead className='whitespace-nowrap text-lg'>
             <tr>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                 승인여부
               </th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>코드</th>
-              <th className='sticky top-0 z-10 bg-gray-200 p-2'>요구사항명</th>
-              <th className='sticky top-0 z-10 bg-gray-200 p-2'>상세설명</th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>코드</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 p-2'>요구사항명</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 p-2'>상세설명</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                 담당자
               </th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
                 작성자
               </th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>버전</th>
-              <th className='sticky top-0 z-10 bg-gray-200 px-4 py-2'>이력</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>버전</th>
+              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>이력</th>
             </tr>
           </thead>
           <tbody>
@@ -166,7 +166,7 @@ const RequirementList = ({
                     requirement.approval === 'u' ? (
                     <button
                       disabled={requirement.manager.employeeId !== employeeId}
-                      className='w-24 rounded bg-plblue px-3 py-2 text-sm text-black hover:bg-pubble disabled:bg-plblue'
+                      className='w-24 rounded bg-pubble px-3 py-2 text-sm text-white hover:bg-dpubble disabled:bg-plblue disabled:text-black'
                       onClick={(event) => {
                         event.stopPropagation();
                         handleConfirm(event, requirement);
@@ -184,7 +184,7 @@ const RequirementList = ({
                     requirement.approval === 'a' ? (
                     <button
                       disabled={true}
-                      className='w-24 rounded bg-pubble px-3 py-2 text-sm text-white'>
+                      className='w-24 rounded bg-green-600 px-3 py-2 text-sm text-white'>
                       승인 완료
                     </button>
                   ) : (
@@ -217,7 +217,7 @@ const RequirementList = ({
                   className='px-4 py-2'
                   onClick={(event) => event.stopPropagation()}>
                   <div className='flex h-full w-full items-center justify-center'>
-                    <HistoryIcon className='h-6 w-6 fill-gray-900' />
+                    <HistoryIcon className='h-6 w-6 fill-gray-900/60' />
                   </div>
                 </td>
               </tr>
