@@ -11,11 +11,12 @@ const Socket = () => {
 
   useEffect(() => {
     connect(
-      `ws://${import.meta.env.VITE_STOMP_BROKER_URL}`,
+      `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
       async () => {
         console.log('WebSocket Connected');
         subscribe(`/sub/project/${projectId}`, (message) => {
-          console.log('Received:', message);
+          const userInfo = JSON.parse(message.body);
+          console.log('Received:', userInfo);
         });
 
         const response = await getVisitor(projectId);
