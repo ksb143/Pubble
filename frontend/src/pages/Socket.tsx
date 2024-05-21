@@ -14,9 +14,12 @@ const Socket = () => {
       `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
       async () => {
         console.log('WebSocket Connected');
-        subscribe(`/sub/project/${projectId}`, (message) => {
-          const userInfo = JSON.parse(message.body);
-          console.log('Received:', userInfo);
+        // subscribe(`/sub/project/${projectId}`, (message) => {
+        //   const userInfo = JSON.parse(message.body);
+        //   console.log('Received:', userInfo);
+        // });
+        subscribe(`/sub/test`, (message) => {
+          console.log('Received:', message);
         });
 
         const response = await getVisitor(projectId);
