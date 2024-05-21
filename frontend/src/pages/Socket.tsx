@@ -18,6 +18,7 @@ const Socket = () => {
     fetchUserInfo();
   }, [trigger, projectId]);
 
+  // 프로젝트 전송
   const sendProjectMessage = () => {
     const messageContent = {
       operation: 'e',
@@ -56,7 +57,7 @@ const Socket = () => {
       locationUrl: '/socket',
     };
 
-    publish(`/pub/project/${projectId}`, messageContent);
+    publish(`/pub/test`, messageContent);
     setTrigger(!trigger);
   };
 
