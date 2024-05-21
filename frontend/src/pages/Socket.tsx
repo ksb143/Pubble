@@ -55,10 +55,69 @@ const Socket = () => {
     publish(`/pub/project/${projectId}`, messageContent);
   };
 
+  const handleTestConnect = () => {
+    connect(
+      `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
+      async () => {
+        console.log('WebSocket Connected');
+        // subscribe(`/sub/project/${projectId}`, (message) => {
+        //   const userInfo = JSON.parse(message.body);
+        //   console.log('Received:', userInfo);
+        // });
+        subscribe(`/sub/test`, (message) => {
+          console.log('Received:', message);
+        });
+
+        const response = await getVisitor(projectId);
+        console.log(response);
+      },
+      (error) => {
+        console.error('Connection error:', error);
+      },
+    );
+
+    return () => {
+      disconnect();
+    };
+  };
+
+  const handleProjectConnect = () => {
+    connect(
+      `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
+      async () => {
+        console.log('WebSocket Connected');
+        subscribe(`/sub/project/${projectId}`, (message) => {
+          console.log('Received:', message);
+          const userInfo = JSON.parse(message.body);
+          console.log('Received:', userInfo);
+        });
+
+        const response = await getVisitor(projectId);
+        console.log(response);
+      },
+      (error) => {
+        console.error('Connection error:', error);
+      },
+    );
+
+    return () => {
+      disconnect();
+    };
+  };
+
   return (
     <div>
-      <button onClick={sendMessage}>Send Message</button>
-      <div></div>
+      <button className='rounded bg-blue-500' onClick={handleTestConnect}>
+        Test Connect
+      </button>
+
+      <button className='rounded bg-green-500' onClick={handleProjectConnect}>
+        Project Connect
+      </button>
+
+      <button className='rounded bg-red-500' onClick={sendMessage}>
+        Send Message
+      </button>
     </div>
   );
 };
