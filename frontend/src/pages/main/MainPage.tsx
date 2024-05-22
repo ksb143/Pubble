@@ -63,10 +63,10 @@ const MainDashboardPage = () => {
       />
       <div className='mx-4 mt-4 flex'>
         <div className='flex items-center justify-center'>
-          <div className='h-full w-1/2 items-center pr-3 text-black'>
+          <div className='h-full w-2/5 items-center pr-3 text-black'>
             <Calendar />
           </div>
-          <div className='flex h-full w-1/2 items-center justify-center overflow-auto text-black'>
+          <div className='flex h-full w-3/5 items-center justify-center overflow-auto text-black'>
             <ProjectList openProjectStatus={showProjectStatus} />
           </div>
         </div>
