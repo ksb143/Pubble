@@ -147,16 +147,8 @@ const Navbar = () => {
       },
     );
 
-    // beforeunload 이벤트를 이용하여 웹소켓 연결 종료
-    const handleUnload = () => {
-      disconnect(); // 웹소켓 연결 해제 함수 호출
-    };
-
-    window.addEventListener('beforeunload', handleUnload);
-
     return () => {
       disconnect();
-      window.removeEventListener('beforeunload', handleUnload); // 이벤트 리스너 제거
     };
   }, [projectId, connect, disconnect, subscribe, handleSendPublish]);
 
