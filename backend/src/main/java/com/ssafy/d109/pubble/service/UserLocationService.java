@@ -29,8 +29,17 @@ public class UserLocationService {
                 .locationName(dto.getLocationName())
                 .locationUrl(dto.getLocationUrl())
                 .build();
+        System.out.println("userLocationDto = " + userLocationDto.toString());
 
         projectUserLocations.computeIfAbsent(projectId, k -> new ConcurrentHashMap<>()).put(user.getEmployeeId(), userLocationDto);
+        System.out.println("===========================enter==========================================");
+        System.out.println("projectUserLocations = " + projectUserLocations);
+        System.out.println("projectUserLocations = " + projectUserLocations.toString());
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId));
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).toString());
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values());
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values().toString());
+
 
         userLocationDto.setOperation("e");
         return userLocationDto;
@@ -70,7 +79,13 @@ public class UserLocationService {
         List<User> participants = projectAssignmentRepository.findUsersByProjectId(projectId);
         System.out.println("participants = " + participants.toString());
         ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
-        System.out.println("userLocations = " + userLocations.toString());
+        System.out.println("===========================getAllUserLocations==========================================");
+        System.out.println("projectUserLocations = " + projectUserLocations);
+        System.out.println("projectUserLocations = " + projectUserLocations.toString());
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId));
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).toString());
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values());
+        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values().toString());
 
         // userLocations가 null일 경우 빈 HashMap을 사용
         if (userLocations == null) {
