@@ -113,8 +113,9 @@ const Navbar = () => {
       `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
       () => {
         console.log('웹소켓 연결 성공');
-        subscribe(`/sub/project/${projectId}`, () => {
-          console.log('프로젝트 구독 성공');
+        subscribe(`/sub/project/${projectId}`, (message) => {
+          const response = JSON.parse(message.body);
+          console.log('프로젝트 구독 성공', response);
         });
 
         if (previousProjectIdRef.current !== projectId) {
