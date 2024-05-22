@@ -108,7 +108,6 @@ const RequirementList = ({
         setHistoryList(response.data);
         setOpenHistoryModal(true);
       }
-      setOpenHistoryModal(true);
     } catch (error) {
       console.log('이력 조회 실패: ', error);
     }
