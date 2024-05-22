@@ -31,14 +31,10 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
 
   const handleAddProject = async () => {
     const participantsArray = participant.split(',').map((part) => part.trim());
-    console.log('api 호출시작');
     try {
       await addProject(title, code, participantsArray, startAt, endAt);
-      console.log('api 호출 성공');
       onClose(); // 프로젝트 생성 후 모달 닫기
-    } catch (error) {
-      console.error('api 호출 실패', error);
-    }
+    } catch (error) {}
   };
 
   return (
