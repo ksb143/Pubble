@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import { getRequirementHistory } from '@/apis/requirement';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import userStore from '@/stores/userStore.ts';
@@ -55,10 +54,8 @@ const RequirementList = ({
   const { setPageType } = usePageInfoStore();
   const { employeeId } = userStore();
   const navigate = useNavigate();
-  const { projectCode, projectId, requirementCode } = usePageInfoStore();
+  const { projectCode } = usePageInfoStore();
   const [currentPage, setCurrentPage] = useState(1);
-  const [openHistoryModal, setOpenHistoryModal] = useState(false);
-  const [historyList, setHistoryList] = useState([]);
 
   // 페이지네이션 처리
   const itemsPerPage = 10;
@@ -96,21 +93,6 @@ const RequirementList = ({
     });
 
     navigate(`/project/${projectCode}/requirement/${requirementCode}`);
-  };
-
-  const handleHistoryClick = async () => {
-    try {
-      const response = await getRequirementHistory(projectId, requirementCode);
-      if (response.data.length === 0) {
-        alert('이력이 존재하지 않습니다');
-        return;
-      } else {
-        setHistoryList(response.data);
-        setOpenHistoryModal(true);
-      }
-    } catch (error) {
-      console.log('이력 조회 실패: ', error);
-    }
   };
 
   return (
@@ -202,9 +184,7 @@ const RequirementList = ({
                 <td
                   className='px-4 py-2'
                   onClick={(event) => event.stopPropagation()}>
-                  <div
-                    className='flex h-full w-full items-center justify-center'
-                    onClick={handleHistoryClick}>
+                  <div className='flex h-full w-full items-center justify-center'>
                     <HistoryIcon className='h-6 w-6 fill-gray-900/60' />
                   </div>
                 </td>
