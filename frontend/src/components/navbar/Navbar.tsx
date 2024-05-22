@@ -56,23 +56,6 @@ const Navbar = () => {
   );
   const [projectUsers, setProjectUsers] = useState<UserInfo[]>([]);
 
-  // 소켓 통신 데이터
-  const socketMessage = {
-    operation: `${projectId === 0 ? 'l' : 'e'}`,
-    employeeId: userState.employeeId,
-    userInfoDto: {
-      name: userState.name,
-      employeeId: userState.employeeId,
-      department: userState.department,
-      position: userState.position,
-      role: userState.role,
-      isApprovable: userState.isApprovable,
-      profileColor: userState.profileColor,
-    },
-    locationName: 'project',
-    locationUrl: '/project',
-  };
-
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
     null | 'message' | 'notification' | 'profile'
@@ -121,15 +104,16 @@ const Navbar = () => {
   useEffect(() => {
     connect(
       `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
-      async () => {
+      () => {
         console.log('웹소켓 연결 성공');
         subscribe(`/sub/project/${projectId}`, () => {
           console.log('프로젝트 구독 성공');
-          publish(`/pub/project/${projectId}`, socketMessage);
         });
+        // 초기 메시지 발행
+        handleSendPublish();
       },
       (error) => {
-        console.error('Connection error:', error);
+        console.error('연결 오류:', error);
       },
     );
 
@@ -137,6 +121,28 @@ const Navbar = () => {
       disconnect();
     };
   }, [projectId]);
+
+  const handleSendPublish = () => {
+    // 소켓 통신 데이터
+    const operation = projectId === 0 ? 'l' : 'e'; // 퇴장 또는 입장
+    const socketMessage = {
+      operation: operation,
+      employeeId: userState.employeeId,
+      userInfoDto: {
+        name: userState.name,
+        employeeId: userState.employeeId,
+        department: userState.department,
+        position: userState.position,
+        role: userState.role,
+        isApprovable: userState.isApprovable,
+        profileColor: userState.profileColor,
+      },
+      locationName: 'project',
+      locationUrl: '/project',
+    };
+    publish(`/pub/project/${projectId}`, socketMessage);
+    console.log('프로젝트 발행 성공');
+  };
 
   return (
     <>
