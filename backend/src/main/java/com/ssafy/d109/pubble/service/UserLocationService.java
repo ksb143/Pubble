@@ -66,8 +66,11 @@ public class UserLocationService {
     }
 
     public AllUserLocationResponseDto getAllUserLocations(Integer projectId) {
+        System.out.println("projectId = " + projectId);
         List<User> participants = projectAssignmentRepository.findUsersByProjectId(projectId);
+        System.out.println("participants = " + participants.toString());
         ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
+        System.out.println("userLocations = " + userLocations.toString());
 
         // userLocations가 null일 경우 빈 HashMap을 사용
         if (userLocations == null) {
@@ -77,7 +80,6 @@ public class UserLocationService {
         Set<String> connectedEmployeeIds = userLocations.values().stream()
                 .map(UserLocationDto::getEmployeeId)
                 .collect(Collectors.toSet());
-        // debug
         System.out.println("connectedEmployeeIds.toString() = " + connectedEmployeeIds.toString());
 
         // 접속자
