@@ -77,6 +77,8 @@ public class UserLocationService {
         Set<String> connectedEmployeeIds = userLocations.values().stream()
                 .map(UserLocationDto::getEmployeeId)
                 .collect(Collectors.toSet());
+        // debug
+        System.out.println("connectedEmployeeIds.toString() = " + connectedEmployeeIds.toString());
 
         // 접속자
         List<UserLocationDto> connectedUserLocations = new ArrayList<>(userLocations.values());
@@ -84,7 +86,11 @@ public class UserLocationService {
         // 비접속자
         // 전체 유저 중 - 비접속자 유저를 걸러 - 각각 userLocationDto로 담아 - 리스트로 반환
         List<UserLocationDto> nonConnectedUserLocations = participants.stream()
-                .filter(user -> !connectedEmployeeIds.contains(user.getEmployeeId()))
+                .filter(user -> {
+                    boolean isConnected = connectedEmployeeIds.contains(user.getEmployeeId());
+                    System.out.println("User ID: " + user.getEmployeeId() + " isConnected: " + isConnected);
+                    return !isConnected;
+                })
                 .map(user -> UserLocationDto.builder()
                         .employeeId(user.getEmployeeId())
                         .userInfoDto(UserInfoDto.createUserInfo(user))
