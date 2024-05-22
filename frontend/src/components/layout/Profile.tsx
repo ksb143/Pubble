@@ -57,7 +57,7 @@ const Profile = ({
     <>
       <div
         css={profileStyle}
-        className={`absolute ${status === 'online' ? '' : 'bg-white/70'}`}></div>
+        className={`absolute ${status === 'online' ? 'border' : ' bg-white/50'}`}></div>
       <div css={[profileStyle, backgroundColor]}>
         <p className={`whitespace-nowrap font-normal ${fontSizeClass}`}>
           {name}
