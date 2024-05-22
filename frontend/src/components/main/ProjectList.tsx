@@ -41,6 +41,7 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState('');
   const [filteredProjects, setFilteredProjects] = useState(projects);
+  const [update, setUpdate] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -57,6 +58,11 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
             progressRatio: project.progressRatio,
             status: project.status,
           }));
+          // Sort projects by startAt date (most recent first)
+          projectData.sort(
+            (a: Project, b: Project) =>
+              new Date(b.startAt).getTime() - new Date(a.startAt).getTime(),
+          );
           setProjects(projectData);
         } else {
           setProjects([]);
@@ -67,7 +73,7 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
       }
     };
     fetchProjects();
-  }, []);
+  }, [update]);
 
   // 필터링 처리
   useEffect(() => {
@@ -124,13 +130,16 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
     openProjectStatus(projectId);
   };
 
+  // 프로젝트 추가 모달창 닫기
+  const handleProjectList = () => {
+    setIsModalOpen(false);
+    setUpdate(!update);
+  };
+
   return (
     <div className='w-full'>
       <div>
-        <ProjectAddModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
+        <ProjectAddModal isOpen={isModalOpen} onClose={handleProjectList} />
         <div className='mb-2 flex justify-between'>
           <input
             placeholder='프로젝트명을 입력해주요.'
