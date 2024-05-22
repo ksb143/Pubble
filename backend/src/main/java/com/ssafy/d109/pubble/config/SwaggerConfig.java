@@ -32,9 +32,9 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi projectApi() {
+    public GroupedOpenApi projectsApi() {
         return GroupedOpenApi.builder()
-                .group("project-api")
+                .group("projects-api")
                 .pathsToMatch("/projects/**")
                 .build();
     }
@@ -68,14 +68,6 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
                 .group("uploads-api")
                 .pathsToMatch("/uploads/**")
-                .build();
-    }
-
-    @Bean
-    public GroupedOpenApi testApi() {
-        return GroupedOpenApi.builder()
-                .group("test-api")
-                .pathsToMatch("/test/**")
                 .build();
     }
 
