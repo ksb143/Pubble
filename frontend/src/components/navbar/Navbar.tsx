@@ -158,7 +158,7 @@ const Navbar = () => {
       disconnect();
       window.removeEventListener('beforeunload', handleUnload); // 이벤트 리스너 제거
     };
-  }, [projectId, connect, disconnect, subscribe]);
+  }, [projectId, connect, disconnect, subscribe, handleSendPublish]);
 
   return (
     <>
