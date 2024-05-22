@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 // 1. react
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 import { css } from '@emotion/react';
@@ -55,23 +55,7 @@ const Navbar = () => {
     null,
   );
   const [projectUsers, setProjectUsers] = useState<UserInfo[]>([]);
-
-  // 소켓 통신 데이터
-  const socketMessage = {
-    operation: `${projectId === 0 ? 'l' : 'e'}`,
-    employeeId: userState.employeeId,
-    userInfoDto: {
-      name: userState.name,
-      employeeId: userState.employeeId,
-      department: userState.department,
-      position: userState.position,
-      role: userState.role,
-      isApprovable: userState.isApprovable,
-      profileColor: userState.profileColor,
-    },
-    locationName: 'project',
-    locationUrl: '/project',
-  };
+  const previousProjectIdRef = useRef(projectId);
 
   // 클릭한 메뉴 상태
   const [activeMenu, setActiveMenu] = useState<
@@ -81,6 +65,27 @@ const Navbar = () => {
   // 메뉴 토글 함수
   const toggleMenu = (menu: 'message' | 'notification' | 'profile') => {
     setActiveMenu(activeMenu === menu ? null : menu);
+  };
+
+  const handleSendPublish = (publishProjectId: number, operation: string) => {
+    // 소켓 통신 데이터
+    const socketMessage = {
+      operation: operation,
+      employeeId: userState.employeeId,
+      userInfoDto: {
+        name: userState.name,
+        employeeId: userState.employeeId,
+        department: userState.department,
+        position: userState.position,
+        role: userState.role,
+        isApprovable: userState.isApprovable,
+        profileColor: userState.profileColor,
+      },
+      locationName: 'project',
+      locationUrl: '/project',
+    };
+    publish(`/pub/project/${publishProjectId}`, socketMessage);
+    console.log('프로젝트 발행 성공');
   };
 
   // firebase 초기 설정
@@ -102,41 +107,50 @@ const Navbar = () => {
     }
   }, [activeMenu, hasNewMessage, hasNewNotification]);
 
-  // 유저 정보 받기
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      // 접속한 유저 정보 받기
-      const response = await getVisitor(projectId);
-      setConnectionInfo(response.data);
-      console.log(response.data);
-
-      // 프로젝트에 소속된 유저 정보 받기
-      const users = await getUserByProject(projectId);
-      setProjectUsers(users.data);
-    };
-    fetchUserInfo();
-  }, [projectId]);
-
-  // 소켓 연결, 구독, 발행
+  // 웹소켓
   useEffect(() => {
     connect(
       `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
-      async () => {
+      () => {
         console.log('웹소켓 연결 성공');
         subscribe(`/sub/project/${projectId}`, () => {
           console.log('프로젝트 구독 성공');
-          publish(`/pub/project/${projectId}`, socketMessage);
         });
+
+        if (previousProjectIdRef.current !== projectId) {
+          if (previousProjectIdRef.current > 0) {
+            // 이전 프로젝트에서 퇴장 처리
+            handleSendPublish(previousProjectIdRef.current, 'l');
+          }
+          previousProjectIdRef.current = projectId;
+        }
+
+        if (projectId > 0) {
+          // 새 프로젝트에서 입장 처리
+          handleSendPublish(projectId, 'e');
+
+          const fetchUserInfo = async () => {
+            // 접속한 유저 정보 받기
+            const response = await getVisitor(projectId);
+            setConnectionInfo(response.data);
+            console.log(response.data);
+
+            // 프로젝트에 소속된 유저 정보 받기
+            const users = await getUserByProject(projectId);
+            setProjectUsers(users.data);
+          };
+          fetchUserInfo();
+        }
       },
       (error) => {
-        console.error('Connection error:', error);
+        console.error('연결 오류:', error);
       },
     );
 
     return () => {
       disconnect();
     };
-  }, [projectId]);
+  }, [projectId, connect, disconnect, subscribe, publish]);
 
   return (
     <>
@@ -204,7 +218,7 @@ const Navbar = () => {
 
           {/* 쪽지 아이콘 */}
           <div
-            className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
+            className={`relative mr-6 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
             onClick={() => toggleMenu('message')}>
             <Envelope
               className={`h-8 w-8 stroke-gray-900 ${activeMenu === 'message' ? 'stroke-[1.5]' : 'stroke-1'}`}
@@ -225,7 +239,7 @@ const Navbar = () => {
           {/* 프로필 아이콘 */}
           <div className='relative'>
             <div
-              className='cursor-pointer'
+              className='shrink-0 cursor-pointer'
               onClick={() => toggleMenu('profile')}>
               <Profile
                 width='3rem'

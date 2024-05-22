@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import { requestConfirm } from '@/apis/confirm';
 import { getRequirementHistory } from '@/apis/requirement';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
@@ -28,7 +27,7 @@ interface Detail {
   status: 'u' | 'd';
 }
 
-interface Requirement {
+interface Summary {
   requirementId: number;
   orderIndex: number;
   version: string;
@@ -45,13 +44,13 @@ interface Requirement {
 }
 
 interface RequirementListProps {
-  requirements: Requirement[];
-  updateRequirementList: () => void;
+  requirements: Summary[];
+  selectedRequirement: (selectedRequirement: Summary) => void;
 }
 
 const RequirementList = ({
   requirements,
-  updateRequirementList,
+  selectedRequirement,
 }: RequirementListProps) => {
   const { setPageType } = usePageInfoStore();
   const { employeeId } = userStore();
@@ -71,33 +70,8 @@ const RequirementList = ({
       setCurrentPage(currentPage + 1);
     }
   };
-  const handleConfirm = async (
-    event: React.MouseEvent,
-    requirement: Requirement,
-  ) => {
-    event.stopPropagation();
-    const reqId = requirement.requirementId; // 선택된 row의 requirementId
-    const requestBody = {
-      projectId: projectId,
-      isLock: requirement.isLock,
-      approval: requirement.approval,
-      requirementName: requirement.requirementName,
-      approvalComment: requirement.approvalComment || '',
-    };
-    try {
-      const response = await requestConfirm(reqId, requestBody);
-      if (response.message === 'Confirm Complete') {
-        console.log('승인 허가', response);
-        updateRequirementList();
-      } else if (response.message === 'Confirm Hold') {
-        console.log('승인 보류', response);
-        updateRequirementList();
-      } else {
-        alert('승인 요청에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('Failed to request confirm:', error);
-    }
+  const handleConfirm = (requirement: Summary) => {
+    selectedRequirement(requirement);
   };
 
   const handlePrevious = () => {
@@ -127,7 +101,13 @@ const RequirementList = ({
   const handleHistoryClick = async () => {
     try {
       const response = await getRequirementHistory(projectId, requirementCode);
-      console.log('이력 조회 성공: ', response.data);
+      if (response.data.length === 0) {
+        alert('이력이 존재하지 않습니다');
+        return;
+      } else {
+        setHistoryList(response.data);
+        setOpenHistoryModal(true);
+      }
       setOpenHistoryModal(true);
     } catch (error) {
       console.log('이력 조회 실패: ', error);
@@ -136,30 +116,24 @@ const RequirementList = ({
 
   return (
     <div className='w-full'>
-      <div className='my-3 h-[27rem] w-full overflow-y-auto rounded shadow-md'>
-        <table className='w-full text-center'>
-          <thead className='whitespace-nowrap text-lg'>
+      <div className='my-3 h-[27rem] w-full overflow-y-auto rounded bg-white shadow-md'>
+        <table className='w-full bg-white text-center'>
+          <thead className='whitespace-nowrap border-b-2 bg-gray-100 text-lg text-gray-600'>
             <tr>
-              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
-                승인여부
-              </th>
-              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>코드</th>
-              <th className='sticky top-0 z-[5] bg-gray-200 p-2'>요구사항명</th>
-              <th className='sticky top-0 z-[5] bg-gray-200 p-2'>상세설명</th>
-              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
-                담당자
-              </th>
-              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>
-                작성자
-              </th>
-              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>버전</th>
-              <th className='sticky top-0 z-[5] bg-gray-200 px-4 py-2'>이력</th>
+              <th className='sticky top-0 z-[5] px-4 py-3'>승인여부</th>
+              <th className='sticky top-0 z-[5] px-4 py-3'>코드</th>
+              <th className='sticky top-0 z-[5] p-2'>요구사항명</th>
+              <th className='sticky top-0 z-[5] p-2'>상세설명</th>
+              <th className='sticky top-0 z-[5] px-4 py-3'>담당자</th>
+              <th className='sticky top-0 z-[5] px-4 py-3'>작성자</th>
+              <th className='sticky top-0 z-[5] px-4 py-3'>버전</th>
+              <th className='sticky top-0 z-[5] px-4 py-3'>이력</th>
             </tr>
           </thead>
-          <tbody>
-            {currentItems.map((requirement: Requirement) => (
+          <tbody className='bg-white'>
+            {currentItems.map((requirement: Summary) => (
               <tr
-                className='break border-gray-2000 h-16 cursor-pointer whitespace-normal break-keep border-t hover:bg-gray-100'
+                className='break h-16 cursor-pointer whitespace-normal break-keep border-b bg-white hover:bg-gray-50'
                 onClick={() =>
                   handleRequirementClick(
                     requirement.requirementId,
@@ -182,7 +156,7 @@ const RequirementList = ({
                       className='w-24 rounded bg-pubble px-3 py-2 text-sm text-white hover:bg-dpubble disabled:bg-plblue disabled:text-black'
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleConfirm(event, requirement);
+                        handleConfirm(requirement);
                       }}>
                       승인 대기
                     </button>
@@ -197,7 +171,7 @@ const RequirementList = ({
                     requirement.approval === 'a' ? (
                     <button
                       disabled={true}
-                      className='w-24 rounded bg-green-600 px-3 py-2 text-sm text-white'>
+                      className='w-24 rounded bg-green-500 px-3 py-2 text-sm text-white'>
                       승인 완료
                     </button>
                   ) : (
@@ -229,11 +203,10 @@ const RequirementList = ({
                 <td
                   className='px-4 py-2'
                   onClick={(event) => event.stopPropagation()}>
-                  <div className='flex h-full w-full items-center justify-center'>
-                    <HistoryIcon
-                      className='h-6 w-6 fill-gray-900/60'
-                      onClick={handleHistoryClick}
-                    />
+                  <div
+                    className='flex h-full w-full items-center justify-center'
+                    onClick={handleHistoryClick}>
+                    <HistoryIcon className='h-6 w-6 fill-gray-900/60' />
                   </div>
                 </td>
               </tr>
@@ -244,13 +217,13 @@ const RequirementList = ({
 
       <div className='flex w-full justify-end'>
         <button
-          className='mr-3 rounded border border-gray-200 bg-white px-4 py-2'
+          className='mr-3 rounded border border-gray-200 bg-white px-4 py-2 disabled:opacity-50'
           onClick={handlePrevious}
           disabled={currentPage === 1}>
           이전
         </button>
         <button
-          className='rounded border border-gray-200 bg-white px-4 py-2'
+          className='rounded border border-gray-200 bg-white px-4 py-2 disabled:opacity-50'
           onClick={handleNext}
           disabled={
             currentPage >= Math.ceil(requirements.length / itemsPerPage)

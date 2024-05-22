@@ -52,7 +52,7 @@ const AlertModal = ({
     if (buttonsType === 'autoclose') {
       const timer = setTimeout(() => {
         closeModal();
-      }, 4000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [buttonsType, closeModal]);

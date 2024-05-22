@@ -6,6 +6,7 @@ import { getLatestRequirementVersion } from '@/apis/project';
 // 4. store 관련
 import usePageInfoStore from '@/stores/pageInfoStore';
 // 5. component 관련
+import ApprovalModal from '@/components/requirement/ApprovalModal.tsx';
 import RequirementList from '@/components/requirement/RequirementList';
 import RequirementAddModal from '@/components/requirement/RequirementAddModal.tsx';
 
@@ -63,7 +64,10 @@ const ProjectPage = () => {
     null,
   );
   const [isOpen, setIsOpen] = useState(false);
+  const [isApprovalOpen, setIsApprovalOpen] = useState(false);
   const [updateRequirement, setUpdateRequirement] = useState(false);
+  const [isSelectedRequirement, setIsSelectedRequirement] =
+    useState<Summary | null>(null);
 
   const updateRequirementList = () => {
     setUpdateRequirement((prev) => !prev);
@@ -74,13 +78,17 @@ const ProjectPage = () => {
       const response = await getLatestRequirementVersion(projectId);
       const { data } = response;
       if (data) {
-        console.log(data);
         setPageType('project', {
           projectId: data.projectId,
           projectCode: data.code,
           projectName: data.projectTitle,
         });
       }
+      data.requirementSummaryDtos.sort((a: Summary, b: Summary) => {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
       setRequirementList(data);
     };
     getRequirementList();
@@ -94,6 +102,12 @@ const ProjectPage = () => {
     }
   };
 
+  // 선택된 요구사항 전달
+  const handleSelectRequirement = (selectedRequirement: Summary) => {
+    setIsSelectedRequirement(selectedRequirement);
+    setIsApprovalOpen(true);
+  };
+
   return (
     <div className='p-4'>
       {isOpen && (
@@ -102,6 +116,17 @@ const ProjectPage = () => {
           onClose={() => {
             setIsOpen(false);
           }}
+          updateRequirementList={updateRequirementList}
+        />
+      )}
+      {isApprovalOpen && isSelectedRequirement && (
+        <ApprovalModal
+          requirements={isSelectedRequirement}
+          isOpen={isApprovalOpen}
+          onClose={() => {
+            setIsApprovalOpen(false);
+          }}
+          updateRequirementList={updateRequirementList}
         />
       )}
       <h1 className='mb-2 text-center text-2xl font-extrabold'>
@@ -111,7 +136,7 @@ const ProjectPage = () => {
         {requirementList?.startAt ? dateParse(requirementList.startAt) : ''} ~
         {requirementList?.endAt ? dateParse(requirementList.endAt) : ''}
       </div>
-      <div className='mx-1 flex justify-between'>
+      <div className='mx-1 flex justify-end'>
         <button
           onClick={() => {
             setIsOpen(true);
@@ -119,14 +144,11 @@ const ProjectPage = () => {
           className='rounded bg-pubble px-4 py-2 text-white hover:bg-dpubble hover:shadow-custom'>
           요구사항 생성
         </button>
-        <button className='rounded border border-gray-200 bg-white px-4 py-2 hover:shadow-custom'>
-          정렬
-        </button>
       </div>
       {requirementList?.requirementSummaryDtos && (
         <RequirementList
           requirements={requirementList.requirementSummaryDtos}
-          updateRequirementList={updateRequirementList}
+          selectedRequirement={handleSelectRequirement}
         />
       )}
     </div>
