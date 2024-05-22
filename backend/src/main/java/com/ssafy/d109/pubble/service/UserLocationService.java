@@ -10,9 +10,7 @@ import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -86,15 +84,27 @@ public class UserLocationService {
         System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).toString());
         System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values());
         System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values().toString());
+        for (Map.Entry<String, UserLocationDto> userEntry : userLocations.entrySet()) {
+            String employeeId = userEntry.getKey();
+            UserLocationDto userLocationDto = userEntry.getValue();
+
+            System.out.println("Employee ID: " + employeeId + ", UserLocationDto: " + userLocationDto);
+        }
 
         // userLocations가 null일 경우 빈 HashMap을 사용
         if (userLocations == null) {
             userLocations = new ConcurrentHashMap<>();
         }
 
-        Set<String> connectedEmployeeIds = userLocations.values().stream()
-                .map(UserLocationDto::getEmployeeId)
-                .collect(Collectors.toSet());
+//        Set<String> connectedEmployeeIds = userLocations.values().stream()
+//                .map(UserLocationDto::getEmployeeId)
+//                .collect(Collectors.toSet());
+//        System.out.println("connectedEmployeeIds.toString() = " + connectedEmployeeIds.toString());
+
+        Set<String> connectedEmployeeIds = new HashSet<>();
+        for (ConcurrentHashMap<String, UserLocationDto> userLocations2 : projectUserLocations.values()) {
+            connectedEmployeeIds.addAll(userLocations2.keySet());
+        }
         System.out.println("connectedEmployeeIds.toString() = " + connectedEmployeeIds.toString());
 
         // 접속자
