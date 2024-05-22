@@ -22,7 +22,7 @@ public class RequirementController {
     private final ProjectService projectService;
     private final RequirementService requirementService;
 
-    @Operation(summary = "(요구사항 코드- 히스토리 확인 : 요구사항 코드에 해당하는 요구사항 항목 기록(모든 버전들) 반환", operationId = "1")
+    @Operation(summary = "(요구사항 코드 - 히스토리 확인 : 요구사항 코드에 해당하는 요구사항 항목 기록(모든 버전들) 반환", operationId = "1")
     @GetMapping()
     public ResponseEntity<ResponseDto<?>> getRequirementsByCode(@PathVariable Integer projectId, @RequestParam("code") String code) {
         List<RequirementSummaryDto> requirementSummaryDtos = requirementService.getRequirementsByCode(projectId, code);
@@ -59,8 +59,8 @@ public class RequirementController {
     }
 
     @Operation(summary = "요구사항 항목 수정", operationId = "5")
-    @PatchMapping("/{requirement-id}")
-    public ResponseEntity<ResponseDto<?>> updateRequirement(@PathVariable("requirement-id") Integer requirementId, @RequestBody RequirementUpdateDto requirementUpdateDto) {
+    @PatchMapping("/{requirementId}")
+    public ResponseEntity<ResponseDto<?>> updateRequirement(@PathVariable Integer requirementId, @RequestBody RequirementUpdateDto requirementUpdateDto) {
         requirementService.updateRequirement(requirementId, requirementUpdateDto);
 
         response = new ResponseDto<>(true, "요구사항 항목 수정", null);

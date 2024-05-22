@@ -319,6 +319,7 @@ public class RequirementService {
                 .toBuilder()
                 .requirementId(null)
                 .version(newVersion)
+                .isLock("u")
                 .approval("u")
                 .build());
 

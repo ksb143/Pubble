@@ -60,7 +60,7 @@ public class RequirementBoardController {
 
     // 스레드 생성
     @Operation(summary = "새 스레드 생성", operationId = "3")
-    @PostMapping("/details/{detailId}/threads")
+    @PostMapping("/details/{detailId}/user-threads")
     public ResponseEntity<ResponseDto<?>> createUserThread(@PathVariable Integer detailId) {
         User user = commonUtil.getUser();
         UserThreadDto userThread = userThreadService.createUserThread(user, detailId);
@@ -70,7 +70,7 @@ public class RequirementBoardController {
     }
 
     @Operation(summary = "세부사항 항목에 해당하는 모든 스레드 조회", operationId = "4")
-    @GetMapping("/details/{detailId}/threads")
+    @GetMapping("/details/{detailId}/user-threads")
     public ResponseEntity<UserThreadResponseDto> getAllThreads(@PathVariable Integer detailId) {
 
         UserThreadResponseDto responseDto = new UserThreadResponseDto();
@@ -95,7 +95,7 @@ public class RequirementBoardController {
     }
 
     @Operation(summary = "스레드 잠금", operationId = "5")
-    @PutMapping("/threads/{userThreadId}/lock")
+    @PutMapping("/user-threads/{userThreadId}/lock")
     public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer userThreadId) {
 
         userThreadService.lockThread(userThreadId);
@@ -107,7 +107,7 @@ public class RequirementBoardController {
     }
 
     @Operation(summary = "해당 스레드의 댓글 조회", operationId = "6")
-    @GetMapping("/threads/{userThreadId}/comments")
+    @GetMapping("/user-threads/{userThreadId}/comments")
     public ResponseEntity<ResponseDto<?>> getComments(@PathVariable Integer userThreadId) {
         UserThreadDto userThread = userThreadService.getUserThread(userThreadId);
 
@@ -116,7 +116,7 @@ public class RequirementBoardController {
     }
 
     @Operation(summary = "새 댓글 생성", operationId = "7")
-    @PostMapping("/threads/{userThreadId}/comments")
+    @PostMapping("/user-threads/{userThreadId}/comments")
     public ResponseEntity<ResponseDto<?>> createComment(@PathVariable Integer userThreadId, @RequestBody CommentCreateDto commentCreateDto) {
         User user = commonUtil.getUser();
         CommentResponseData commentResponseData = userThreadService.createComment(user, userThreadId, commentCreateDto);

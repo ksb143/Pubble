@@ -64,6 +64,14 @@ public class SwaggerConfig {
     }
 
     @Bean
+    public GroupedOpenApi RequirementBoardApi() {
+        return GroupedOpenApi.builder()
+                .group("requirement-board-api")
+                .pathsToMatch("/requirement-board/**")
+                .build();
+    }
+
+    @Bean
     public GroupedOpenApi uploadsApi() {
         return GroupedOpenApi.builder()
                 .group("uploads-api")
