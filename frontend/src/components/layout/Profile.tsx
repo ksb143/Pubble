@@ -6,7 +6,7 @@ import { css } from '@emotion/react';
 import { getTextColor } from '@/utils/profile';
 // 4. store
 // 5. component
-// 6. assets
+// 6. asset
 
 // 프로필 타입 정의
 interface ProfileProps {
@@ -14,9 +14,16 @@ interface ProfileProps {
   height: string; // 단위 포함, 예: '3rem'
   name: string;
   profileColor: string;
+  status?: 'online' | 'offline';
 }
 
-const Profile = ({ width, height, name, profileColor }: ProfileProps) => {
+const Profile = ({
+  width,
+  height,
+  name,
+  profileColor,
+  status = 'online',
+}: ProfileProps) => {
   const textColor = getTextColor(profileColor); // 프로필 배경색에 따른 텍스트 색상 설정
 
   // 프로필 스타일
@@ -27,9 +34,13 @@ const Profile = ({ width, height, name, profileColor }: ProfileProps) => {
     align-items: center;
     justify-content: center;
     border-radius: 9999px;
-    background-color: ${profileColor};
     color: ${textColor};
     flex-shrink: 0;
+  `;
+
+  // 배경색 스타일
+  const backgroundColor = css`
+    background-color: ${profileColor};
   `;
 
   // 폰트 크기 스타일 정의
@@ -44,7 +55,10 @@ const Profile = ({ width, height, name, profileColor }: ProfileProps) => {
 
   return (
     <>
-      <div css={profileStyle}>
+      <div
+        css={profileStyle}
+        className={`absolute ${status === 'online' ? '' : ' bg-white/90'}`}></div>
+      <div css={[profileStyle, backgroundColor]}>
         <p className={`whitespace-nowrap font-normal ${fontSizeClass}`}>
           {name}
         </p>

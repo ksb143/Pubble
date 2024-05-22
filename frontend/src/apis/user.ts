@@ -25,3 +25,9 @@ export const getUserByProject = async (projectId: number) => {
   const { data } = await privateApi.get(`/users/userinfo/${projectId}`);
   return data;
 };
+
+// 현재 접속중인 유저 리스트를 불러오는 함수
+export const getVisitor = async (projectId: number) => {
+  const { data } = await privateApi.get(`/project/${projectId}/current-user`);
+  return data;
+};
