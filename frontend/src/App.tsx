@@ -11,7 +11,7 @@ import User from '@/routers/User';
 import Project from '@/routers/Project';
 import Admin from '@/routers/Admin';
 import Layout from '@/components/layout/Layout';
-import MainPage from '@/pages/main/MainPage';
+import MainPage from '@/pages/main/MainPage.tsx';
 // 6. assets
 
 function App() {

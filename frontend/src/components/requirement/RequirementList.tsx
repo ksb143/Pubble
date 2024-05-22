@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
-import { requestConfirm } from '@/apis/confirm';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import userStore from '@/stores/userStore.ts';
@@ -27,7 +26,7 @@ interface Detail {
   status: 'u' | 'd';
 }
 
-interface Requirement {
+interface Summary {
   requirementId: number;
   orderIndex: number;
   version: string;
@@ -44,18 +43,18 @@ interface Requirement {
 }
 
 interface RequirementListProps {
-  requirements: Requirement[];
-  updateRequirementList: () => void;
+  requirements: Summary[];
+  selectedRequirement: (selectedRequirement: Summary) => void;
 }
 
 const RequirementList = ({
   requirements,
-  updateRequirementList,
+  selectedRequirement,
 }: RequirementListProps) => {
   const { setPageType } = usePageInfoStore();
   const { employeeId } = userStore();
   const navigate = useNavigate();
-  const { projectCode, projectId } = usePageInfoStore();
+  const { projectCode } = usePageInfoStore();
   const [currentPage, setCurrentPage] = useState(1);
 
   // 페이지네이션 처리
@@ -68,33 +67,8 @@ const RequirementList = ({
       setCurrentPage(currentPage + 1);
     }
   };
-  const handleConfirm = async (
-    event: React.MouseEvent,
-    requirement: Requirement,
-  ) => {
-    event.stopPropagation();
-    const reqId = requirement.requirementId; // 선택된 row의 requirementId
-    const requestBody = {
-      projectId: projectId,
-      isLock: requirement.isLock,
-      approval: requirement.approval,
-      requirementName: requirement.requirementName,
-      approvalComment: requirement.approvalComment || '',
-    };
-    try {
-      const response = await requestConfirm(reqId, requestBody);
-      if (response.message === 'Confirm Complete') {
-        console.log('승인 허가', response);
-        updateRequirementList();
-      } else if (response.message === 'Confirm Hold') {
-        console.log('승인 보류', response);
-        updateRequirementList();
-      } else {
-        alert('승인 요청에 실패했습니다.');
-      }
-    } catch (error) {
-      console.error('Failed to request confirm:', error);
-    }
+  const handleConfirm = (requirement: Summary) => {
+    selectedRequirement(requirement);
   };
 
   const handlePrevious = () => {
@@ -144,7 +118,7 @@ const RequirementList = ({
             </tr>
           </thead>
           <tbody>
-            {currentItems.map((requirement: Requirement) => (
+            {currentItems.map((requirement: Summary) => (
               <tr
                 className='break border-gray-2000 h-16 cursor-pointer whitespace-normal break-keep border-t hover:bg-gray-100'
                 onClick={() =>
@@ -169,7 +143,7 @@ const RequirementList = ({
                       className='w-24 rounded bg-pubble px-3 py-2 text-sm text-white hover:bg-dpubble disabled:bg-plblue disabled:text-black'
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleConfirm(event, requirement);
+                        handleConfirm(requirement);
                       }}>
                       승인 대기
                     </button>
@@ -184,7 +158,7 @@ const RequirementList = ({
                     requirement.approval === 'a' ? (
                     <button
                       disabled={true}
-                      className='w-24 rounded bg-green-600 px-3 py-2 text-sm text-white'>
+                      className='w-24 rounded bg-green-500 px-3 py-2 text-sm text-white'>
                       승인 완료
                     </button>
                   ) : (
@@ -228,13 +202,13 @@ const RequirementList = ({
 
       <div className='my-4 flex w-full justify-end'>
         <button
-          className='mr-3 rounded border border-gray-200 bg-white px-4 py-2'
+          className='mr-3 rounded border border-gray-200 bg-white px-4 py-2 disabled:opacity-50'
           onClick={handlePrevious}
           disabled={currentPage === 1}>
           이전
         </button>
         <button
-          className='rounded border border-gray-200 bg-white px-4 py-2'
+          className='rounded border border-gray-200 bg-white px-4 py-2 disabled:opacity-50'
           onClick={handleNext}
           disabled={
             currentPage >= Math.ceil(requirements.length / itemsPerPage)

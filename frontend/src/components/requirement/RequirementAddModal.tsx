@@ -22,9 +22,14 @@ import {
 interface RequirementAddModalProps {
   isOpen: boolean;
   onClose: () => void;
+  updateRequirementList: () => void;
 }
 
-const RequirementAddModal = ({ isOpen, onClose }: RequirementAddModalProps) => {
+const RequirementAddModal = ({
+  isOpen,
+  onClose,
+  updateRequirementList,
+}: RequirementAddModalProps) => {
   const projectId = usePageInfoStore.getState().projectId;
   const employeeId = useUserStore.getState().employeeId;
   const [title, setTitle] = useState('');
@@ -54,10 +59,11 @@ const RequirementAddModal = ({ isOpen, onClose }: RequirementAddModalProps) => {
         reqData.authorEId,
         reqData.targetUser,
       );
-      console.log('api 호출 성공');
+      updateRequirementList(); // 요구사항 생성 후 리스트 갱신
       onClose(); // 요구사항 생성 후 모달 닫기
     } catch (error) {
-      console.error('api 호출 실패', error);
+      console.error(error);
+      alert('요구사항 생성에 실패했습니다.');
     }
   };
 

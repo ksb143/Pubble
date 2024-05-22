@@ -219,13 +219,13 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
       </div>
       <div className='my-4 flex w-full justify-end'>
         <button
-          className='mr-3 rounded border border-gray-200 bg-white px-4 py-2'
+          className='mr-3 rounded border border-gray-200 bg-white px-4 py-2 disabled:opacity-50'
           onClick={handlePrevious}
           disabled={currentPage === 1}>
           이전
         </button>
         <button
-          className='rounded border border-gray-200 bg-white px-4 py-2'
+          className='rounded border border-gray-200 bg-white px-4 py-2 disabled:opacity-50'
           onClick={handleNext}
           disabled={currentPage >= Math.ceil(projects.length / itemsPerPage)}>
           다음
