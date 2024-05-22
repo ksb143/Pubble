@@ -150,7 +150,7 @@ const Navbar = () => {
     return () => {
       disconnect();
     };
-  }, [projectId, connect, disconnect, subscribe, handleSendPublish]);
+  }, [projectId, connect, disconnect, subscribe, publish]);
 
   return (
     <>
