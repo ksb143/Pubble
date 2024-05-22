@@ -218,7 +218,7 @@ const Navbar = () => {
 
           {/* 쪽지 아이콘 */}
           <div
-            className={`relative mr-6 flex h-11 w-11 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
+            className={`relative mr-6 flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded hover:bg-gray-500/10 ${activeMenu === 'message' ? ' bg-gray-900/10' : ''}`}
             onClick={() => toggleMenu('message')}>
             <Envelope
               className={`h-8 w-8 stroke-gray-900 ${activeMenu === 'message' ? 'stroke-[1.5]' : 'stroke-1'}`}
@@ -239,7 +239,7 @@ const Navbar = () => {
           {/* 프로필 아이콘 */}
           <div className='relative'>
             <div
-              className='cursor-pointer'
+              className='shrink-0 cursor-pointer'
               onClick={() => toggleMenu('profile')}>
               <Profile
                 width='3rem'

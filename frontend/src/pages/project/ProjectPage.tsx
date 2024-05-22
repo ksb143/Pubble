@@ -136,7 +136,7 @@ const ProjectPage = () => {
         {requirementList?.startAt ? dateParse(requirementList.startAt) : ''} ~
         {requirementList?.endAt ? dateParse(requirementList.endAt) : ''}
       </div>
-      <div className='mx-1 flex justify-between'>
+      <div className='mx-1 flex justify-end'>
         <button
           onClick={() => {
             setIsOpen(true);
