@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 // 2. library
 // 3. api
 import { requestConfirm } from '@/apis/confirm';
+import { getRequirementHistory } from '@/apis/requirement';
 // 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import userStore from '@/stores/userStore.ts';
@@ -55,8 +56,10 @@ const RequirementList = ({
   const { setPageType } = usePageInfoStore();
   const { employeeId } = userStore();
   const navigate = useNavigate();
-  const { projectCode, projectId } = usePageInfoStore();
+  const { projectCode, projectId, requirementCode } = usePageInfoStore();
   const [currentPage, setCurrentPage] = useState(1);
+  const [openHistoryModal, setOpenHistoryModal] = useState(false);
+  const [historyList, setHistoryList] = useState([]);
 
   // 페이지네이션 처리
   const itemsPerPage = 10;
@@ -121,9 +124,19 @@ const RequirementList = ({
     navigate(`/project/${projectCode}/requirement/${requirementCode}`);
   };
 
+  const handleHistoryClick = async () => {
+    try {
+      const response = await getRequirementHistory(projectId, requirementCode);
+      console.log('이력 조회 성공: ', response.data);
+      setOpenHistoryModal(true);
+    } catch (error) {
+      console.log('이력 조회 실패: ', error);
+    }
+  };
+
   return (
     <div className='w-full'>
-      <div className='mt-4 h-[30rem] w-full overflow-y-auto'>
+      <div className='my-3 h-[27rem] w-full overflow-y-auto rounded shadow-md'>
         <table className='w-full text-center'>
           <thead className='whitespace-nowrap text-lg'>
             <tr>
@@ -217,7 +230,10 @@ const RequirementList = ({
                   className='px-4 py-2'
                   onClick={(event) => event.stopPropagation()}>
                   <div className='flex h-full w-full items-center justify-center'>
-                    <HistoryIcon className='h-6 w-6 fill-gray-900/60' />
+                    <HistoryIcon
+                      className='h-6 w-6 fill-gray-900/60'
+                      onClick={handleHistoryClick}
+                    />
                   </div>
                 </td>
               </tr>
@@ -226,7 +242,7 @@ const RequirementList = ({
         </table>
       </div>
 
-      <div className='my-4 flex w-full justify-end'>
+      <div className='flex w-full justify-end'>
         <button
           className='mr-3 rounded border border-gray-200 bg-white px-4 py-2'
           onClick={handlePrevious}

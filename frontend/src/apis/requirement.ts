@@ -83,3 +83,14 @@ export const updateRequirementDetailStatus = async (
   );
   return data;
 };
+
+// 요구사항 이력 조회 함수
+export const getRequirementHistory = async (
+  projectId: number,
+  code: string,
+) => {
+  const { data } = await privateApi.get(`/projects/${projectId}/requirements`, {
+    params: { code },
+  });
+  return data;
+};
