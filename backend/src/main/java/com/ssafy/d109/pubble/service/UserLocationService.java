@@ -99,6 +99,7 @@ public class UserLocationService {
 
         // 접속자
         List<UserLocationDto> connectedUserLocations = new ArrayList<>(userLocations.values());
+        System.out.println("connectedUserLocations.toString() = " + connectedUserLocations.toString());
 
         // 비접속자
         // 전체 유저 중 - 비접속자 유저를 걸러 - 각각 userLocationDto로 담아 - 리스트로 반환
