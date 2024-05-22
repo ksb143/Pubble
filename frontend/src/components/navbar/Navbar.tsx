@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { css } from '@emotion/react';
 // 3. api
 import { getFCMToken, setupFCMListener } from '@/apis/notification';
-import { getVisitor, getUserByProject } from '@/apis/user';
+import { getVisitor } from '@/apis/user';
 // 4. store
 import useUserStore from '@/stores/userStore';
 import useNotificationStore from '@/stores/notificationStore';
@@ -24,7 +24,6 @@ import Logo from '@/assets/images/logo_long.png';
 import Envelope from '@/assets/icons/envelope.svg?react';
 import Bell from '@/assets/icons/bell.svg?react';
 // 7. type
-import { UserInfo } from '@/types/userType';
 import { SocketInfo } from '@/types/socketType';
 
 interface ConnectionInfo {
@@ -33,8 +32,8 @@ interface ConnectionInfo {
 }
 
 // 프로필 스타일
-const zIndexStyle = (index: number) => css`
-  z-index: ${1000 - index};
+const zIndexStyle = (index: number, value: number) => css`
+  z-index: ${value - index};
 `;
 
 const Navbar = () => {
@@ -54,7 +53,6 @@ const Navbar = () => {
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(
     null,
   );
-  const [projectUsers, setProjectUsers] = useState<UserInfo[]>([]);
   const previousProjectIdRef = useRef(projectId);
 
   // 클릭한 메뉴 상태
@@ -85,7 +83,31 @@ const Navbar = () => {
       locationUrl: '/project',
     };
     publish(`/pub/project/${publishProjectId}`, socketMessage);
-    console.log('프로젝트 발행 성공');
+    console.log('publish 성공');
+  };
+
+  const handleUserChange = (response: SocketInfo) => {
+    setConnectionInfo((prevConnectionInfo) => {
+      if (!prevConnectionInfo) return prevConnectionInfo;
+
+      if (response.operation === 'e') {
+        return {
+          connected: [...prevConnectionInfo.connected, response],
+          nonConnected: prevConnectionInfo.nonConnected.filter(
+            (user) => user.employeeId !== response.userInfoDto?.employeeId,
+          ),
+        };
+      } else if (response.operation === 'l') {
+        return {
+          connected: prevConnectionInfo.connected.filter(
+            (user) => user.userInfoDto?.employeeId !== response.employeeId,
+          ),
+          nonConnected: [...prevConnectionInfo.nonConnected, response],
+        };
+      }
+
+      return prevConnectionInfo;
+    });
   };
 
   // firebase 초기 설정
@@ -112,10 +134,10 @@ const Navbar = () => {
     connect(
       `wss://${import.meta.env.VITE_STOMP_BROKER_URL}`,
       () => {
-        console.log('웹소켓 연결 성공');
         subscribe(`/sub/project/${projectId}`, (message) => {
           const response = JSON.parse(message.body);
-          console.log('프로젝트 구독 성공', response);
+          handleUserChange(response);
+          console.log('프로젝트 구독 성공 : ', response);
         });
 
         if (previousProjectIdRef.current !== projectId) {
@@ -134,11 +156,7 @@ const Navbar = () => {
             // 접속한 유저 정보 받기
             const response = await getVisitor(projectId);
             setConnectionInfo(response.data);
-            console.log(response.data);
-
-            // 프로젝트에 소속된 유저 정보 받기
-            const users = await getUserByProject(projectId);
-            setProjectUsers(users.data);
+            console.log('visitor: ', response.data);
           };
           fetchUserInfo();
         }
@@ -148,8 +166,17 @@ const Navbar = () => {
       },
     );
 
+    window.addEventListener('beforeunload', () => {
+      handleSendPublish(projectId, 'l');
+      disconnect();
+    });
+
     return () => {
       disconnect();
+      window.addEventListener('beforeunload', () => {
+        handleSendPublish(projectId, 'l');
+        disconnect();
+      });
     };
   }, [projectId, connect, disconnect, subscribe, publish]);
 
@@ -193,26 +220,43 @@ const Navbar = () => {
           {/* 접속 유저 */}
           {projectId > 0 && (
             <div className='mr-6 flex w-full items-center justify-center'>
-              {projectUsers.map((user, index) => {
-                // 접속 상태 확인: connected 목록에 해당 사용자의 employeeId가 있는지 검사
-                const isOnline = connectionInfo?.connected.some(
-                  (conn) => conn.userInfoDto?.employeeId === user.employeeId,
-                );
-
-                return (
-                  <div
-                    key={user.employeeId}
-                    css={zIndexStyle(index)}
-                    className={`relative -ml-2 shrink-0 first-of-type:ml-0 ${isOnline ? 'opacity-100' : ''}`}>
-                    <Profile
-                      width='3rem'
-                      height='3rem'
-                      name={user.name}
-                      profileColor={user.profileColor}
-                      status={isOnline ? 'online' : 'offline'}
-                    />
-                  </div>
-                );
+              {/* 연결된 사용자 렌더링 */}
+              {connectionInfo?.connected.map((user, index) => {
+                if (user.userInfoDto) {
+                  return (
+                    <div
+                      key={`connected_${user.userInfoDto.employeeId}`}
+                      css={zIndexStyle(index, 1000)}
+                      className={`relative -ml-2 shrink-0 opacity-100 first-of-type:ml-0`}>
+                      <Profile
+                        width='3rem'
+                        height='3rem'
+                        name={user.userInfoDto.name}
+                        profileColor={user.userInfoDto.profileColor}
+                        status='online'
+                      />
+                    </div>
+                  );
+                }
+              })}
+              {/* 비연결된 사용자 렌더링 */}
+              {connectionInfo?.nonConnected.map((user, index) => {
+                if (user.userInfoDto) {
+                  return (
+                    <div
+                      key={`nonconnected_${user.userInfoDto.employeeId}`}
+                      css={zIndexStyle(index, 500)}
+                      className={`relative -ml-2 shrink-0 opacity-100 first-of-type:ml-0`}>
+                      <Profile
+                        width='3rem'
+                        height='3rem'
+                        name={user.userInfoDto.name}
+                        profileColor={user.userInfoDto.profileColor}
+                        status='offline'
+                      />
+                    </div>
+                  );
+                }
               })}
             </div>
           )}
