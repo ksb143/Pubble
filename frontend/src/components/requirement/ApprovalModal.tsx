@@ -82,7 +82,6 @@ const ApprovalModal = ({
         requirements.requirementId,
         fullRequestBody,
       );
-      console.log(response);
       alert(response.message);
       updateRequirementList();
     } catch (error) {

@@ -68,7 +68,6 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
           setProjects([]);
         }
       } catch (error) {
-        console.error('Error fetching projects:', error);
         setProjects([]);
       }
     };
@@ -110,7 +109,6 @@ const ProjectList = ({ openProjectStatus }: ProjectListProps) => {
     projectTitle: string,
   ) => {
     if (!projectId || !prdId || !projectTitle) {
-      console.error('Invalid project data');
       return;
     }
     setPageType('project', {

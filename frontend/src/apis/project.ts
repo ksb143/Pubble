@@ -106,3 +106,11 @@ export const updateRequirementLockStatus = async (
   );
   return data;
 };
+
+// 요구사항 히스토리 조회 - GET
+export const getRequirementHistory = async (pjtId: number, code: string) => {
+  const { data } = await privateApi.get(`/projects/${pjtId}/requirements`, {
+    params: { code },
+  });
+  return data;
+};
