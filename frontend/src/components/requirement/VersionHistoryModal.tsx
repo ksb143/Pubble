@@ -1,5 +1,4 @@
 import React from 'react';
-import Modal from 'react-modal';
 import {
   Dialog,
   DialogContent,
@@ -9,8 +8,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-
-Modal.setAppElement('#root');
 
 interface HistoryDetail {
   requirementDetailId: number;
@@ -61,32 +58,58 @@ const VersionHistoryModal: React.FC<VersionHistoryModalProps> = ({
   onClose,
   historyList,
 }) => {
+  const getApprovalStatus = (approval: 'u' | 'h' | 'a') => {
+    switch (approval) {
+      case 'h':
+        return '보류';
+      case 'a':
+        return '승인';
+      default:
+        return '미승인';
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogTrigger asChild></DialogTrigger>
       <DialogContent className='sm:max-w-[425px]'>
         <DialogHeader>
-          <DialogTitle>Version History</DialogTitle>
+          <DialogTitle>버전 이력</DialogTitle>
         </DialogHeader>
         <div className='grid gap-4 py-4'>
           {historyList.length > 0 ? (
             historyList.map((history, index) => (
-              <div key={index} className='history-item'>
-                <h3>{history.version}</h3>
-                <p>{history.requirementName}</p>
-                <p>Approval: {history.approval}</p>
-                <p>Approval Comment: {history.approvalComment}</p>
-                <p>Manager: {history.manager.name}</p>
-                <p>Author: {history.author.name}</p>
-                <p>
-                  Created At: {new Date(history.createdAt).toLocaleString()}
-                </p>
-                <ul>
-                  {history.details.map((detail) => (
-                    <li key={detail.requirementDetailId}>{detail.content}</li>
-                  ))}
-                </ul>
-              </div>
+              <React.Fragment key={index}>
+                <div className='history-item'>
+                  <div className='whitespace-break-spaces text-xl'>
+                    {history.version}
+                    <span className='ml-3 font-bold'>
+                      {history.requirementName}
+                    </span>
+                  </div>
+
+                  <p className='text-base'>
+                    승인: {getApprovalStatus(history.approval)}
+                  </p>
+                  <p className='text-base'>
+                    승인 내용: {history.approvalComment}
+                  </p>
+                  <p className='text-base'>담당자: {history.manager.name}</p>
+                  <p className='text-base'>작성자: {history.author.name}</p>
+                  <p className='text-base'>
+                    생성일시: {new Date(history.createdAt).toLocaleString()}
+                  </p>
+                  <ul>
+                    {history.details.map((detail) => (
+                      <li key={detail.requirementDetailId}>
+                        - {detail.content}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {index < historyList.length - 1 && <hr className='my-4' />}{' '}
+                {/* 구분선 추가 */}
+              </React.Fragment>
             ))
           ) : (
             <p>No history available</p>

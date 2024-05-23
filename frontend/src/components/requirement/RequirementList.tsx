@@ -1,15 +1,9 @@
-// 1. react 관련
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// 2. library
-// 3. api
 import { getRequirementHistory } from '@/apis/project';
-// 4. store
 import usePageInfoStore from '@/stores/pageInfoStore';
 import userStore from '@/stores/userStore.ts';
-// 5. components
 import VersionHistoryModal from '@/components/requirement/VersionHistoryModal';
-// 6. etc
 import HistoryIcon from '@/assets/icons/history-line.svg?react';
 
 interface Person {
@@ -44,6 +38,44 @@ interface Summary {
   code: string;
 }
 
+interface HistoryDetail {
+  requirementDetailId: number;
+  content: string;
+  status: 'u' | 'd';
+}
+
+interface HistorySummary {
+  requirementId: number;
+  orderIndex: number;
+  version: string;
+  isLock: 'u' | 'l';
+  approval: 'u' | 'h' | 'a';
+  approvalComment: string | null;
+  details: HistoryDetail[];
+  manager: {
+    name: string;
+    employeeId: string;
+    department: string;
+    position: string;
+    role: string;
+    isApprovable: 'y' | 'n';
+    profileColor: string;
+  };
+  targetUser: string;
+  createdAt: string;
+  author: {
+    name: string;
+    employeeId: string;
+    department: string;
+    position: string;
+    role: string;
+    isApprovable: 'y' | 'n';
+    profileColor: string;
+  };
+  requirementName: string;
+  code: string;
+}
+
 interface RequirementListProps {
   requirements: Summary[];
   selectedRequirement: (selectedRequirement: Summary) => void;
@@ -56,21 +88,22 @@ const RequirementList = ({
   const { setPageType } = usePageInfoStore();
   const { employeeId } = userStore();
   const navigate = useNavigate();
-  const { projectCode, projectId, requirementCode } = usePageInfoStore();
+  const { projectCode, projectId } = usePageInfoStore(); // requirementCode 제거
   const [currentPage, setCurrentPage] = useState(1);
   const [openHistoryModal, setOpenHistoryModal] = useState(false);
-  const [historyList, setHistoryList] = useState([]);
+  const [historyList, setHistoryList] = useState<HistorySummary[]>([]); // 타입 수정
 
-  // 페이지네이션 처리
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = requirements.slice(indexOfFirstItem, indexOfLastItem);
+
   const handleNext = () => {
     if (currentPage < Math.ceil(requirements.length / itemsPerPage)) {
       setCurrentPage(currentPage + 1);
     }
   };
+
   const handleConfirm = (requirement: Summary) => {
     selectedRequirement(requirement);
   };
@@ -99,12 +132,12 @@ const RequirementList = ({
     navigate(`/project/${projectCode}/requirement/${requirementCode}`);
   };
 
-  const handleVersionHistoryClick = async () => {
+  const handleVersionHistoryClick = async (requirementCode: string) => {
+    // requirementCode 매개변수 추가
     try {
       const response = await getRequirementHistory(projectId, requirementCode);
       if (response.data.length === 0) {
         alert('버전 변경사항이 존재하지 않습니다');
-        // console.log(response);
         return;
       } else {
         setHistoryList(response.data);
@@ -206,7 +239,8 @@ const RequirementList = ({
                   onClick={(event) => event.stopPropagation()}>
                   <div
                     className='flex h-full w-full items-center justify-center'
-                    onClick={handleVersionHistoryClick}>
+                    onClick={() => handleVersionHistoryClick(requirement.code)} // 수정된 부분
+                  >
                     <HistoryIcon className='h-6 w-6 fill-gray-900/60' />
                   </div>
                 </td>
@@ -235,7 +269,7 @@ const RequirementList = ({
       <VersionHistoryModal
         isOpen={openHistoryModal}
         onClose={() => setOpenHistoryModal(false)}
-        historyList={historyList}
+        historyList={historyList} // 타입 일관성 유지
       />
     </div>
   );
