@@ -27,7 +27,8 @@ import Bell from '@/assets/icons/bell.svg?react';
 import { SocketInfo } from '@/types/socketType';
 
 interface ConnectionInfo {
-  users: (SocketInfo & { isConnected: boolean })[];
+  connected: SocketInfo[];
+  nonConnected: SocketInfo[];
 }
 
 // 프로필 스타일
@@ -90,23 +91,21 @@ const Navbar = () => {
       if (!prevConnectionInfo) return prevConnectionInfo;
 
       if (response.operation === 'e') {
-        response.isConnected = true;
         return {
-          users: [
-            ...prevConnectionInfo.users,
-            { ...response, isConnected: true },
-          ],
-        };
-      } else if (response.operation === 'l') {
-        response.isConnected = false;
-        return {
-          users: prevConnectionInfo.users.map((user) =>
-            user.employeeId === response.employeeId
-              ? { ...user, isConnected: false }
-              : user,
+          connected: [...prevConnectionInfo.connected, response],
+          nonConnected: prevConnectionInfo.nonConnected.filter(
+            (user) => user.employeeId !== response.userInfoDto?.employeeId,
           ),
         };
+      } else if (response.operation === 'l') {
+        return {
+          connected: prevConnectionInfo.connected.filter(
+            (user) => user.userInfoDto?.employeeId !== response.employeeId,
+          ),
+          nonConnected: [...prevConnectionInfo.nonConnected, response],
+        };
       }
+
       return prevConnectionInfo;
     });
   };
@@ -156,19 +155,7 @@ const Navbar = () => {
           const fetchUserInfo = async () => {
             // 접속한 유저 정보 받기
             const response = await getVisitor(projectId);
-            const dataWithConnectionStatus = {
-              users: [
-                ...response.data.connected.map((user: SocketInfo) => ({
-                  ...user,
-                  isConnected: true,
-                })),
-                ...response.data.nonConnected.map((user: SocketInfo) => ({
-                  ...user,
-                  isConnected: false,
-                })),
-              ],
-            };
-            setConnectionInfo(dataWithConnectionStatus);
+            setConnectionInfo(response.data);
             console.log('visitor: ', response.data);
           };
           fetchUserInfo();
@@ -233,9 +220,9 @@ const Navbar = () => {
           {/* 접속 유저 */}
           {projectId > 0 && (
             <div className='mr-6 flex w-full items-center justify-center'>
-              {/* 접속한 사용자 렌더링 */}
-              {connectionInfo?.users.map((user, index) => {
-                if (user.userInfoDto && user.isConnected) {
+              {/* 연결된 사용자 렌더링 */}
+              {connectionInfo?.connected.map((user, index) => {
+                if (user.userInfoDto) {
                   return (
                     <div
                       key={`connected_${user.userInfoDto.employeeId}`}
@@ -253,8 +240,8 @@ const Navbar = () => {
                 }
               })}
               {/* 비연결된 사용자 렌더링 */}
-              {connectionInfo?.users.map((user, index) => {
-                if (user.userInfoDto && !user.isConnected) {
+              {connectionInfo?.nonConnected.map((user, index) => {
+                if (user.userInfoDto) {
                   return (
                     <div
                       key={`nonconnected_${user.userInfoDto.employeeId}`}
