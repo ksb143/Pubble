@@ -8,4 +8,5 @@ export interface SocketInfo {
   userInfoDto?: UserInfo;
   locationName?: string;
   locationUrl?: string;
+  isConnected?: boolean;
 }

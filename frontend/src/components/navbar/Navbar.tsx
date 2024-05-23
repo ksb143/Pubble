@@ -53,6 +53,7 @@ const Navbar = () => {
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(
     null,
   );
+  const [projectUsers, setProjectUsers] = useState<SocketInfo[]>([]);
   const previousProjectIdRef = useRef(projectId);
 
   // 클릭한 메뉴 상태
@@ -91,6 +92,7 @@ const Navbar = () => {
       if (!prevConnectionInfo) return prevConnectionInfo;
 
       if (response.operation === 'e') {
+        response.isConnected = true;
         return {
           connected: [...prevConnectionInfo.connected, response],
           nonConnected: prevConnectionInfo.nonConnected.filter(
@@ -98,6 +100,7 @@ const Navbar = () => {
           ),
         };
       } else if (response.operation === 'l') {
+        response.isConnected = false;
         return {
           connected: prevConnectionInfo.connected.filter(
             (user) => user.userInfoDto?.employeeId !== response.employeeId,
@@ -155,7 +158,19 @@ const Navbar = () => {
           const fetchUserInfo = async () => {
             // 접속한 유저 정보 받기
             const response = await getVisitor(projectId);
-            setConnectionInfo(response.data);
+            const dataWithConnectionStatus = {
+              connected: response.data.connected.map((user: SocketInfo) => ({
+                ...user,
+                isConnected: true,
+              })),
+              nonConnected: response.data.nonConnected.map(
+                (user: SocketInfo) => ({
+                  ...user,
+                  isConnected: false,
+                }),
+              ),
+            };
+            setConnectionInfo(dataWithConnectionStatus);
             console.log('visitor: ', response.data);
           };
           fetchUserInfo();
@@ -221,8 +236,8 @@ const Navbar = () => {
           {projectId > 0 && (
             <div className='mr-6 flex w-full items-center justify-center'>
               {/* 연결된 사용자 렌더링 */}
-              {connectionInfo?.connected.map((user, index) => {
-                if (user.userInfoDto) {
+              {projectUsers.map((user, index) => {
+                if (user.userInfoDto && user.isConnected) {
                   return (
                     <div
                       key={`connected_${user.userInfoDto.employeeId}`}
@@ -240,8 +255,8 @@ const Navbar = () => {
                 }
               })}
               {/* 비연결된 사용자 렌더링 */}
-              {connectionInfo?.nonConnected.map((user, index) => {
-                if (user.userInfoDto) {
+              {projectUsers.map((user, index) => {
+                if (user.userInfoDto && !user.isConnected) {
                   return (
                     <div
                       key={`nonconnected_${user.userInfoDto.employeeId}`}
