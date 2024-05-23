@@ -18,12 +18,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/messages")
 @RequiredArgsConstructor
 public class MessageController {
 
-    private ResponseDto response;
+    private ResponseDto<?> response;
     private final CommonUtil commonUtil;
     private final MessageService messageService;
     private final UserRepository userRepository;
@@ -31,14 +30,14 @@ public class MessageController {
     // 수신한 메세지 페이지 확인
     @Operation(summary = "수신한 메세지 확인")
     @GetMapping("/received")
-    public ResponseEntity<ResponseDto> getReceivedMessageList(
+    public ResponseEntity<ResponseDto<?>> getReceivedMessageList(
             @RequestParam int page,
             @RequestParam int size) {
         Integer receiverId = commonUtil.getUser().getUserId();
 
         Page<MessageResponseDto> messagesPage = messageService.getMessagesPage(receiverId, page, size);
 
-        response = new ResponseDto(true, "수신 메세지 페이지 반환", messagesPage);
+        response = new ResponseDto<>(true, "수신 메세지 페이지 반환", messagesPage);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -48,7 +47,7 @@ public class MessageController {
     // 하나의 메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨
     @Operation(summary = "메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨")
     @PutMapping("/{messageId}")
-    public ResponseEntity<ResponseDto> updateMessage(@PathVariable("messageId")Integer messageId, @RequestBody MessageStatusDto dto) {
+    public ResponseEntity<ResponseDto<?>> updateMessage(@PathVariable("messageId")Integer messageId, @RequestBody MessageStatusDto dto) {
         String status = dto.getStatus();
 
         String msg;
@@ -66,14 +65,14 @@ public class MessageController {
             msg = "알 수 없는 상태정보 입력 : " + status;
         }
 
-        response = new ResponseDto(true, msg, null);
+        response = new ResponseDto<>(true, msg, null);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 해당 사번 유저에게 메세지 보내기
     @Operation(summary = "해당 사번 유저에게 메세지 보내기")
     @PostMapping("/{employeeId}")
-    public ResponseEntity<ResponseDto> sendMessage(@PathVariable("employeeId") String employeeId, @RequestBody MessageSendDto messageSendDto) {
+    public ResponseEntity<ResponseDto<?>> sendMessage(@PathVariable("employeeId") String employeeId, @RequestBody MessageSendDto messageSendDto) {
         Optional<User> optionalReceiver = userRepository.findByEmployeeId(employeeId);
 
         if (optionalReceiver.isPresent()) {
@@ -81,12 +80,12 @@ public class MessageController {
             User sender = commonUtil.getUser();
 
             messageService.sendMessage(sender, receiver, messageSendDto);
-            response = new ResponseDto(true, "해당 사용자에게 쪽지를 보냈습니다.", null);
+            response = new ResponseDto<>(true, "해당 사용자에게 쪽지를 보냈습니다.", null);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } else {
 
-            response = new ResponseDto(false, "해당 수신자 정보가 없습니다", null);
+            response = new ResponseDto<>(false, "해당 수신자 정보가 없습니다", null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }

@@ -32,9 +32,9 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi projectApi() {
+    public GroupedOpenApi projectsApi() {
         return GroupedOpenApi.builder()
-                .group("project-api")
+                .group("projects-api")
                 .pathsToMatch("/projects/**")
                 .build();
     }
@@ -64,18 +64,18 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public GroupedOpenApi uploadsApi() {
+    public GroupedOpenApi RequirementBoardApi() {
         return GroupedOpenApi.builder()
-                .group("uploads-api")
-                .pathsToMatch("/uploads/**")
+                .group("requirement-board-api")
+                .pathsToMatch("/requirement-board/**")
                 .build();
     }
 
     @Bean
-    public GroupedOpenApi testApi() {
+    public GroupedOpenApi uploadsApi() {
         return GroupedOpenApi.builder()
-                .group("test-api")
-                .pathsToMatch("/test/**")
+                .group("uploads-api")
+                .pathsToMatch("/uploads/**")
                 .build();
     }
 

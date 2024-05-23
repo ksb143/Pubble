@@ -17,6 +17,7 @@ import com.ssafy.d109.pubble.exception.UserThread.UserThreadNotFoundException;
 import com.ssafy.d109.pubble.repository.*;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 @Log4j2
 public class UserThreadService {
 
@@ -39,18 +41,6 @@ public class UserThreadService {
     private final ProjectRepository projectRepository;
     private final RequirementRepository requirementRepository;
 
-
-    public UserThreadService(UserThreadRepository userThreadRepository, CommentRepository commentRepository, CommonUtil commonUtil, RequirementDetailRepository detailRepository, NotificationService notificationService, UserRepository userRepository, ProjectRepository projectRepository, RequirementRepository requirementRepository) {
-        this.userThreadRepository = userThreadRepository;
-        this.commentRepository = commentRepository;
-        this.commonUtil = commonUtil;
-        this.detailRepository = detailRepository;
-        this.notificationService = notificationService;
-        this.userRepository = userRepository;
-        this.projectRepository = projectRepository;
-        this.requirementRepository = requirementRepository;
-    }
-
     public List<RequirementThreadsDto> getRequirementsThreads(Integer requirementId) {
         // db에서 id만 뽑아오는게 더 좋을 것 같긴 한데
         List<RequirementDetail> details = detailRepository.findAllByRequirement_requirementId(requirementId);
@@ -63,7 +53,6 @@ public class UserThreadService {
                     .userThreadDtos(allUserThreads)
                     .build();
             dtos.add(threadsDto);
-            // 멸망해버린 변수명
         }
         return dtos;
     }
@@ -96,10 +85,7 @@ public class UserThreadService {
         }
 
         currentThread.setLockYN("y");
-
-
     }
-
 
     private UserThreadDto convertUserThreadToDto(UserThread userThread) {
         UserThreadDto dto = new UserThreadDto();
@@ -113,6 +99,11 @@ public class UserThreadService {
         dto.setCommentList(commentDataList);
 
         return dto;
+    }
+
+    public UserThreadDto getUserThread(Integer userThreadId) {
+        UserThread userThread = userThreadRepository.findUserThreadByUserThreadId(userThreadId).orElseThrow(UserThreadNotFoundException::new);
+        return convertUserThreadToDto(userThread);
     }
 
     private CommentResponseData convertCommentToDto(Comment comment) {

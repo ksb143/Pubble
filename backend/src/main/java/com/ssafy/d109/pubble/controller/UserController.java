@@ -43,41 +43,41 @@ public class UserController {
 
 
     // user info list
-    private ResponseDto response;
+    private ResponseDto<?> response;
 
     @Operation(summary = "모든 유저의 사번, 이름")
     @GetMapping("/simple/all")
-    public ResponseEntity<ResponseDto> getAllUserSimpleInfos() {
+    public ResponseEntity<ResponseDto<?>> getAllUserSimpleInfos() {
         List<SimpleUserInfoDto> simpleAllUserInfos = userService.getAllUserSimpleInfos();
 
-        response = new ResponseDto(true, "모든 유저의 사번, 이름", simpleAllUserInfos);
+        response = new ResponseDto<>(true, "모든 유저의 사번, 이름", simpleAllUserInfos);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "당 프로젝트에 참여중인 유저의 사번, 이름")
     @GetMapping("/simple/{projectId}")
-    public ResponseEntity<ResponseDto> getProjectUserSimpleInfos(@PathVariable Integer projectId) {
+    public ResponseEntity<ResponseDto<?>> getProjectUserSimpleInfos(@PathVariable Integer projectId) {
         List<SimpleUserInfoDto> simpleProjectUserInfos = userService.getProjectUserSimpleInfos(projectId);
 
-        response = new ResponseDto(true, "해당 프로젝트에 참여중인 유저의 사번, 이름", simpleProjectUserInfos);
+        response = new ResponseDto<>(true, "해당 프로젝트에 참여중인 유저의 사번, 이름", simpleProjectUserInfos);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "모든 유저의 일부 정보")
     @GetMapping("/userinfo/all")
-    public ResponseEntity<ResponseDto> getUserInfoAllList() {
+    public ResponseEntity<ResponseDto<?>> getUserInfoAllList() {
         List<UserInfoDto> allUserInfos = userService.getAllUserInfos();
 
-        response = new ResponseDto(true, "모든 유저의 일부 정보", allUserInfos);
+        response = new ResponseDto<>(true, "모든 유저의 일부 정보", allUserInfos);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(summary = "해당 프로젝트에 참여중인 유저의 일부 정보")
     @GetMapping("/userinfo/{projectId}")
-    public ResponseEntity<ResponseDto> getUserInfoProjectList(@PathVariable Integer projectId) {
+    public ResponseEntity<ResponseDto<?>> getUserInfoProjectList(@PathVariable Integer projectId) {
         List<UserInfoDto> projectUserInfos = userService.getProjectUserInfos(projectId);
 
-        response = new ResponseDto(true, "해당 프로젝트에 참여중인 유저의 일부 정보", projectUserInfos);
+        response = new ResponseDto<>(true, "해당 프로젝트에 참여중인 유저의 일부 정보", projectUserInfos);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
