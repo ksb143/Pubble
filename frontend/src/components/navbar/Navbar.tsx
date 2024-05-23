@@ -27,8 +27,7 @@ import Bell from '@/assets/icons/bell.svg?react';
 import { SocketInfo } from '@/types/socketType';
 
 interface ConnectionInfo {
-  connected: SocketInfo[];
-  nonConnected: SocketInfo[];
+  users: (SocketInfo & { isConnected: boolean })[];
 }
 
 // 프로필 스타일
@@ -53,7 +52,6 @@ const Navbar = () => {
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(
     null,
   );
-  const [projectUsers, setProjectUsers] = useState<SocketInfo[]>([]);
   const previousProjectIdRef = useRef(projectId);
 
   // 클릭한 메뉴 상태
@@ -94,21 +92,21 @@ const Navbar = () => {
       if (response.operation === 'e') {
         response.isConnected = true;
         return {
-          connected: [...prevConnectionInfo.connected, response],
-          nonConnected: prevConnectionInfo.nonConnected.filter(
-            (user) => user.employeeId !== response.userInfoDto?.employeeId,
-          ),
+          users: [
+            ...prevConnectionInfo.users,
+            { ...response, isConnected: true },
+          ],
         };
       } else if (response.operation === 'l') {
         response.isConnected = false;
         return {
-          connected: prevConnectionInfo.connected.filter(
-            (user) => user.userInfoDto?.employeeId !== response.employeeId,
+          users: prevConnectionInfo.users.map((user) =>
+            user.employeeId === response.employeeId
+              ? { ...user, isConnected: false }
+              : user,
           ),
-          nonConnected: [...prevConnectionInfo.nonConnected, response],
         };
       }
-
       return prevConnectionInfo;
     });
   };
@@ -159,16 +157,16 @@ const Navbar = () => {
             // 접속한 유저 정보 받기
             const response = await getVisitor(projectId);
             const dataWithConnectionStatus = {
-              connected: response.data.connected.map((user: SocketInfo) => ({
-                ...user,
-                isConnected: true,
-              })),
-              nonConnected: response.data.nonConnected.map(
-                (user: SocketInfo) => ({
+              users: [
+                ...response.data.connected.map((user: SocketInfo) => ({
+                  ...user,
+                  isConnected: true,
+                })),
+                ...response.data.nonConnected.map((user: SocketInfo) => ({
                   ...user,
                   isConnected: false,
-                }),
-              ),
+                })),
+              ],
             };
             setConnectionInfo(dataWithConnectionStatus);
             console.log('visitor: ', response.data);
@@ -235,8 +233,8 @@ const Navbar = () => {
           {/* 접속 유저 */}
           {projectId > 0 && (
             <div className='mr-6 flex w-full items-center justify-center'>
-              {/* 연결된 사용자 렌더링 */}
-              {projectUsers.map((user, index) => {
+              {/* 접속한 사용자 렌더링 */}
+              {connectionInfo?.users.map((user, index) => {
                 if (user.userInfoDto && user.isConnected) {
                   return (
                     <div
@@ -255,7 +253,7 @@ const Navbar = () => {
                 }
               })}
               {/* 비연결된 사용자 렌더링 */}
-              {projectUsers.map((user, index) => {
+              {connectionInfo?.users.map((user, index) => {
                 if (user.userInfoDto && !user.isConnected) {
                   return (
                     <div
