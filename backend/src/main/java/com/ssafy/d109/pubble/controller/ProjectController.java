@@ -56,7 +56,7 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @Operation(summary = "프로젝트 상태 변경", operationId = "4")
+    @Operation(summary = "프로젝트 상태 변경", description = "아직 딱히 제한 없음" ,operationId = "4")
     @PutMapping("/{projectId}")
     public ResponseEntity<ResponseDto<?>> changeProjectStatus(@PathVariable Integer projectId, @RequestBody CommandDto commandDto) {
         projectService.changeProjectStatus(projectId, commandDto.getCommand());
