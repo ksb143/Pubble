@@ -69,6 +69,7 @@ public class UserLocationService {
         return UserLocationDto.builder()
                 .operation("l")
                 .employeeId(user.getEmployeeId())
+                .userInfoDto(UserInfoDto.createUserInfo(user))
                 .build();
     }
 
