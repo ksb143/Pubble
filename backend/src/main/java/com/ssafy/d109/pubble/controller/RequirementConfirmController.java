@@ -58,6 +58,12 @@ public class RequirementConfirmController {
             requirementConfirmService.updateApprovalComment(requirement, reqDto.getApprovalComment());
             requirementService.updateVersion(requirementId, reqDto.getApproval());
 
+
+            // 보류 시 요구사항 리스트에 읽기 전용된 보류 버전이 올라와야 한다.
+            requirement.setIsLock("u");
+            requirementRepository.save(requirement);
+
+
         } else if (reqDto.getApproval().equals("a")) {
             log.info("APPROVAL! 승인이여요");
             // 1. 해당 요구사항의 approval, approvalComment 정보 갱신
