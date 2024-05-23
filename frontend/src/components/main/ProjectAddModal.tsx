@@ -34,7 +34,9 @@ const ProjectAddModal = ({ isOpen, onClose }: ProjectAddModalProps) => {
     try {
       await addProject(title, code, participantsArray, startAt, endAt);
       onClose(); // 프로젝트 생성 후 모달 닫기
-    } catch (error) {}
+    } catch (error) {
+      console.error('api 호출 실패', error);
+    }
   };
 
   return (
