@@ -44,7 +44,7 @@ public class RequirementBoardController {
 
     // 세부사항 상태 변경
     @Operation(summary = "세부사항 상태 변경", operationId = "2")
-    @PutMapping("/details/{detailId}/status")
+    @PatchMapping("/details/{detailId}/status")
     public ResponseEntity<ResponseDto<?>> updateDetailStatus(@PathVariable Integer requirementId, @PathVariable Integer detailId, @RequestBody UpdateDetailStatusDto dto) {
         Integer userId = commonUtil.getUser().getUserId();
         try {
@@ -95,7 +95,7 @@ public class RequirementBoardController {
     }
 
     @Operation(summary = "스레드 잠금", operationId = "5")
-    @PutMapping("/user-threads/{userThreadId}/lock")
+    @PatchMapping("/user-threads/{userThreadId}/lock")
     public ResponseEntity<UserThreadLockResponseDto> lockThread(@PathVariable Integer userThreadId) {
 
         userThreadService.lockThread(userThreadId);

@@ -77,7 +77,7 @@ public class RequirementController {
     }
 
     @Operation(summary = "해당 요구사항 항목의 잠금 상태 변경", description = "바로 잠기도록 합니다. 잠금 풀기 기능 추가 가능/문의하십시오", operationId = "7")
-    @PutMapping("/{requirementId}/lock")
+    @PatchMapping("/{requirementId}/lock")
     public ResponseEntity<ResponseDto<?>> updateRequirementLock(@PathVariable Integer requirementId) {
         requirementService.updateRequirementLock(requirementId);
 
@@ -86,7 +86,7 @@ public class RequirementController {
     }
 
     @Operation(summary = "해당 요구사항 항목의 승인 상태 변경", description = "u : 아직 조작 안됨, a : 승인됨, h : 보류됨", operationId = "8")
-    @PutMapping("/{requirementId}/approval")
+    @PatchMapping("/{requirementId}/approval")
     public ResponseEntity<ResponseDto<?>> updateRequirementApproval(@PathVariable Integer requirementId, @RequestBody ApprovalDto approvalDto) {
         requirementService.updateRequirementApproval(requirementId, approvalDto);
 

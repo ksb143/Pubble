@@ -10,6 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MessageSendDto {
 
+    private String employeeId;
     private String title;
     private String content;
 }

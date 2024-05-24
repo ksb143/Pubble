@@ -34,8 +34,8 @@ public class NoticeController {
     }
 
     @Operation(summary = "해당 공지사항 조회")
-    @GetMapping("/{notice-id}")
-    public ResponseEntity<ResponseDto<?>> getNotice(@PathVariable("notice-id") Integer noticeId) {
+    @GetMapping("/{noticeId}")
+    public ResponseEntity<ResponseDto<?>> getNotice(@PathVariable Integer noticeId) {
         NoticeResponseDto notice = noticeService.getNotice(noticeId);
 
         response = new ResponseDto<>(true, "해당 공지사항 조회", notice);
@@ -61,8 +61,8 @@ public class NoticeController {
     }
 
     @Operation(summary = "공지사항 삭제(d) 처리")
-    @PutMapping("/{notice-id}/delete")
-    public ResponseEntity<ResponseDto<?>> deleteNotice(@PathVariable("notice-id") Integer noticeId) {
+    @PatchMapping("/{noticeId}/delete")
+    public ResponseEntity<ResponseDto<?>> deleteNotice(@PathVariable Integer noticeId) {
         User user = commonUtil.getUser();
 
         if ("ADMIN".equals(user.getRole())) {

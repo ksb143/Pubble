@@ -46,7 +46,7 @@ public class MessageController {
 
     // 하나의 메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨
     @Operation(summary = "메세지 조작 | u : 열람 안됨, r : 열람됨, d : 삭제됨")
-    @PutMapping("/{messageId}")
+    @PatchMapping("/{messageId}")
     public ResponseEntity<ResponseDto<?>> updateMessage(@PathVariable("messageId")Integer messageId, @RequestBody MessageStatusDto dto) {
         String status = dto.getStatus();
 
@@ -71,9 +71,9 @@ public class MessageController {
 
     // 해당 사번 유저에게 메세지 보내기
     @Operation(summary = "해당 사번 유저에게 메세지 보내기")
-    @PostMapping("/{employeeId}")
-    public ResponseEntity<ResponseDto<?>> sendMessage(@PathVariable("employeeId") String employeeId, @RequestBody MessageSendDto messageSendDto) {
-        Optional<User> optionalReceiver = userRepository.findByEmployeeId(employeeId);
+    @PostMapping()
+    public ResponseEntity<ResponseDto<?>> sendMessage(@RequestBody MessageSendDto messageSendDto) {
+        Optional<User> optionalReceiver = userRepository.findByEmployeeId(messageSendDto.getEmployeeId());
 
         if (optionalReceiver.isPresent()) {
             User receiver = optionalReceiver.get();
