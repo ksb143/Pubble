@@ -79,10 +79,6 @@
 
 ![Static Badge](https://img.shields.io/badge/Tiptap-000000?style=flat)
 
-![Static Badge](https://img.shields.io/badge/Tiptap-000000?style=flat)
-
-![Static Badge](https://img.shields.io/badge/Tiptap-000000?style=flat)
-
 ![Static Badge](https://img.shields.io/badge/Tailwindcss-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
 
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=flat&logo=firebase&logoColor=white)
