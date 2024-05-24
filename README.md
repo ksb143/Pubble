@@ -107,7 +107,7 @@
 
 ##### 😀 인프라
 
-![Static Badge](https://img.shields.io/badge/AWS EC2-FF9900?style=flat&logo=amazonec2&logoColor=white)
+![Static Badge](https://img.shields.io/badge/AWSEC2-FF9900?style=flat&logo=amazonec2&logoColor=white)
 
 ![Static Badge](https://img.shields.io/badge/Jenkins-D24939?style=flat&logo=jenkins&logoColor=white)
 
