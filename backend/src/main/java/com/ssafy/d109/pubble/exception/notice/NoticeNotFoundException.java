@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.exception.Notice;
+package com.ssafy.d109.pubble.exception.notice;
 
 public class NoticeNotFoundException extends RuntimeException{
     public NoticeNotFoundException() {

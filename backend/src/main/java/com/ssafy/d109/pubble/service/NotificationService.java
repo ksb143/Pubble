@@ -8,7 +8,7 @@ import com.ssafy.d109.pubble.dto.responseDto.NotificationMessageResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.SenderInfoDto;
 import com.ssafy.d109.pubble.dto.responseDto.TypeDataDto;
 import com.ssafy.d109.pubble.entity.*;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.user.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationMessageNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
 import com.ssafy.d109.pubble.repository.NotificationMessageRepository;

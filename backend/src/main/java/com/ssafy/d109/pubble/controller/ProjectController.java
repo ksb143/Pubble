@@ -48,7 +48,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "해당 프로젝트의 대시보드", operationId = "3")
-    @GetMapping("/projectId/dashboard")
+    @GetMapping("/{projectId}/dashboard")
     public ResponseEntity<ResponseDto<?>> getProjectDashboard(@PathVariable Integer projectId) {
         ProjectDashboardDto projectDashboardDto = projectService.getProjectDashboard(projectId);
 

@@ -5,7 +5,7 @@ import com.ssafy.d109.pubble.dto.noticeDto.NoticeResponseDto;
 import com.ssafy.d109.pubble.dto.noticeDto.NoticeSummaryDto;
 import com.ssafy.d109.pubble.entity.Notice;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.Notice.NoticeNotFoundException;
+import com.ssafy.d109.pubble.exception.notice.NoticeNotFoundException;
 import com.ssafy.d109.pubble.repository.NoticeRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

@@ -7,17 +7,15 @@ import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.RequirementDetail;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.requirement.RequirementNotFoundException;
+import com.ssafy.d109.pubble.exception.user.UserNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
 import com.ssafy.d109.pubble.repository.*;
-import com.ssafy.d109.pubble.exception.UserThread.UnauthorizedAccessException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,7 +128,11 @@ public class RequirementService {
             changeRatio = (float) changed / (changed + unchanged);
         }
 
-        return ProgressRatio.builder().lockRatio(lockRatio).approvalRatio(approvalRatio).changeRatio(changeRatio).build();
+        return ProgressRatio.builder()
+                .lockRatio(lockRatio)
+                .approvalRatio(approvalRatio)
+                .changeRatio(changeRatio)
+                .build();
     }
 
     public List<RequirementDetailDto> getRequirementDetailDtos(Integer requirementId) {
@@ -232,7 +234,6 @@ public class RequirementService {
                     throw new NotificationSendingFailedException();
                 }
             }
-
         }
     }
 
@@ -243,7 +244,7 @@ public class RequirementService {
         UserInfoDto managerInfo = UserInfoDto.createUserInfo(requirement.getManager());
         UserInfoDto authorInfo = UserInfoDto.createUserInfo(requirement.getAuthor());
 
-        RequirementSummaryDto requirementSummaryDto = RequirementSummaryDto.builder()
+        return RequirementSummaryDto.builder()
                 .requirementId(requirement.getRequirementId())
                 .orderIndex(requirement.getOrderIndex())
                 .version(requirement.getVersion())
@@ -258,10 +259,7 @@ public class RequirementService {
                 .createdAt(requirement.getCreatedAt())
                 .author(authorInfo)
                 .build();
-
-        return requirementSummaryDto;
     }
-
 
     @Transactional
     public void updateRequirement(Integer requirementId, RequirementUpdateDto udto) {
@@ -341,6 +339,7 @@ public class RequirementService {
 
     }
 
+    // 오직 잠그기만 하도록 변경됨
     @Transactional
     public void updateRequirementLock(Integer requirementId/*, String lock*/) {
         Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
@@ -356,19 +355,16 @@ public class RequirementService {
 
     @Transactional
     public void updateRequirementApproval(Integer requirementId, ApprovalDto approvalDto) {
-        Optional<Requirement> optionalRequirement = requirementRepository.findByRequirementId(requirementId);
+        Requirement requirement = requirementRepository.findByRequirementId(requirementId).orElseThrow(RequirementNotFoundException::new);
 
-        if (optionalRequirement.isPresent()) {
-            Requirement requirement = optionalRequirement.get();
-            switch (approvalDto.getApproval()) {
-                case "u" -> requirement.setApproval("u");
-                case "h" -> requirement.setApproval("h");
-                case "a" -> requirement.setApproval("a");
-            }
-
-            requirement.setApprovalComment(approvalDto.getApprovalComment());
-            requirementRepository.save(requirement);
+        switch (approvalDto.getApproval()) {
+            case "u" -> requirement.setApproval("u");
+            case "h" -> requirement.setApproval("h");
+            case "a" -> requirement.setApproval("a");
         }
+
+        requirement.setApprovalComment(approvalDto.getApprovalComment());
+        requirementRepository.save(requirement);
     }
 
     public List<RequirementSummaryDto> getRequirementsByCode(Integer projectId, String requirementCode) {

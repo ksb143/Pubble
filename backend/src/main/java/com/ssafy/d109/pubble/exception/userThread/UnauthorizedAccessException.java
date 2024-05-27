@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.exception.UserThread;
+package com.ssafy.d109.pubble.exception.userThread;
 
 public class UnauthorizedAccessException extends RuntimeException{
 

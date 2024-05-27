@@ -27,16 +27,8 @@ public class UserLocationService {
                 .locationName(dto.getLocationName())
                 .locationUrl(dto.getLocationUrl())
                 .build();
-        System.out.println("userLocationDto = " + userLocationDto.toString());
 
         projectUserLocations.computeIfAbsent(projectId, k -> new ConcurrentHashMap<>()).put(user.getEmployeeId(), userLocationDto);
-        System.out.println("===========================enter==========================================");
-        System.out.println("projectUserLocations = " + projectUserLocations);
-        System.out.println("projectUserLocations = " + projectUserLocations.toString());
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId));
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).toString());
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values());
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values().toString());
 
 
         userLocationDto.setOperation("e");
@@ -74,39 +66,13 @@ public class UserLocationService {
     }
 
     public AllUserLocationResponseDto getAllUserLocations(Integer projectId) {
-        System.out.println("projectId = " + projectId);
         List<User> participants = projectAssignmentRepository.findUsersByProjectId(projectId);
-        System.out.println("participants = " + participants.toString());
         ConcurrentHashMap<String, UserLocationDto> userLocations = projectUserLocations.get(projectId);
-        System.out.println("===========================getAllUserLocations==========================================");
-        System.out.println("projectUserLocations = " + projectUserLocations);
-        System.out.println("projectUserLocations = " + projectUserLocations.toString());
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId));
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).toString());
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values());
-        System.out.println("projectUserLocations = " + projectUserLocations.get(projectId).values().toString());
-        for (Map.Entry<String, UserLocationDto> userEntry : userLocations.entrySet()) {
-            String employeeId = userEntry.getKey();
-            UserLocationDto userLocationDto = userEntry.getValue();
-
-            System.out.println("Employee ID: " + employeeId + ", UserLocationDto: " + userLocationDto);
-        }
-
-        // userLocations가 null일 경우 빈 HashMap을 사용
-        if (userLocations == null) {
-            userLocations = new ConcurrentHashMap<>();
-        }
-
-//        Set<String> connectedEmployeeIds = userLocations.values().stream()
-//                .map(UserLocationDto::getEmployeeId)
-//                .collect(Collectors.toSet());
-//        System.out.println("connectedEmployeeIds.toString() = " + connectedEmployeeIds.toString());
 
         Set<String> connectedEmployeeIds = new HashSet<>();
         for (ConcurrentHashMap<String, UserLocationDto> userLocations2 : projectUserLocations.values()) {
             connectedEmployeeIds.addAll(userLocations2.keySet());
         }
-        System.out.println("connectedEmployeeIds.toString() = " + connectedEmployeeIds.toString());
 
         // 접속자
         List<UserLocationDto> connectedUserLocations = new ArrayList<>(userLocations.values());
@@ -117,7 +83,6 @@ public class UserLocationService {
         List<UserLocationDto> nonConnectedUserLocations = participants.stream()
                 .filter(user -> {
                     boolean isConnected = connectedEmployeeIds.contains(user.getEmployeeId());
-                    System.out.println("User ID: " + user.getEmployeeId() + " isConnected: " + isConnected);
                     return !isConnected;
                 })
                 .map(user -> UserLocationDto.builder()

@@ -1,13 +1,12 @@
 package com.ssafy.d109.pubble.service;
 
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.ssafy.d109.pubble.config.S3Config;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.Upload;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
+import com.ssafy.d109.pubble.exception.requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UploadRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;
@@ -16,9 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartRequest;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
 

@@ -6,7 +6,7 @@ import com.ssafy.d109.pubble.config.S3Config;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.Upload;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
+import com.ssafy.d109.pubble.exception.requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UploadRepository;
 import com.ssafy.d109.pubble.util.CommonUtil;

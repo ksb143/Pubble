@@ -8,6 +8,8 @@ import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.exception.project.ProjectAccessDeniedException;
+import com.ssafy.d109.pubble.exception.project.ProjectNotFoundException;
 import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
@@ -38,6 +40,7 @@ public class ProjectService {
     private final NotificationService notificationService;
 
     private List<UserInfoDto> getDashboardUserInfos(Integer projectId) {
+
         List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
         List<UserInfoDto> userInfoDtos = new ArrayList<>();
         for (User user : users) {
@@ -126,27 +129,30 @@ public class ProjectService {
     }
 
     public ProjectDashboardDto getProjectDashboard(Integer projectId) {
-        Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
+        Project project = projectRepository.findByProjectId(projectId).orElseThrow(ProjectNotFoundException::new);
+
+        // postponed
+//        if (!projectAssignmentRepository.existsProjectAssignmentByUserIdAndProjectId(userId, projectId)) {
+//            throw new ProjectAccessDeniedException();
+//        }
+
         ProjectDashboardDto projectDashboardDto = null;
 
-        if (optionalProject.isPresent()) {
-            Project project = optionalProject.get();
-            ProgressRatio progressRatio = requirementService.getProgressRatio(projectId);
-            List<UserInfoDto> userInfoDtos = getDashboardUserInfos(projectId);
+        ProgressRatio progressRatio = requirementService.getProgressRatio(projectId);
+        List<UserInfoDto> userInfoDtos = getDashboardUserInfos(projectId);
 
-            projectDashboardDto = ProjectDashboardDto.builder()
-                    .projectId(projectId)
-                    .projectTitle(project.getProjectTitle())
-                    .startAt(project.getStartAt())
-                    .endAt(project.getEndAt())
-                    .status(project.getStatus())
-                    .code(project.getCode())
-                    .people(userInfoDtos)
-                    .lockRatio(progressRatio.getLockRatio())
-                    .approveRatio(progressRatio.getApprovalRatio())
-                    .changedRatio(progressRatio.getChangeRatio())
-                    .build();
-        }
+        projectDashboardDto = ProjectDashboardDto.builder()
+                .projectId(projectId)
+                .projectTitle(project.getProjectTitle())
+                .startAt(project.getStartAt())
+                .endAt(project.getEndAt())
+                .status(project.getStatus())
+                .code(project.getCode())
+                .people(userInfoDtos)
+                .lockRatio(progressRatio.getLockRatio())
+                .approveRatio(progressRatio.getApprovalRatio())
+                .changedRatio(progressRatio.getChangeRatio())
+                .build();
 
         return projectDashboardDto;
     }

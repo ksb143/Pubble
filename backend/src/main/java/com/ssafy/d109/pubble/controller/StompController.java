@@ -6,7 +6,7 @@ import com.ssafy.d109.pubble.dto.userLocationDto.AllUserLocationResponseDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationDto;
 import com.ssafy.d109.pubble.dto.userLocationDto.UserLocationRequestDto;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.user.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.service.RealTimeRequirementService;
 import com.ssafy.d109.pubble.service.UserLocationService;

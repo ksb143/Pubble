@@ -1,9 +1,7 @@
 package com.ssafy.d109.pubble.security.jwt;
 
-import com.ssafy.d109.pubble.dto.projectDto.ProjectListDto;
-import com.ssafy.d109.pubble.dto.responseDto.EditableProjectsResponseDto;
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.user.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import com.ssafy.d109.pubble.service.ProjectService;
 import io.jsonwebtoken.Jwts;
@@ -13,9 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @Component
 public class JWTUtil {

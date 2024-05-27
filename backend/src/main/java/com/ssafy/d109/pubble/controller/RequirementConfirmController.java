@@ -5,7 +5,7 @@ import com.ssafy.d109.pubble.dto.requestDto.RequirementConfirmRequestDto;
 import com.ssafy.d109.pubble.dto.responseDto.Error400ResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.RequirementConfirmResponsedto;
 import com.ssafy.d109.pubble.entity.Requirement;
-import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
+import com.ssafy.d109.pubble.exception.requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.service.RequirementConfirmService;
 import com.ssafy.d109.pubble.service.RequirementService;
