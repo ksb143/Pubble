@@ -23,5 +23,5 @@ public class ProjectCreateDto {
     private LocalDateTime endAt;
     private String status;
     private String code;
-    private List<Integer> participants;
+    private List<String> participantsEID;
 }

@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.exception.User;
+package com.ssafy.d109.pubble.exception.user;
 
 public class UserNotFoundException extends RuntimeException {
 

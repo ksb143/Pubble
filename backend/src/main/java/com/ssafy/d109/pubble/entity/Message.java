@@ -1,15 +1,16 @@
 package com.ssafy.d109.pubble.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder
 @Table(name = "message")
 public class Message {
@@ -19,22 +20,25 @@ public class Message {
     @Column(name = "messageId")
     private Integer messageId;
 
-    @Column(name = "createdAt")
-    private LocalDateTime createdAt;
+    @Column(name = "title")
+    private String title;
 
     @Column(name = "content")
     private String content;
 
+    @Column(name = "status")
+    private String status; // u : 열람 안됨, r : 열람됨, d : 삭제됨
+
+    @Column(name = "createdAt", updatable = false, nullable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
     // 연관 관계
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "receiverId", referencedColumnName = "userId")
-//    private User receiver;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "senderId", referencedColumnName = "userId")
-//    private User sender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "senderId")
+    private User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user;
+    @JoinColumn(name = "receiverId")
+    private User receiver;
 }

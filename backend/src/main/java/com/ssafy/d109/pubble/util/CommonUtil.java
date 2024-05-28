@@ -1,7 +1,7 @@
 package com.ssafy.d109.pubble.util;
 
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.user.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

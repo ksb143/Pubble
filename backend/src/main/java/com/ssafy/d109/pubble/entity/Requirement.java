@@ -1,13 +1,13 @@
 package com.ssafy.d109.pubble.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -44,8 +44,8 @@ public class Requirement {
     @Column(name = "requirementName") // 요구사항명
     private String requirementName;
 
-    @Column(name = "detail") // 상세설명
-    private String detail;
+//    @Column(name = "detail") // 상세설명
+//    private String detail;
 
     @Column(name = "targetUser") // 타겟 이용자
     private String targetUser;
@@ -70,4 +70,7 @@ public class Requirement {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author") // 작성자
     private User author;
+
+//    @OneToMany(mappedBy = "requirement", fetch = FetchType.LAZY)
+//    private List<RequirementDetail> requirementDetails;
 }

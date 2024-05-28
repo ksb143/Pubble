@@ -48,7 +48,7 @@ public class ReissueService {
         String role = jwtUtil.getRole(refreshToken);
         String newAccessToken = jwtUtil.createJwt("Authorization", employeeId, role, 600000L);
 
-        response.setHeader("Auhtorization", "Bearer " + newAccessToken);
+        response.setHeader("Authorization", "Bearer " + newAccessToken);
         log.info("===============New Access Token: {} ===============" ,newAccessToken);
 
         ReissueResponseDataDto dto = ReissueResponseDataDto

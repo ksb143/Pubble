@@ -39,6 +39,12 @@ dependencies {
 	implementation 'com.mysql:mysql-connector-j'
 	// s3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'com.amazonaws:aws-java-sdk-s3'
+
+	// Spring Web Socket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	implementation 'org.webjars:sockjs-client:1.1.2'
+	implementation 'org.webjars:stomp-websocket:2.3.4'
 
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
@@ -46,6 +52,9 @@ dependencies {
 
 	// swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	implementation 'com.itextpdf:itext7-core:7.1.9'
+	implementation 'com.google.firebase:firebase-admin:8.1.0'
 
 	// test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
