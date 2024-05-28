@@ -17,7 +17,7 @@ export const lockRequirement = async (
   projectId: number,
   requirementId: number,
 ) => {
-  const { data } = await privateApi.put(
+  const { data } = await privateApi.patch(
     `/projects/${projectId}/requirements/${requirementId}/lock`,
   );
   return data;
