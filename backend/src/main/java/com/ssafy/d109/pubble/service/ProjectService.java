@@ -132,7 +132,7 @@ public class ProjectService {
         Project project = projectRepository.findByProjectId(projectId).orElseThrow(ProjectNotFoundException::new);
 
         // postponed
-//        if (!projectAssignmentRepository.existsProjectAssignmentByUserIdAndProjectId(userId, projectId)) {
+//        if (!projectAssignmentRepository.existsProjectAssignmentByUser_UserIdAndProject_ProjectId(userId, projectId)) {
 //            throw new ProjectAccessDeniedException();
 //        }
 
