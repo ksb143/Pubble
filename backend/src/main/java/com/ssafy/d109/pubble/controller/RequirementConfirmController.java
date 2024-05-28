@@ -5,7 +5,7 @@ import com.ssafy.d109.pubble.dto.requestDto.RequirementConfirmRequestDto;
 import com.ssafy.d109.pubble.dto.responseDto.Error400ResponseDto;
 import com.ssafy.d109.pubble.dto.responseDto.RequirementConfirmResponsedto;
 import com.ssafy.d109.pubble.entity.Requirement;
-import com.ssafy.d109.pubble.exception.Requirement.RequirementNotFoundException;
+import com.ssafy.d109.pubble.exception.requirement.RequirementNotFoundException;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.service.RequirementConfirmService;
 import com.ssafy.d109.pubble.service.RequirementService;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 
 @RestController
-@RequestMapping("/api/requirements")
+@RequestMapping("/requirements")
 @Log4j2
 public class RequirementConfirmController {
 
@@ -57,6 +57,12 @@ public class RequirementConfirmController {
             log.info("HOLD! 보류여요");
             requirementConfirmService.updateApprovalComment(requirement, reqDto.getApprovalComment());
             requirementService.updateVersion(requirementId, reqDto.getApproval());
+
+
+            // 보류 시 요구사항 리스트에 읽기 전용된 보류 버전이 올라와야 한다.
+            requirement.setIsLock("u");
+            requirementRepository.save(requirement);
+
 
         } else if (reqDto.getApproval().equals("a")) {
             log.info("APPROVAL! 승인이여요");

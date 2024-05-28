@@ -3,7 +3,9 @@ package com.ssafy.d109.pubble.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 import java.time.LocalDateTime;
@@ -12,6 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter
 @Table(name = "comment")
 public class Comment {
 
@@ -23,7 +26,8 @@ public class Comment {
     @Column(name = "content")
     private String content;
 
-    @Column(name = "createdAt")
+    @Column(name = "createdAt", updatable = false, nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     // 연관 관계

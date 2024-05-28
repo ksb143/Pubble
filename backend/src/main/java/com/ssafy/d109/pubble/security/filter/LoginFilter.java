@@ -99,8 +99,11 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
             role = auth.getAuthority();
         }
 
-        String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, 600000L);
+        long oneMonthMillis = 30L * 24 * 60 * 60 * 1000;
+        String accessToken = jwtUtil.createJwt("Authorization", employeeId, role, oneMonthMillis);
+        log.info("이거 보임?");
         String refreshToken = jwtUtil.createJwt("refresh", employeeId, role, 86400000L);
+        log.info("이건 보임?");
         String profileColor = jwtUtil.getProfileColor(accessToken);
         String name = jwtUtil.getName(accessToken);
         String department = jwtUtil.getDepartment(accessToken);
@@ -120,6 +123,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 .messges("SignIn Success")
                 .resData(dto)
                 .build();
+
 
         response.addHeader("Authorization", "Bearer " + accessToken);
         response.addCookie(createCookie("refresh", refreshToken));
@@ -163,6 +167,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);
         cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+
+
 
         return cookie;
     }

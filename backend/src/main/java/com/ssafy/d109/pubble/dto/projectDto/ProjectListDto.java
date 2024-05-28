@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ProjectListDto {
 
+    private Integer projectId;
     private String prdId;
     private String projectTitle;
     private List<String> people;

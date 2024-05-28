@@ -1,8 +1,9 @@
 package com.ssafy.d109.pubble.security.jwt;
 
 import com.ssafy.d109.pubble.entity.User;
-import com.ssafy.d109.pubble.exception.User.UserNotFoundException;
+import com.ssafy.d109.pubble.exception.user.UserNotFoundException;
 import com.ssafy.d109.pubble.repository.UserRepository;
+import com.ssafy.d109.pubble.service.ProjectService;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -17,11 +18,14 @@ public class JWTUtil {
 
     private SecretKey secretKey;
     private final UserRepository userRepository;
+    private final ProjectService projectService;
 
-    public JWTUtil(@Value("${spring.jwt.secret}") String secret, UserRepository userRepository) {
+
+    public JWTUtil(@Value("${spring.jwt.secret}") String secret, UserRepository userRepository, ProjectService projectService) {
 
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
         this.userRepository = userRepository;
+        this.projectService = projectService;
     }
 
     public String getEmployeeId(String token) {
@@ -69,14 +73,48 @@ public class JWTUtil {
         String department = user.getDepartment();
         String position = user.getPosition();
 
+        /*
+        List<String> reponseDto = new ArrayList<>();
+        List<String> editableProjects = new ArrayList<>();
+        List<String> uneditableProjects = new ArrayList<>();
+
+
+        List<ProjectListDto> projectListDtos = projectService.getProjectList(user.getUserId());
+        for (ProjectListDto dto : projectListDtos) {
+            reponseDto.add(dto.getProjectId() + dto.getProjectTitle() + "/*");
+        }
+
+         */
+
+
+        /*
+
+        List<EditableProjectsResponseDto> editables =  projectService.getEditableProjects(user.getUserId());
+        for (EditableProjectsResponseDto e : editables) {
+            editableProjects.add(e.getProjectId() + "/" + e.getProjectCode() + "/" + e.getRequirementId() + "/" + e.getRequirementCode() + "/*");
+        }
+
+        List<EditableProjectsResponseDto> uneditables = projectService.getUneditableProjects(user.getUserId());
+        for (EditableProjectsResponseDto ue : uneditables) {
+            uneditableProjects.add(ue.getProjectId() + "/" + ue.getProjectCode() + "/" + ue.getRequirementId() + "/" + ue.getRequirementCode() + "/*");
+        }
+
+         */
+
+
         return Jwts.builder()
                 .claim("category", category)
+                .claim("userId", user.getUserId())
                 .claim("employeeId", employeeId)
                 .claim("role", r)
                 .claim("profileColor", profileColor)
                 .claim("name", name)
                 .claim("department", department)
                 .claim("position", position)
+//                .claim("allowedDocumentNames", reponseDto)
+                .claim("isApprovable", user.getIsApprovable())
+//                .claim("editable", editableProjects)
+//                .claim("uneditable", uneditableProjects)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiredMs))
                 .signWith(secretKey)

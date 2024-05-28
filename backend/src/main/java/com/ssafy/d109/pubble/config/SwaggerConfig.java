@@ -27,14 +27,71 @@ public class SwaggerConfig {
     public GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
                 .group("user-api")
-                .pathsToMatch("/api/users/**")
+                .pathsToMatch("/users/**")
                 .build();
     }
+
     @Bean
-    public GroupedOpenApi projectApi() {
+    public GroupedOpenApi projectsApi() {
         return GroupedOpenApi.builder()
-                .group("project-api")
-                .pathsToMatch("/api/projects/**")
+                .group("projects-api")
+                .pathsToMatch("/projects/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi noticeApi() {
+        return GroupedOpenApi.builder()
+                .group("notice-api")
+                .pathsToMatch("/notices/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi requirementsConfirmApi() {
+        return GroupedOpenApi.builder()
+                .group("confirm-api")
+                .pathsToMatch("/requirements/confirm/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi requirementsApi() {
+        return GroupedOpenApi.builder()
+                .group("requirements-api")
+                .pathsToMatch("/requirements/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi RequirementBoardApi() {
+        return GroupedOpenApi.builder()
+                .group("requirement-board-api")
+                .pathsToMatch("/requirement-board/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi uploadsApi() {
+        return GroupedOpenApi.builder()
+                .group("uploads-api")
+                .pathsToMatch("/uploads/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi messageApi() {
+        return GroupedOpenApi.builder()
+                .group("message-api")
+                .pathsToMatch("/messages/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi adminApi() {
+        return GroupedOpenApi.builder()
+                .group("admin-api")
+                .pathsToMatch("/admin/**")
                 .build();
     }
 

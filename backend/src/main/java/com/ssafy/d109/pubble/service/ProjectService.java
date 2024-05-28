@@ -2,24 +2,33 @@ package com.ssafy.d109.pubble.service;
 
 
 import com.ssafy.d109.pubble.dto.projectDto.*;
+import com.ssafy.d109.pubble.dto.requestDto.NotificationRequestDto;
+import com.ssafy.d109.pubble.dto.responseDto.EditableProjectsResponseDto;
 import com.ssafy.d109.pubble.entity.Project;
 import com.ssafy.d109.pubble.entity.ProjectAssignment;
 import com.ssafy.d109.pubble.entity.Requirement;
 import com.ssafy.d109.pubble.entity.User;
+import com.ssafy.d109.pubble.exception.project.ProjectAccessDeniedException;
+import com.ssafy.d109.pubble.exception.project.ProjectNotFoundException;
+import com.ssafy.d109.pubble.exception.notification.NotificationSendingFailedException;
 import com.ssafy.d109.pubble.repository.ProjectAssignmentRepository;
 import com.ssafy.d109.pubble.repository.ProjectRepository;
 import com.ssafy.d109.pubble.repository.RequirementRepository;
 import com.ssafy.d109.pubble.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.ssafy.d109.pubble.entity.NotificationType.PROJECT;
+
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class ProjectService {
 
     //     비고 | 현재, 프로젝트 = 요구사항 명세서
@@ -28,27 +37,17 @@ public class ProjectService {
     private final ProjectAssignmentRepository projectAssignmentRepository;
     private final RequirementService requirementService;
     private final RequirementRepository requirementRepository;
+    private final NotificationService notificationService;
 
-    private DashboardUserInfo getDashboardUserInfo(User user) {
-        return DashboardUserInfo.builder()
-                .name(user.getName())
-                .employeeId(user.getEmployeeId())
-                .department(user.getDepartment())
-                .position(user.getPosition())
-                .role(user.getRole())
-                .isApprovable(user.getIsApprovable())
-                .profileColor(user.getProfileColor())
-                .build();
-    }
+    private List<UserInfoDto> getDashboardUserInfos(Integer projectId) {
 
-    private List<DashboardUserInfo> getDashboardUserInfos(Integer projectId) {
         List<User> users = projectAssignmentRepository.findUsersByProjectId(projectId);
-        List<DashboardUserInfo> dashboardUserInfos = new ArrayList<>();
+        List<UserInfoDto> userInfoDtos = new ArrayList<>();
         for (User user : users) {
-            dashboardUserInfos.add(getDashboardUserInfo(user));
+            userInfoDtos.add(UserInfoDto.createUserInfo(user));
         }
 
-        return dashboardUserInfos;
+        return userInfoDtos;
     }
 
     public List<ProjectListDto> getProjectList(Integer userId) {
@@ -60,6 +59,7 @@ public class ProjectService {
             float progressRatio = requirementService.getApprovalRatio(project.getProjectId());
 
             ProjectListDto projectListDto = ProjectListDto.builder()
+                    .projectId(project.getProjectId())
                     .prdId(project.getCode())
                     .projectTitle(project.getProjectTitle())
                     .people(people)
@@ -88,8 +88,8 @@ public class ProjectService {
         projectRepository.save(project);
 
         // participants mapping
-        for (int userid : projectCreateDto.getParticipants()) {
-            Optional<User> optionalUser = userRepository.findByUserId(userid);
+        for (String userEID : projectCreateDto.getParticipantsEID()) {
+            Optional<User> optionalUser = userRepository.findByEmployeeId(userEID);
             if (optionalUser.isPresent()) {
                 User user1 = optionalUser.get();
                 ProjectAssignment projectAssignment = ProjectAssignment.builder()
@@ -97,32 +97,62 @@ public class ProjectService {
                         .project(project)
                         .build();
                 projectAssignmentRepository.save(projectAssignment);
+
+                // 알림 메시지 생성 및 발송
+                NotificationRequestDto reqDto = NotificationRequestDto.builder()
+                        .title(projectCreateDto.getProjectTitle())
+                        .message(user1.getName() + " " + user1.getPosition() + "님, '" + project.getProjectTitle() + "' 프로젝트에 참여하게 되었습니다.")
+                        .type("PROJECT")
+                        .build();
+                /*
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        notificationService.sendNotification(reqDto, user1.getEmployeeId());
+                        notificationService.saveNotificationMessage(reqDto.getMessage(), PROJECT, user1.getUserId(), null, project, null, null);
+                    } catch (Exception e) {
+                        log.error("Failed to send notification", e);
+                        throw new NotificationSendingFailedException();
+                    }
+                });
+
+                 */
+
+                try {
+                    notificationService.sendNotification(reqDto, user1.getEmployeeId());
+                    notificationService.saveNotificationMessage(reqDto.getTitle(), reqDto.getMessage(), PROJECT, user1.getUserId(), user.getUserId(), project, null, null);
+                } catch (Exception e) {
+                    log.error("Failed to send notification", e);
+                    throw new NotificationSendingFailedException();
+                }
             }
         }
     }
 
     public ProjectDashboardDto getProjectDashboard(Integer projectId) {
-        Optional<Project> optionalProject = projectRepository.findByProjectId(projectId);
+        Project project = projectRepository.findByProjectId(projectId).orElseThrow(ProjectNotFoundException::new);
+
+        // postponed
+//        if (!projectAssignmentRepository.existsProjectAssignmentByUser_UserIdAndProject_ProjectId(userId, projectId)) {
+//            throw new ProjectAccessDeniedException();
+//        }
+
         ProjectDashboardDto projectDashboardDto = null;
 
-        if (optionalProject.isPresent()) {
-            Project project = optionalProject.get();
-            ProgressRatio progressRatio = requirementService.getProgressRatio(projectId);
-            List<DashboardUserInfo> dashboardUserInfos = getDashboardUserInfos(projectId);
+        ProgressRatio progressRatio = requirementService.getProgressRatio(projectId);
+        List<UserInfoDto> userInfoDtos = getDashboardUserInfos(projectId);
 
-            projectDashboardDto = ProjectDashboardDto.builder()
-                    .projectId(projectId)
-                    .projectTitle(project.getProjectTitle())
-                    .startAt(project.getStartAt())
-                    .endAt(project.getEndAt())
-                    .status(project.getStatus())
-                    .code(project.getCode())
-                    .people(dashboardUserInfos)
-                    .lockRatio(progressRatio.getLockRatio())
-                    .approveRatio(progressRatio.getApprovalRatio())
-                    .changedRatio(progressRatio.getChangeRatio())
-                    .build();
-        }
+        projectDashboardDto = ProjectDashboardDto.builder()
+                .projectId(projectId)
+                .projectTitle(project.getProjectTitle())
+                .startAt(project.getStartAt())
+                .endAt(project.getEndAt())
+                .status(project.getStatus())
+                .code(project.getCode())
+                .people(userInfoDtos)
+                .lockRatio(progressRatio.getLockRatio())
+                .approveRatio(progressRatio.getApprovalRatio())
+                .changedRatio(progressRatio.getChangeRatio())
+                .build();
 
         return projectDashboardDto;
     }
@@ -133,13 +163,13 @@ public class ProjectService {
 
         if (optionalProject.isPresent()) {
             Project project = optionalProject.get();
-            List<DashboardUserInfo> dashboardUserInfos = getDashboardUserInfos(projectId);
+            List<UserInfoDto> userInfoDtos = getDashboardUserInfos(projectId);
             List<RequirementSummaryDto> requirementSummaryDtos = new ArrayList<>();
             List<Requirement> requirements = requirementRepository.findLatestRequirementsForProjectByProjectId(projectId);
 
             for (Requirement requirement : requirements) {
-                DashboardUserInfo managerInfo = getDashboardUserInfo(requirement.getManager());
-                DashboardUserInfo authorInfo = getDashboardUserInfo(requirement.getAuthor());
+                UserInfoDto managerInfo = UserInfoDto.createUserInfo(requirement.getManager());
+                UserInfoDto authorInfo = UserInfoDto.createUserInfo(requirement.getAuthor());
 
                 RequirementSummaryDto requirementSummaryDto = RequirementSummaryDto.builder()
                         .requirementId(requirement.getRequirementId())
@@ -150,7 +180,7 @@ public class ProjectService {
                         .approvalComment(requirement.getApprovalComment())
                         .code(requirement.getCode())
                         .requirementName(requirement.getRequirementName())
-                        .detail(requirement.getDetail())
+                        .details(requirementService.getRequirementDetailDtos(requirement.getRequirementId()))
                         .manager(managerInfo)
                         .targetUser(requirement.getTargetUser())
                         .createdAt(requirement.getCreatedAt())
@@ -168,7 +198,7 @@ public class ProjectService {
                     .endAt(project.getEndAt())
                     .status(project.getStatus())
                     .code(project.getCode())
-                    .people(dashboardUserInfos)
+                    .people(userInfoDtos)
                     /*상단 끝*/
                     .requirementSummaryDtos(requirementSummaryDtos)
                     .build();
@@ -184,5 +214,48 @@ public class ProjectService {
             Project project = optionalProject.get();
             project.setStatus(status);
         }
+    }
+
+    public List<EditableProjectsResponseDto> getEditableProjects(Integer userId) {
+        List<Object[]> projectsAndRequirements = projectRepository.findEditableProjectsAndRequirementsByUserId(userId);
+        List<EditableProjectsResponseDto> dtos = new ArrayList<>();
+
+        for (Object[] pr : projectsAndRequirements) {
+            Project project = (Project) pr[0];
+            Requirement requirement = (Requirement) pr[1];
+
+            EditableProjectsResponseDto dto = EditableProjectsResponseDto.builder()
+                    .projectId(project.getProjectId())
+                    .projectCode(project.getCode())
+                    .requirementId(requirement != null ? requirement.getRequirementId() : null)
+                    .requirementCode(requirement != null ? requirement.getCode() : null)
+                    .build();
+
+            dtos.add(dto);
+        }
+
+        return dtos;
+
+    }
+
+    public List<EditableProjectsResponseDto> getUneditableProjects(Integer userId) {
+        List<Object[]> projectsAndRequirements = projectRepository.findUneditableProjectsAndRequirementsByUserId(userId);
+        List<EditableProjectsResponseDto> dtos = new ArrayList<>();
+
+        for (Object[] pr : projectsAndRequirements) {
+            Project project = (Project) pr[0];
+            Requirement requirement = (Requirement) pr[1];
+
+            EditableProjectsResponseDto dto = EditableProjectsResponseDto.builder()
+                    .projectId(project.getProjectId())
+                    .projectCode(project.getCode())
+                    .requirementId(requirement != null ? requirement.getRequirementId() : null)
+                    .requirementCode(requirement != null ? requirement.getCode() : null)
+                    .build();
+
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 }

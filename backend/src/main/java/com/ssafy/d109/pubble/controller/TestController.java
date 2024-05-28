@@ -19,7 +19,6 @@ import java.util.List;
 
 @RestController
 @Log4j2
-@RequestMapping("/api")
 @CrossOrigin("*")
 public class TestController {
 

@@ -18,7 +18,7 @@ public class ProjectDashboardDto {
     private LocalDateTime endAt;
     private String status;
     private String code;
-    private List<DashboardUserInfo> people;
+    private List<UserInfoDto> people;
     private float lockRatio;
     private float approveRatio;
     private float changedRatio;

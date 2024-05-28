@@ -6,6 +6,7 @@ import com.ssafy.d109.pubble.security.filter.CustomLogoutFilter;
 import com.ssafy.d109.pubble.security.filter.JWTFilter;
 import com.ssafy.d109.pubble.security.filter.LoginFilter;
 import com.ssafy.d109.pubble.security.jwt.JWTUtil;
+import com.ssafy.d109.pubble.service.NotificationService;
 import com.ssafy.d109.pubble.util.CommonUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,13 +37,15 @@ public class SecurityConfig {
     private final JWTUtil jwtUtil;
     private RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil,RefreshTokenRepository refreshTokenRepository, UserRepository userRepository, NotificationService notificationService) {
         this.authenticationConfiguration = authenticationConfiguration;
         this.jwtUtil = jwtUtil;
         this.refreshTokenRepository = refreshTokenRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     @Bean
@@ -63,7 +68,7 @@ public class SecurityConfig {
 //        http.logout((logout) -> logout.disable());
 
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/hash", "/api/users/**","/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**").permitAll()
+                .requestMatchers("/hash", "/api/users/signin", "/api/users/refresh", "/api/hash","/api/projects/**","/api-docs/**", "/v3/**","api/api-docs/**", "/api/v3/**", "/ws").permitAll()
                 .requestMatchers("/api/admin").hasRole("ADMIN")
                 .anyRequest().authenticated());
 
@@ -71,35 +76,33 @@ public class SecurityConfig {
 
         // 로그인 경로 수정
         LoginFilter loginFilter = new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil,refreshTokenRepository, userRepository);
-        loginFilter.setFilterProcessesUrl("/api/users/signin");
         http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
-        loginFilter.setFilterProcessesUrl("/api/users/signin");
-        http
-                .addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+        loginFilter.setFilterProcessesUrl("/users/signin");
 
         // 로그아웃 경로 수정
         http.logout((logout) -> logout
-                .logoutRequestMatcher(new AntPathRequestMatcher("/api/users/logout"))
+                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
                 .logoutSuccessUrl("/")
                 .invalidateHttpSession(true));
+        http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository, notificationService), LogoutFilter.class);
 
-
-        http
-                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
-
-        http
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.cors((c) -> c.configurationSource(new CorsConfigurationSource() {
             @Override
             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 
+                // setAllowedOrigins
+                List<String> origins = Arrays.asList(
+                        System.getenv("FRONT_BASE"),
+                        System.getenv("FRONT_LOCAL"),
+                        System.getenv("BASE_URL")
+                );
+
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE")));
-                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_LOCAL")));
-//                configuration.setAllowedOrigins(Collections.singletonList(System.getenv("FRONT_BASE_TWO")));
+//                configuration.setAllowedOrigins(origins);
+                configuration.setAllowedOriginPatterns(origins);
                 configuration.setAllowedMethods(Collections.singletonList("*"));
                 configuration.setAllowCredentials(true);
                 configuration.setAllowedHeaders(Collections.singletonList("*"));

@@ -20,6 +20,7 @@ public class RefreshToken {
     private Integer refreshId;
 
     private String employeeId;
+    @Column(name = "refreshToken", length = 10000)
     private String refreshToken;
     private String expiration;
 

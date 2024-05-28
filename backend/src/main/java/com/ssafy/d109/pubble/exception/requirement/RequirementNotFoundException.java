@@ -1,4 +1,4 @@
-package com.ssafy.d109.pubble.exception.Requirement;
+package com.ssafy.d109.pubble.exception.requirement;
 
 public class RequirementNotFoundException extends RuntimeException{
 
