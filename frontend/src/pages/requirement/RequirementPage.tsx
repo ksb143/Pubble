@@ -162,7 +162,7 @@ const RequirementPage = () => {
   // 스레드 생성 함수
   const handleChatClick = async (detailId: number) => {
     try {
-      await createThread(detailId);
+      await createThread(requirementId, detailId);
       toggleDropdown(detailId); // 스레드 생성 버튼 클릭 시 드롭다운 닫기
       setThreadsUpdated((prev) => !prev); // 상태 플립하여 useEffect 트리거
       setIsThreadsOpen(true); // 스레드 열기

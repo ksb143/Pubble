@@ -23,7 +23,8 @@ export const sendMessage = async (
   title: string,
   content: string,
 ) => {
-  await privateApi.post(`/messages/${employeeId}`, {
+  await privateApi.post(`/messages`, {
+    employeeId: employeeId,
     title: title,
     content: content,
   });

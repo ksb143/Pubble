@@ -26,35 +26,36 @@ export const lockRequirement = async (
 // 스레드 조회 함수
 export const getThread = async (requirementId: number) => {
   const { data } = await privateApi.get(
-    `/requirements/details/requirements-all-threads/${requirementId}`,
+    `/requirement-board/${requirementId}`,
   );
   return data;
 };
 
 // 스레드 생성 함수
-export const createThread = async (detailId: number) => {
+export const createThread = async (requirementId: number, detailId: number) => {
   const { data } = await privateApi.post(
-    `/requirements/details/${detailId}/threads`,
+    `/requirement-board/${requirementId}/details/${detailId}/user-threads`,
   );
   return data;
 };
 
 // 댓글 작성 함수
 export const createComment = async (
-  threadId: number,
+  requirementId: number,
+  userThreadId: number,
   CommentData: CommentData,
 ) => {
   const { data } = await privateApi.post(
-    `/requirements/details/threads/${threadId}/comments`,
+    `/requirement-board/${requirementId}/user-threads/${userThreadId}/comments`,
     CommentData,
   );
   return data;
 };
 
 // 스레드 잠금 함수
-export const lockThread = async (userThreadId: number) => {
-  const { data } = await privateApi.put(
-    `/requirements/details/threads/${userThreadId}/lock`,
+export const lockThread = async (requirementId: number, userThreadId: number) => {
+  const { data } = await privateApi.patch(
+    `/requirement-board/${requirementId}/user-threads/${userThreadId}/lock`,
   );
   return data;
 };
@@ -77,8 +78,8 @@ export const updateRequirementDetailStatus = async (
   detailId: number,
   command: string,
 ) => {
-  const { data } = await privateApi.put(
-    `/projects/reuqirements/${requirementId}/details/${detailId}/status`,
+  const { data } = await privateApi.patch(
+    `/requirement-board/${requirementId}/details/${detailId}/status`,
     { command },
   );
   return data;

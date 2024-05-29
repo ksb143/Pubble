@@ -135,7 +135,7 @@ const Thread = ({
         projectId: projectId,
         requirementId: requirementId,
       };
-      createComment(data[0].userThreadId, commentData);
+      createComment(requirementId, data[0].userThreadId, commentData);
       setCommentInput('');
       setSelectedUser({
         isMentioned: false,
@@ -164,7 +164,7 @@ const Thread = ({
   // 요구사항 잠금 함수
   const handleThreadLock = async () => {
     try {
-      await lockThread(data[0].userThreadId);
+      await lockThread(requirementId, data[0].userThreadId);
       setAlertModalProps({
         text: '스레드 잠금 성공',
         buttonsType: 'autoclose',
