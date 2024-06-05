@@ -14,12 +14,20 @@ type UserStore = {
   position: string;
   profileColor: string;
   textColor: string;
+  userId: number;
+  allowedDocumentNames: string[];
+  role: string;
+  isApprovable: 'y' | 'n';
   setName: (name: string) => void;
   setEmployeeId: (employeeId: string) => void;
   setDepartment: (department: string) => void;
   setPosition: (position: string) => void;
   setProfileColor: (color: string) => void;
   setTextColor: (color: string) => void;
+  setAllowedDocumentNames: (names: string[]) => void;
+  setUserId: (userId: number) => void;
+  setRole: (role: string) => void;
+  setIsApprovable: (isApprovable: 'y' | 'n') => void;
 };
 
 const useUserStore = create<UserStore>((set) => ({
@@ -29,6 +37,10 @@ const useUserStore = create<UserStore>((set) => ({
   department: '',
   employeeId: '',
   position: '',
+  userId: 0,
+  allowedDocumentNames: [],
+  role: '',
+  isApprovable: 'n',
   setName: (name: string) => set({ name }),
   setEmployeeId: (employeeId: string) => set({ employeeId }),
   setDepartment: (department: string) => set({ department }),
@@ -39,6 +51,11 @@ const useUserStore = create<UserStore>((set) => ({
     set({ profileColor: color, textColor });
   },
   setTextColor: (color: string) => set({ textColor: color }),
+  setAllowedDocumentNames: (names: string[]) =>
+    set({ allowedDocumentNames: names }),
+  setUserId: (userId: number) => set({ userId }),
+  setRole: (role: string) => set({ role }),
+  setIsApprovable: (isApprovable: 'y' | 'n') => set({ isApprovable }),
 }));
 
 export default useUserStore;

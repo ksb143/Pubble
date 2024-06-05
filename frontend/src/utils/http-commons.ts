@@ -7,12 +7,14 @@ interface ApiConfig {
   baseURL: string;
   withCredentials?: boolean;
   headers?: Record<string, string>;
+  flag?: boolean;
 }
 
 const createApi = ({
   baseURL,
   withCredentials,
-  headers = {},
+  headers,
+  flag,
 }: ApiConfig): AxiosInstance => {
   const api = axios.create({
     baseURL,
@@ -21,7 +23,7 @@ const createApi = ({
   });
 
   api.interceptors.request.use((config) => {
-    if (withCredentials) {
+    if (flag) {
       const accessToken = localStorage.getItem('accessToken');
       if (accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
@@ -30,7 +32,7 @@ const createApi = ({
     return config;
   });
 
-  if (withCredentials) {
+  if (flag) {
     api.interceptors.response.use(
       (response) => response,
       async (error) => {
@@ -79,8 +81,9 @@ export const noneApi = createApi({
 // 토큰 존재하지 않는 api ex. 회원가입, 로그인
 export const publicApi = createApi({
   baseURL: VITE_API_URI,
-  withCredentials: false,
+  withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
+  flag: false,
 });
 // 토큰 존재하는 api
 export const privateApi = createApi({
@@ -89,4 +92,5 @@ export const privateApi = createApi({
   headers: {
     'Content-Type': 'application/json',
   },
+  flag: true,
 });

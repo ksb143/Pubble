@@ -24,6 +24,17 @@ const oldConfig = {
       boxShadow: {
         custom: '0px 0px 8px rgba(0, 0, 0, 0.12)',
       },
+      keyframes: {
+        'badge-ping': {
+          '0%': { transform: 'scale(1)', opacity: 1 },
+          '33%': { transform: 'scale(2)', opacity: 0 },
+          '33.1%, 100%': { transform: 'scale(1)', opacity: 0 },
+        },
+      },
+      animation: {
+        // 알림 배지 1초동안 퍼지고, 2초동안 대기, 무한반복
+        'badge-ping': 'badge-ping 3s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
     },
   },
   plugins: [],
