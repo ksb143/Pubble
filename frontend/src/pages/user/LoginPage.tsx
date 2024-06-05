@@ -1,5 +1,5 @@
 // 1. react
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // 2. library
 import { AxiosError } from 'axios';
@@ -9,7 +9,7 @@ import { login } from '@/apis/user';
 // 4. store
 import useUserStore from '@/stores/userStore';
 // 5. component
-import ErrorAlertModal from '@/components/layouts/ErrorAlertModal.tsx';
+import ErrorAlertModal from '@/components/layout/ErrorAlertModal.tsx';
 // 6. assets
 import loginAnimation from '@/assets/lotties/login.json';
 
@@ -27,6 +27,10 @@ const LoginPage = () => {
     setEmployeeId,
     setDepartment,
     setPosition,
+    setAllowedDocumentNames,
+    setUserId,
+    setRole,
+    setIsApprovable,
   } = useUserStore();
 
   // 로티 기본 옵션
@@ -68,6 +72,7 @@ const LoginPage = () => {
     try {
       const data = await login(loginEmployeeId, password);
       localStorage.setItem('accessToken', data.resData.accessToken);
+      localStorage.setItem('userId', loginEmployeeId);
       const decodeToken = parseJwt(data.resData.accessToken);
       // 이름, id, 부서, 직급, 고유 색 스토어 설정
       setName(decodeToken.name);
@@ -75,6 +80,12 @@ const LoginPage = () => {
       setDepartment(decodeToken.department);
       setPosition(decodeToken.position);
       setProfileColor(decodeToken.profileColor);
+      setAllowedDocumentNames(decodeToken.allowedDocumentNames);
+      setUserId(decodeToken.userId);
+      setUserId(decodeToken.userId);
+      setRole(decodeToken.role);
+      setIsApprovable(decodeToken.isApprovable);
+
       // 성공 후 페이지 리다이렉션
       navigate('/main');
     } catch (error: unknown) {
@@ -107,8 +118,16 @@ const LoginPage = () => {
     setIsError(false);
   };
 
+  // 엔터키 입력 시 로그인 함수
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') {
+      handleLogin();
+    }
+  };
   return (
-    <div className='mx-12 grid h-screen grid-cols-12 items-center'>
+    <div
+      className='mx-12 grid h-screen grid-cols-12 items-center'
+      onKeyDown={handleKeyDown}>
       {isError && (
         <ErrorAlertModal isOpen={isError} closeDialog={handleCloseDialog}>
           {error}
