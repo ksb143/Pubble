@@ -15,13 +15,13 @@ self.addEventListener('activate', function (e) {
 
 // Firebase 설정 값
 const firebaseConfig = {
-  apiKey: 'AIzaSyA-jlbMvTl34uffdBao_ToX8cxDwqSiA4k',
-  authDomain: 'pubble-push.firebaseapp.com',
-  projectId: 'pubble-push',
-  storageBucket: 'pubble-push.appspot.com',
-  messagingSenderId: '36975261213',
-  appId: '1:36975261213:web:c89c3c83722c542d9678f4',
-  measurementId: 'G-RDDYCM82CV',
+  apiKey: '', // Your API Key
+  authDomain: '', // Your Auth Domain
+  projectId: '', // Your Project ID
+  storageBucket: '', // Your Storage Bucket
+  messagingSenderId: '', // Your Messaging Sender ID
+  appId: '', // Your App ID
+  measurementId: '', // Your Measurement ID
 };
 
 // Firebase SDK 초기화
