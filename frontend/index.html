@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pubble</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Firebase Service Worker 등록
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/firebase-messaging-sw.js').then(
+            () => {
+              console.log('ServiceWorker 등록 성공');
+            },
+            (err) => {
+              console.log('ServiceWorker 등록 실패: ', err);
+            },
+          );
+        });
+      } else {
+        console.log('이 브라우저는 Service Worker를 지원하지 않습니다.');
+      }
+    </script>
+  </body>
+</html>

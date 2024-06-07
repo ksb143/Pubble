@@ -1,0 +1,74 @@
+config:
+  import:
+    classpath:
+      application-secret.yml
+
+server:
+  port: 9091
+  servlet:
+    context-path: /api
+  #Access logging
+  tomcat:
+    basedir: .                              # access log를 저장할 base directory 지정
+    accesslog:
+      enabled: true                         # access log 저장 여부 (default: false)
+      directory: logs                       # access log를 저장할 상세 directory (base directory에 기반한) (default: logs)
+      pattern: '%h %l %u %t "%r" %s %b %D'  # access log 출력 패턴
+      prefix: access                        # access log 파일이름 prefix
+      suffix: .log                          # access log 파일이름 suffix (확장자 포함)
+
+spring:
+  application:
+    name: pubble
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+
+  datasource:
+    url: ENC(4e8GH8J5pBy/EVDqV7y5sTnjGKiTYjvrWqp+lOPA9om0VmnUrinZZgWQXVwhsLQ6GPT/TpytbUI=)
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ENC(mCoXDUfo7pgBQiB1UgTEsQ==)
+    password: ENC(ebSdgNbER/IlSSpsoLo0LjXXgGjBobLw)
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        default_batch_fetch_size: 100
+
+  jwt:
+    secret: ENC(Uai6z1AChaeZrwQSWvhAkrwFO5fSH3lffVOYL1SCoTPyXpYqp9QHhPfXhc7HvdnDLcU+DYFhe+VCNIZtYgaYQMdQl9I4CafZZ+atB9TNChdyhmXliKiqtFny0kU9Zdat)
+
+
+
+
+springdoc:
+  swagger-ui:
+    path: /v3/api-docs
+
+cloud:
+  aws:
+    s3:
+      bucket: pubble
+      base-url: https://pubble.s3.ap-northeast-2.amazonaws.com/
+    credentials:
+      access-key: ENC(77Tj4QvKoqtOdQydOj7AU9lxFsYdHc2vDNGs8smEDrs=)
+      secret-key: ENC(aaJkCiiOLwOARpZkUAlw3ciq4bkLftCgahPSBYS/v571HA6UlSIVUnYzXMHK5b0qmrdrWYTHgXM=)
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+debug:
+  true
+
